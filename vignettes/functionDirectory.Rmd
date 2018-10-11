@@ -1,0 +1,36 @@
+---
+title: "demos"
+author: "Cory Merow"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{rangeModelMetadata R package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+INTRO
+
+##Function Directory
+For full information on each function, see the associated help file.
+
+
+##Function Types
+<!-- * `rmm` Primary functions are the most commonly used functions in the package and are usually where you start. -->
+
+###Primary functions
+<!-- * `rmmTemplate` Creates an empty `rmm` object that can then be populated by the user. -->
+<!-- * `rmmPrintFull` Prints only the rmm fields that have been populated. -->
+<!-- * `rmmPrintEmpty` Checks for empty values in the rmm object. -->
+<!-- * `rmmSuggest` Provides suggested values for rmm object fields. -->
+
+
+###Other function groups
+
+
+
+
