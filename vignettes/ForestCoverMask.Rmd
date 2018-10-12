@@ -1,0 +1,31 @@
+---
+title: "Masking with Forest Cover"
+author: "Cory Merow"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    fig_caption: yes
+    toc: true
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{An overview of making rangeModelMetadata objects}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+```{r,results='hide'}
+library(maskedRangeR)
+library(raster)
+```
+
+## Background
+
+The Olinguito is a new species of carnivore recently described from museum specimens that were previously identified as something else. The Olinguito lives in Northern Andean cloud forests in Colombia and Ecuador, and, according to experts, apparently has strict tolerances for forest cover. Limited recent occurrence records (n = 18) allow for very simple data-driven masking based on observed ranges of forest cover, but likely represent too few to use in model calibration. The data-driven determination of thresholds for masking using recent records represents a simple, conservative methodology that can be used for many species with few (precious) recent records, and also will prove useful for processing of expert range maps or other pre-existing range estimates (that do not take into account human modifications of the environment). A 30 arc-second Bioclimatic-variable climate-based Maxent ENM was tuned for the Olinguito using a mix of historical data paired with field notes, as well as contemporary citizen science records associated with photo-vouchers. The ENM was trained on 0.7 degree buffered circles around occurrence records and then projected to an area encompassing 5 degrees (bounding box) around occurrence records. We then removed areas from the ENM representing biogeographic regions where the species has not been documented like the Eastern Cordillera of Colombia and other small non-contiguous areas. We then used remotely sensed products (MODIS Vegetation Continuous Fields; 250 m from the years matching the most recent occurrence records: 2006-2016) concerning the yearly percent forest cover of the region for post processing of the final ENM. The MODIS rasters from different years were not all aligned with one another and had to be realigned to create a raster stack for R. A subset of the more recent occurrence records (2006-2016) were then temporally-matched with forest cover rasters to obtain values of forest cover per occurrence (one record was excluded because it was based on an observation that seemed like roadkill; Saavedra-Rodríguez & Velandia-Perilla, 2011). The forest cover values at occurrence records were then assessed across all years, and the minimum value was used to generate a forest cover threshold (binary mask) for the most recent year (2010). After resampling the ENM to match the resolution of the MODIS data, this threshold of forest cover was used as a mask to reduce the ENM’s spatial prediction to only those climatically suitable areas where observed forest cover above the threshold exists. This reduced ENM shows a conservative estimation of the species range given current non-climatic variables that represent anthropogenic modification of land cover. 
+ <!-- We tested for any correlation between the forest layers and the climate layers used in the ENM to ensure they are contributing different information.  -->
+
+
