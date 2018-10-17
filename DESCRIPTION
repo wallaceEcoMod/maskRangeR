@@ -13,8 +13,8 @@ Imports:
     virtualspecies,
     tidyverse,
     lubridate,
-    dplyr,
-    utils
+    utils,
+    magrittr
 Suggests:
     testthat,
     knitr,

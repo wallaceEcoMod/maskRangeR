@@ -1,0 +1,37 @@
+---
+title: "Masking based on expert opinion"
+author: "Cory Merow"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    fig_caption: yes
+    toc: true
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{An overview of making rangeModelMetadata objects}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+  
+```{r setup, include=FALSE,results='hide'}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+```{r,results='hide'}
+library(maskedRangeR)
+library(raster)
+```
+
+# Background 
+BioModelos is a web app for the collaborative development of species distribution models. In BioModelos, taxonomic/ecology/biogeography experts aid in 1) cleaning occurrence data; 2) identifying species’ suitable land covers; 4) selecting adequate omission thresholds to create binary models 5) identifying species’ accessible areas as well as areas of model over and underprediction and 6) qualitatively evaluating the biological realism of resulting model predictions. A complete description of BioModelos is available at https://www.biorxiv.org/content/early/2018/10/05/432617.
+
+This use case concerns processing of expert inputs in step 5. Using web tools available in BioModelos an expert may draw a polygon on top of a geographic viewer to indicate a species A) Accessible area B) An area that must be removed from a model or C) an area that must be added to a model. The Howling Monkey, Alouatta seniculus, exemplifies a situation in which the three inputs were gathered from experts. This species occurs in Colombia, Ecuador, Peru, Venezuela and Brazil (IUCN 2018). In Colombia they are widely distributed occurring from 0-3200 masl and apparently absent from the Choco biogeographic region, likely due to the dominance of closed canopies in the region to which Alouatta palliata is better adapted, but not to barriers to A. seniculus dispersal (Defler 2010). 
+
+Records for A. seniculus in Colombia were curated independently by the colombian primatology association and records from outside of colombia were curated by the primates expert group of BioModelos using the web app. A model for the distribution of this species was built using a background area from north Peru to south Costa Rica and limiting to the west with Venezuela. The rationale for this was that given the wide altitudinal range of the species it didn’t seem like there was any geographic barrier limiting A. seniculus dispersal in this region, but rather habitat preferences. Modeling done in Maxent and ENMeval was used to select optimum feature/regularization values using checkerboard2 to partition records and AUCtest as evaluation criterion. The final model was run using all available occurrences and the regularization and feature combination with the highest AUC in model testing. Experts in the primates group selected the minimum training presence threshold as the threshold that best represented the prevalence of suitable climatic conditions for the species in the country. However, they also identified areas of model over and underprediction once the model was thresholded. Therefore models were post-processed, as described in https://github.com/LBAB-Humboldt/modeling/tree/master/primates
+
+In summary the following steps had to be performed to improve the generated model
+
+1.   Add polygon: in some cases an expert may consider that a model underpredicts the suitable area for a species. For example, when modeling the Howling Monkey (Alouatta seniculus) in Colombia there were gaps in the distribution of this species in the Amazon, that were judged by experts as errors. Therefore, they may add those missing areas to the model by directly drawing a polygon onto a map, indicating that values in the area should change to 1. See link for illustration.
+3.   Remove polygon: in some other cases, experts may consider that the model is predicting an area where the species’ presence is not possible. Again, for the Howling Monkey (Alouatta seniculus), experts considered that predictions of the distribution of this species in the Guajira peninsula were unlikely. They opted to remove that area from the model by drawing a polygon into the map indicating that in the area model values should be 0.
+4.   Clip model: models may also need to be clipped to 1) drawn polygon; 2) user provided shapefile; 3) user provided list of land covers. In the howling monkey example we clipped first by an user drawn M and later by national boundaries (as we were not interested in predictions beyond Colombia). Later (not shown), we clipped that map using a list of land covers suitable for the species, as defined by experts, using a national land cover map. 

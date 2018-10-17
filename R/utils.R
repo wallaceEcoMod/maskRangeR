@@ -1,48 +1,50 @@
 #=========================================================================================
 #=======================================================================================
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 .reDate <- function(datedOccs, dateScale){
-  #require(dplyr)
+  long=lat=date=parse_date_time=ymd=year=month=day=NULL # trick for check
   if(dateScale == "year"){
-    return(datedOccs %>% dplyr::select(long,lat,date) %>%
-             dplyr::mutate(date = as.Date(paste0(date, "-01-01"))) %>%
-             dplyr::mutate(years = year(date)))
+    out=datedOccs %>% dplyr::select(long,lat,date) %>%
+      dplyr::mutate(date = as.Date(paste0(date, "-01-01"))) %>%
+      dplyr::mutate(years = lubridate::year(date))
   }
   if(dateScale == "month"){
-    return(datedOccs %>% dplyr::select(long,lat,date) %>%
-             dplyr::mutate(date = parse_date_time(date, "ym")) %>%
-             dplyr::mutate(months = month(date)) %>%
-             dplyr::mutate(years = year(date)))
+    out=datedOccs %>% dplyr::select(long,lat,date) %>%
+      dplyr::mutate(date = parse_date_time(date, "ym")) %>%
+      dplyr::mutate(months = lubridate::month(date)) %>%
+      dplyr::mutate(years = lubridate::year(date))
   }
   if(dateScale == "day"){
-    return(datedOccs %>% dplyr::select(long,lat,date) %>%
-             dplyr::mutate(date = ymd(date)) %>%
-             dplyr::mutate(years = year(date)) %>% 
-             dplyr::mutate(months = month(date)) %>%
-             dplyr::mutate(days = day(date)))
+    out=datedOccs %>% dplyr::select(long,lat,date) %>%
+      dplyr::mutate(date = lubridate::ymd(date)) %>%
+      dplyr::mutate(years = lubridate::year(date)) %>% 
+      dplyr::mutate(months = lubridate::month(date)) %>%
+      dplyr::mutate(days = lubridate::day(date))
   }
+  return(out)
 }
 
 #=========================================================================================
 #=======================================================================================
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 .uniDates<-function(occ1, dateScale){
-  #require(dplyr)
+  years=days=NULL # trick for check
   if (dateScale == "year"){
-    return(dplyr::arrange(unique(dplyr::select(occ1, years)), years))
+    out=dplyr::arrange(unique(dplyr::select(occ1, years)), years)
   } 
   if (dateScale == "month"){
-    return(dplyr::arrange(unique(dplyr::select(occ1, years, months)), years))
+    out=dplyr::arrange(unique(dplyr::select(occ1, years, months)), years)
   } 
   if (dateScale == "day"){
-    return(dplyr::arrange(unique(dplyr::select(occ1, years, months, days)), years))
+    out=dplyr::arrange(unique(dplyr::select(occ1, years, months, days)), years)
   }
+  return(out)
 }
 #=========================================================================================
 #=======================================================================================
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 .parseDate <- function(dateScale, occ1, uniqueDates){
-  #require(dplyr)
+  years=days=NULL # trick for check
   t1 <- NULL
   if (dateScale == "year"){
     for (i in 1:nrow(uniqueDates)){
@@ -64,14 +66,15 @@
 }
 #=========================================================================================
 #=======================================================================================
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 .valExtract <- function(occ3, RSenv){
-  #require(dplyr)
-  occ4 <- lapply(occ3, function(x) x %>% dplyr::select(.data$long, .data$lat))
+  lat=long=NULL # trick for check
+  occ4 <- lapply(occ3, function(x) x %>% dplyr::select(long, lat))
   vals <- mapply(raster::extract, utils::unstack(RSenv), occ4)
   lowerBound <- min(unlist(vals))
   upperBound <- max(unlist(vals))
-  return(as.data.frame(cbind(lowerBound, upperBound)))
+  out=as.data.frame(cbind(lowerBound, upperBound))
+  return(out)
 }
 
 #=========================================================================================

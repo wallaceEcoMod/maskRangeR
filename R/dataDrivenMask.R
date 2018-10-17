@@ -9,18 +9,17 @@
 #' @param Model A raster file (generally in continuous output) with extent, resolution, etc. matching RSenv.
 #' @param Bounds User selects which bounds observed for the species are limiting: "upper", "lower", "both"
 #'         
-#' @author Peter Galante <pgalante[at]amnh.org>
+#' @author Peter Galante <pgalante@@amnh.org>
 #' 
 ##########################################################################################
 #############################  MASTER FUNCTION TO MASK MODEL OUTPUT  #####################
 ##########################################################################################
 RSmask<-function(datedOccs, RSenv, dateScale, Model, Bounds){
-  require(dplyr)
   ###############################################################################
   ### Extract occs into sub-tables based on dates (here, using only year)  ######
   ##############  Eventually, find online RS data for tutorial  #################
   ##  First parse out the dates into the appropriate dateScale (year, month, date)
-  occ1 <- .reDate(datedOccs = datedOccs, dateScale = 'year')
+  occ1 <- .reDate(datedOccs = datedOccs, dateScale = dateScale)
   ##  Next, for each appropriate dateScale, get unique dates
   uniqueDates <- .uniDates(occ1 = occ1, dateScale = dateScale)
   ##  Last, for each unique date, create different tibbles
