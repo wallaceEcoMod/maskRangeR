@@ -29,5 +29,6 @@ RSmask<-function(datedOccs, RSenv, dateScale, Model, Bounds){
   ###############################################################################
   ######### Use bounds to set mask limits and create mask  ######################
   ulBounds <-.valExtract(occ3, RSenv)
-  .dataMask(RSenv, ulBounds, Model, Bounds)
+  out=.dataMask(RSenv, ulBounds, Model, Bounds)
+  return(out)
 }

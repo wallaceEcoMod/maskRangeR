@@ -1,0 +1,135 @@
+---
+title: "Masking with Forest Cover"
+author: "Cory Merow"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    fig_caption: yes
+    toc: true
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{An overview of making rangeModelMetadata objects}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+# navlink: "[NAVTITLE](http://NAVLINK/)"
+# og:
+#   type: "article"
+#   title: "opengraph title"
+#   url: "optional opengraph url"
+#   image: "optional opengraph image link"
+#   toc: true 
+#   toc_depth: 3 
+# footer:
+#   - content: '[link1](http://example.com/) • [link2](http://example.com/)<br/>'
+#   - content: 'Copyright blah blah'
+# date: "`r Sys.Date()`"
+# output: markdowntemplates::skeleton
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+<!-- ========================================================================== -->
+<!-- ========================================================================== -->
+<!-- ========================================================================== -->
+# Forest Cover
+
+## Background
+
+The Olinguito is a new species of carnivore recently described from museum specimens that were previously identified as something else. The Olinguito lives in Northern Andean cloud forests in Colombia and Ecuador, and, according to experts, apparently has strict tolerances for forest cover. Limited recent occurrence records (n = 18) allow for very simple data-driven masking based on observed ranges of forest cover, but likely represent too few to use in model calibration. The data-driven determination of thresholds for masking using recent records represents a simple, conservative methodology that can be used for many species with few (precious) recent records, and also will prove useful for processing of expert range maps or other pre-existing range estimates (that do not take into account human modifications of the environment). A 30 arc-second Bioclimatic-variable climate-based Maxent ENM was tuned for the Olinguito using a mix of historical data paired with field notes, as well as contemporary citizen science records associated with photo-vouchers. The ENM was trained on 0.7 degree buffered circles around occurrence records and then projected to an area encompassing 5 degrees (bounding box) around occurrence records. We then removed areas from the ENM representing biogeographic regions where the species has not been documented like the Eastern Cordillera of Colombia and other small non-contiguous areas. We then used remotely sensed products (MODIS Vegetation Continuous Fields; 250 m from the years matching the most recent occurrence records: 2006-2016) concerning the yearly percent forest cover of the region for post processing of the final ENM. The MODIS rasters from different years were not all aligned with one another and had to be realigned to create a raster stack for R. A subset of the more recent occurrence records (2006-2016) were then temporally-matched with forest cover rasters to obtain values of forest cover per occurrence (one record was excluded because it was based on an observation that seemed like roadkill; Saavedra-Rodríguez & Velandia-Perilla, 2011). The forest cover values at occurrence records were then assessed across all years, and the minimum value was used to generate a forest cover threshold (binary mask) for the most recent year (2010). After resampling the ENM to match the resolution of the MODIS data, this threshold of forest cover was used as a mask to reduce the ENM’s spatial prediction to only those climatically suitable areas where observed forest cover above the threshold exists. This reduced ENM shows a conservative estimation of the species range given current non-climatic variables that represent anthropogenic modification of land cover. 
+ <!-- We tested for any correlation between the forest layers and the climate layers used in the ENM to ensure they are contributing different information.  -->
+
+```{r}
+library(raster)
+library(maskedRangeR)
+dataDir='/Users/ctg/Dropbox/Projects/Wallace/maskedRangeR_Misc/UseCaseData/dataDriven/olinguito/'
+# need to move this data to the package when its smaller
+```
+
+```{r}
+RSenv =stack(paste0(dataDir,'/olinguito_Modis.tif'))
+envDates=c('2005','2006','2008','2009','2010')
+
+datedOccs <- read.csv(paste0(dataDir,'All_new_records_by_year.csv'))
+coordinates(datedOccs)=c('long','lat')
+#we're assuming you've already got the points in the same projection as the rasters
+projection(datedOccs)=projection(RSenv)
+
+#dateScale = "year"
+sdm = raster(paste0(dataDir,'olinguito_SDM.tif'))
+
+# try just matching dates between envDates and the occurrence dates
+#year(parse_date_time(envDates, orders = c("Y", "Ym")))xxx
+uniqueDates=unique(datedOccs$date)
+out=unlist(lapply(seq_along(uniqueDates),function(x,datedOccs,envDates,RSenv){
+  pts=subset(datedOccs,date==uniqueDates[x])
+  keep=match(uniqueDates[x],envDates)
+  if(is.na(keep)) {
+    warning('Some env layers were missing that correspond to the dates in your occurrence points')
+    out=rep(NA,nrow(pts))
+    return(out)
+  }
+  if(length(keep)>1) stop('Multiple dates in your environmental layers correspond 
+                            to the dates for your occurrences; make sure your 
+                            environmental layers have unique dates')
+  raster::extract(RSenv[[keep]],pts)
+},datedOccs=datedOccs,envDates=envDates,RSenv=RSenv))
+datedOccs$forest=out
+# rsTest <- RSmask(datedOccs = datedOccs, 
+#                  RSenv = RSenv, 
+#                  dateScale = dateScale, 
+#                  Model = sdm, 
+#                  Bounds = "lower")
+```
+
+<!-- ========================================================================== -->
+<!-- ========================================================================== -->
+<!-- ========================================================================== -->
+# Expert Maps
+
+
+```{r,results='hide'}
+library(maskedRangeR)
+library(raster)
+```
+
+# Background 
+BioModelos is a web app for the collaborative development of species distribution models. In BioModelos, taxonomic/ecology/biogeography experts aid in 1) cleaning occurrence data; 2) identifying species’ suitable land covers; 4) selecting adequate omission thresholds to create binary models 5) identifying species’ accessible areas as well as areas of model over and underprediction and 6) qualitatively evaluating the biological realism of resulting model predictions. A complete description of BioModelos is available at https://www.biorxiv.org/content/early/2018/10/05/432617.
+
+This use case concerns processing of expert inputs in step 5. Using web tools available in BioModelos an expert may draw a polygon on top of a geographic viewer to indicate a species A) Accessible area B) An area that must be removed from a model or C) an area that must be added to a model. The Howling Monkey, Alouatta seniculus, exemplifies a situation in which the three inputs were gathered from experts. This species occurs in Colombia, Ecuador, Peru, Venezuela and Brazil (IUCN 2018). In Colombia they are widely distributed occurring from 0-3200 masl and apparently absent from the Choco biogeographic region, likely due to the dominance of closed canopies in the region to which Alouatta palliata is better adapted, but not to barriers to A. seniculus dispersal (Defler 2010). 
+
+Records for A. seniculus in Colombia were curated independently by the colombian primatology association and records from outside of colombia were curated by the primates expert group of BioModelos using the web app. A model for the distribution of this species was built using a background area from north Peru to south Costa Rica and limiting to the west with Venezuela. The rationale for this was that given the wide altitudinal range of the species it didn’t seem like there was any geographic barrier limiting A. seniculus dispersal in this region, but rather habitat preferences. Modeling done in Maxent and ENMeval was used to select optimum feature/regularization values using checkerboard2 to partition records and AUCtest as evaluation criterion. The final model was run using all available occurrences and the regularization and feature combination with the highest AUC in model testing. Experts in the primates group selected the minimum training presence threshold as the threshold that best represented the prevalence of suitable climatic conditions for the species in the country. However, they also identified areas of model over and underprediction once the model was thresholded. Therefore models were post-processed, as described in https://github.com/LBAB-Humboldt/modeling/tree/master/primates
+
+In summary the following steps had to be performed to improve the generated model
+
+1.   Add polygon: in some cases an expert may consider that a model underpredicts the suitable area for a species. For example, when modeling the Howling Monkey (Alouatta seniculus) in Colombia there were gaps in the distribution of this species in the Amazon, that were judged by experts as errors. Therefore, they may add those missing areas to the model by directly drawing a polygon onto a map, indicating that values in the area should change to 1. See link for illustration.
+3.   Remove polygon: in some other cases, experts may consider that the model is predicting an area where the species’ presence is not possible. Again, for the Howling Monkey (Alouatta seniculus), experts considered that predictions of the distribution of this species in the Guajira peninsula were unlikely. They opted to remove that area from the model by drawing a polygon into the map indicating that in the area model values should be 0.
+4.   Clip model: models may also need to be clipped to 1) drawn polygon; 2) user provided shapefile; 3) user provided list of land covers. In the howling monkey example we clipped first by an user drawn M and later by national boundaries (as we were not interested in predictions beyond Colombia). Later (not shown), we clipped that map using a list of land covers suitable for the species, as defined by experts, using a national land cover map. 
+
+
+<!-- ========================================================================== -->
+<!-- ========================================================================== -->
+<!-- ========================================================================== -->
+
+# Biotic interactions
+```{r,results='hide'}
+library(maskedRangeR)
+library(raster)
+dataDir='/Users/ctg/Dropbox/Projects/Wallace/maskedRangeR_Misc/UseCaseData/dataDriven/heteromys/'
+```
+
+# Background
+The spiny pocket mice (Heteromys spp. and Liomys spp.) are distributed from southern Texas to northern South America. All known species exhibit parapatry with their neighbors, which is likely caused by competition for resources and/or suitable habitat. This situation of congeneric species replacing each other across space is extremely common, and hence the methodology used here could make range estimates much more realistic. This research focuses on the distributions of two species in Ecuador: H. australis and H. teleus. H. australis ranges from Venezuela in the east to Ecuador in the south, but here we use high-quality data for the southern part of its range (Ecuador and southwestern Colombia; this situation of a regional model for part of the range represents a common situation, e.g., country-specific range estimates and modeling efforts that support them). H. teleus, found only in Ecuador, was recently discovered and remains very data-poor, with only 10 documented occurrences of varied spatial uncertainty. Sampling efforts for both species span many years, and neither species has ever been detected far within the range of its neighbor, with only a thin region of possible sympatry (or microparapatry) detectable: two sites of apparent sympatry exist near the estimated range boundary. As IUCN geographical estimates for data-poor species may be vast underestimates if convex hulls around known occurrences are used solely to delimit the extent of occurrence -- and conversely, estimates based on predictive models may vastly overestimate ranges if the distribution of the congeneric species is not taken into account --  we seek to improve estimates for both species using predictive models that are post-processed to consider both abiotic and biotic constraints. Because the congeners presumably have bidirectional effects on each other’s ranges, they should not be included in calibrating each other’s SDM (add citations for Soberon/Anderson/Hutchinson in vignette). 
+Specifically, we estimate IUCN’s extent of occurrence (EOO) using convex hulls around both occurrence points (spatial) and around a thresholded SDM (environmental). For both EOO estimates, we then mask out the species’ predicted range using its SDM prediction thresholded by the minimum predicted suitability across all occurrences. Within this predicted range in the EOO, we then mask out biotically unsuitable areas (i.e., those more likely occupied by each species’ parapatric neighbor) to estimate the potential area of occupancy (IUCN’s AOO) in four ways: occupied grid cells, spatial, environmental, and a hybrid of both. The occupied grid cell AOO is recommended for most cases by the IUCN, and involves summing the area of all cells that overlap with species occurrences. The spatial AOO masks out areas predicted to be in the range of the congener using a simple spatial classifier trained with occurrence points of both species. The environmental AOO masks out areas predicted more suitable for the congener via raster algebra of the continuous SDM suitability predictions. The hybrid AOO masks out areas predicted to be in the range of the congener with the same spatial classifier as the spatial AOO, but adds continuous suitabilities predicted by the SDMs as additional predictor variables. The final calculation for AOO sums the area left after masking both with and without present forest cover. Finally, we report the differences in the area of EOO and AOO for both IUCN-recommended methodologies (EOO: convex hull of occurrences; AOO: occupied grid cells) and the masked range estimates. 
+
+```{r}
+source('/Users/ctg/Dropbox/Projects/Wallace/maskedRangeR_Misc/UseCaseData/dataDriven/heteromys/rangeSVM.R')
+# xy1=read.csv(paste0(dataDir,'H_teleus.csv'))
+# xy2=read.csv(paste0(dataDir,'H_australis.csv'))
+# sdm1=raster(paste0(dataDir,'H_teleus_sdmPred.tif'))
+# sdm2=raster(paste0(dataDir,'H_australis_sdmPred.tif'))
+#out=rangeSVM(xy1, xy2, raster::stack(sdm1, sdm2))
+
+```

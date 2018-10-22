@@ -70,7 +70,7 @@
 .valExtract <- function(occ3, RSenv){
   lat=long=NULL # trick for check
   occ4 <- lapply(occ3, function(x) x %>% dplyr::select(long, lat))
-  vals <- mapply(raster::extract, utils::unstack(RSenv), occ4)
+  vals <- mapply(raster::extract, raster::unstack(RSenv), occ4)
   lowerBound <- min(unlist(vals))
   upperBound <- max(unlist(vals))
   out=as.data.frame(cbind(lowerBound, upperBound))
