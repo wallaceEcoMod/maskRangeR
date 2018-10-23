@@ -42,7 +42,7 @@ maskedRangeR=function(potentialDist,
   if(method=='mask'){
     mask.bin=eval(parse(text=logicString))
     if(raster::nlayers(maskLayers)==1){
-      out=raster::mask(potentialDist,mask=mask.bin,maskvalue=1)
+      out=raster::mask(potentialDist,mask=mask.bin,maskvalue=0)
     } else {
       if(!raster::nlayers(potentialDist)==raster::nlayers(maskLayers)) {
         stop('Error: you must either supply a single layer to mask all layers 
@@ -55,7 +55,8 @@ maskedRangeR=function(potentialDist,
     }
   } # end if method=='mask'
   
-  
+  out=stack(out,potentialDist,mask.bin)
+  names(out)=c('maskedDist','potentialDist',paste0(names(maskLayers),'Mask'))
   return(out)
 }
 

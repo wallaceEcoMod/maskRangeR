@@ -13,24 +13,17 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-INTRO
-
-##Function Directory
 For full information on each function, see the associated help file.
 
+##Data driven masking 
 
-##Function Types
-<!-- * `rmm` Primary functions are the most commonly used functions in the package and are usually where you start. -->
+* `annotate` Match raster layers to date associated with point and extract the value of the respective raster at each point
 
-###Primary functions
-<!-- * `rmmTemplate` Creates an empty `rmm` object that can then be populated by the user. -->
-<!-- * `rmmPrintFull` Prints only the rmm fields that have been populated. -->
-<!-- * `rmmPrintEmpty` Checks for empty values in the rmm object. -->
-<!-- * `rmmSuggest` Provides suggested values for rmm object fields. -->
+* `maskedRanger` Makes a mask and masks a potential distribution. 
 
 
-###Other function groups
+##Expert masking 
 
-
+* `rangeSVM` Delineate dinstinct ranges for two species which are known, based on expert expectations, not to co-occur. 
 
 
