@@ -30,6 +30,7 @@ vignettes/*.pdf
 .DS_Store
 .Rbuildignore
 .Rproj.user
-
 ForestCoverMask_cache/
 demos_cache/
+DESCRIPTION
+vignettes/UseCases_cache/

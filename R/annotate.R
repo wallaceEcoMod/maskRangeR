@@ -29,24 +29,37 @@ annotate=function(datedOccs,
                   env,
                   envDates,
                   dateScale){
+  # uses the convention that dates for values indicated by a year are YYYY-01-01
+  # uses the convention that dates for values indicated by a month are YYYY-MM-01
+  if(dateScale=='year') {
+    form="%Y"
+  } else if (dateScale=='month'){
+    form="%Y-%m"
+  } else if (dateScale=='day'){
+    form="%Y-%m-%d"
+  } else { stop('Choose a supported value for dateScale: year, month or day')}
   
-  datedOccs$myDate=unlist(do.call(dateScale,list(datedOccs$date)))
-  uniqueDates=unique(datedOccs$myDate)
-  myEnvDates=unlist(do.call(dateScale,list(envDates)))
-  
-  out=unlist(lapply(seq_along(uniqueDates),function(x,datedOccs,myEnvDates,env){
-    pts=subset(datedOccs,myDate==uniqueDates[x])
+  datedOccs$myDate=format(datedOccs$date,form)
+  uniqueDates=stats::na.omit(unique(datedOccs$myDate))
+  myEnvDates=format(envDates,form)
+
+  out=lapply(seq_along(uniqueDates),function(x,datedOccs,myEnvDates,env){
+    pts=datedOccs[which(datedOccs$myDate==uniqueDates[x]),]
     keep=match(uniqueDates[x],myEnvDates)
     if(is.na(keep)) {
       print(paste0('Environmental layers were missing for date ',uniqueDates[x]) )
-      out=rep(NA,nrow(pts))
-      return(out)
+      pts$env=rep(NA,nrow(pts))
+      return(pts)
     }
     if(length(keep)>1) stop('Multiple dates in your environmental layers correspond 
                             to the dates for your occurrences; make sure your 
                             environmental layers have unique dates')
-    raster::extract(env[[keep]],pts)
-  },datedOccs=datedOccs,myEnvDates=myEnvDates,env=env))
-  datedOccs$env=out
-  return(datedOccs)
+    pts$env=raster::extract(env[[keep]],pts)
+    return(pts)
+  },datedOccs=datedOccs,myEnvDates=myEnvDates,env=env)
+
+  tmp=suppressWarnings(do.call('rbind',out))
+  lost=nrow(datedOccs)-nrow(tmp)
+  if(lost>0) print(paste(lost,'points were omitted because they had no dates'))
+  return(tmp)
 }

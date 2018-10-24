@@ -25,5 +25,6 @@ For full information on each function, see the associated help file.
 ##Expert masking 
 
 * `rangeSVM` Delineate dinstinct ranges for two species which are known, based on expert expectations, not to co-occur. 
+* `rasterizeRangeSVM` Project an SVM across a domain.
 
 

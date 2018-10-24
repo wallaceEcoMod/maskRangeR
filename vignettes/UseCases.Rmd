@@ -46,7 +46,7 @@ Throughout the package, we use the following definitions:
 <!-- ========================================================================== -->
 <!-- ========================================================================== -->
 
-# Forest Cover
+# 1. Forest Cover Mask
 
 ## Background
 
@@ -118,7 +118,7 @@ plot(maskedDist[[1]],col=c(grey(.6),'red1'),main='Masked Distribution')
 <!-- ========================================================================== -->
 <!-- ========================================================================== -->
 <!-- ========================================================================== -->
-# Expert Maps
+# 2. Expert Maps
 
 ## Background 
 BioModelos is a web app for the collaborative development of species distribution models [link](http://biomodelos.humboldt.org.co/). In BioModelos, taxonomic/ecology/biogeography experts aid in
@@ -145,15 +145,134 @@ In summary the following steps had to be performed to improve the statistical mo
 ```{r,results='hide'}
 library(maskedRangeR)
 library(raster)
+library(rgdal)
+dataDir='/Users/ctg/Dropbox/Projects/Wallace/maskedRangeR_Misc/UseCaseData/dataDriven/Alouatta'
 ```
-No Data Yet
+
+Read in data
+```{r}
+original=stack('/Users/ctg/Dropbox/Projects/Wallace/maskedRangeR_Misc/UseCaseData/dataDriven/Alouatta/Alouatta_seniculus_0_mx.tif')
+expertAddedPoly=rgdal::readOGR('/Users/ctg/Dropbox/Projects/Wallace/maskedRangeR_Misc/UseCaseData/dataDriven/Alouatta/Alouatta_seniculus_add_HO.shp')
+```
+
+Add a polygon drawn by an expert to an earlier 
+```{r}
+expertAddRaster=rasterize(expertAddedPoly,original)
+expertAddRaster[is.na(expertAddRaster)]=0
+final=original+expertAddRaster
+# remove overlap
+final[final>1]=1
+```
+
+Plot the results
+```{r}
+par(mfrow=c(1,2))
+plot(original)
+plot(final)
+plot(expertAddedPoly,add=T)
+```
+
+Calculate the difference in range size.
+```{r}
+cellStats(original,sum)
+cellStats(final,sum)
+```
+
 
 
 <!-- ========================================================================== -->
 <!-- ========================================================================== -->
 <!-- ========================================================================== -->
 
-# Biotic interactions
+# 2. Multiple expert masks
+
+## Background
+The "swamp forest crab" (*Parathelphusa reticulata*) is a freshwater crab endemic to the Nee Soon Swamp Forest, Singapore's last remaining patch of freshwater swamp forest, and is currently listed as Critically Endangered by the IUCN. Like many freshwater crabs of the region (i.e. Southeast Asia), *P. reticulata* is primarily a scavenger that feeds on coarse organic matter, such as leaf litter. Given its endemic and endangered status, the ideal habitat parameters in which this species is found are highly restricted. However, available distribution information is quite limited: there is only one locality for this species available in GBIF, and the IUCN range map is a coarse overestimate. The environmental variables most closely associated with this species' geographic range, according to expert opinion, include distance to forest streams/swamps, pH, dissolved oxygen, temperature, elevation, and canopy cover. However, building a niche-based distribution model is not feasible due to considerable data and sample size limitations that likely violate the assumptions of the approach (available high quality georeferenced occurrence data (N=1) do not capture the range of habitats occupied by the species). In this use case, we will perform an expert-driven species range estimate using a series of informed masks that constrain the coarse IUCN range map to a more specific area of suitable environmental. We will then constrain the range to: areas of soil pH from 5.17-5.79, dissolved oxygen from 27.2-36.6%, daytime temperature (air) 26-34˚C, elevation 16-26m, and canopy cover 75-100%, following Chua et al. (2015), a study that conducted fine-scale sampling in two of the nature reserves in Singapore known to have swamp forest crabs and analyzed the relationship between crab communities and environmental variables. Due to the species rarity, the occurrence data are not publicly available, however the environmental correlates described above are provided. Data layers include soil pH accessed from soilGrids.org[1], temperature data was accessed from worldclim.org[2], elevation from LPDAAC[3], canopy cover from Hansen et al., 2013[4], and surface water from the global surface water database (Source: EC JRC/Google)[5]. Resolutions differ between layers. Therefore, rasters were either resampled or dis/aggregated to match the mask. 
+
+<!-- Note to Cory: add where most appropriate (this use case and others?) and edit as you see fit: We examined a graphic summary visualization of how range area decreased with each successive mask. -->
+
+<!-- Chua KWJ, Ng DJJ, Zeng Y, Yeo DCJ. 2015. Habitat characteristics of tropical rainforest freshwater crabs in Singapore. Journal of Crustacean Biology 35(4): 533-539. https://academic.oup.com/jcb/article/35/4/533/2547833  -->
+
+<!-- [1] Hengl T, Mendes de Jesus J, Heuvelink GBM, Ruiperez Gonzalez M, Kilibarda M, Blagotić A, et al. (2017) SoilGrids250m: Global gridded soil information based on machine learning. PLoS ONE 12(2): e0169748. https://doi.org/10.1371/journal.pone.0169748 -->
+<!-- [2] Hijmans, R. J., Cameron, S. E., Parra, J. L., Jones, P. G., & Jarvis, A. (2005). Very high resolution interpolated climate surfaces for global land areas. International journal of climatology, 25(15), 1965-1978. -->
+<!-- [3] NASA/METI/AIST/Japan Space Systems. (2009). ASTER global digital elevation model [data set]. NASA EOSDIS Land Processes DAAC. -->
+<!-- [4] Hansen, M. C., Potapov, P. V., Moore, R., Hancher, M., Turubanova, S. A. A., Tyukavina, A., ... & Kommareddy, A. (2013). High-resolution global maps of 21st-century forest cover change. science, 342(6160), 850-853. -->
+<!-- [5] Jean-Francois Pekel, Andrew Cottam, Noel Gorelick, Alan S. Belward, High-resolution mapping of global surface water and its long-term changes. Nature 540, 418-422 (2016). (doi:10.1038/nature20584) -->
+
+## Example
+
+```{r,results='hide'}
+library(maskedRangeR)
+library(raster)
+library(rgdal)
+dataDir='/Users/ctg/Dropbox/Projects/Wallace/maskedRangeR_Misc/UseCaseData/expertDriven/swampForestCrab'
+```
+
+<!-- singapore=raster(paste0(dataDir,'/SingaporeRaster.tif')) -->
+
+Read in the data.
+```{r}
+expertMap=readOGR(paste0(dataDir,'/IUCNshape/data_0.shp'))
+
+#CM: pH and Water bounds are mutually exclusive, so we can only choose one, otherwise there is no suitable habitat. as i understand it, the soil grids shouldn't be taken too seriously at fine grain
+#masks
+maskListRaw=list(treeCover=raster(paste0(dataDir,'/Hansen_percent_treecover.tif')), 
+                 dem=raster(paste0(dataDir,'/DEM.tif')),
+                 mat=raster(paste0(dataDir,'/MATsingapore.tif')),
+                 pH=raster(paste0(dataDir,'/PHIHOX_M_sl1_250m.tif')))#,
+                 #water=raster(paste0(dataDir,'/standingWaterPercent.tif')))
+
+# define the limits for each mask
+maskBounds=read.csv(paste0(dataDir,'/crabInfo.csv'))
+```
+
+Its always important to do a little cleaning.
+```{r}
+# rename to match maskListRaw
+maskBounds$Layer=c('water','treeCover','dem','pH','mat')
+# make sure the units match between the layers and the bounds
+maskListRaw$mat=maskListRaw$mat/10
+maskListRaw$pH=maskListRaw$pH/10
+```
+
+Crop rasters to the same extent as the expert map, since we're not worried about building any masks outside the expert map. Note that 
+```{r}
+crt=cropResampleTrim(expertMap,maskListRaw)
+```
+
+Create each mask, and mask the expert map.
+```{r}
+expertRaster=crt$expertRaster
+maskStack=crt$maskStack
+realized=lotsOfMasks(expertRaster,maskStack,maskBounds)
+```
+
+Plot the realized distribution, along with each of masks.
+```{r,fig=T,fig.width=7}
+plot(stack(realized))
+```
+
+It's hard to see what's left of the realized distribution, so lets see if we can zoom. The black polygon represents the original expert map and red locations indicate those that remain as suitable habitat after the masks have been applied
+```{r,fig=T,fig.width=7}
+real=raster::trim(realized$realizedDist)
+plot(real,col=c('white','red'))
+plot(expertMap,add=T)
+```
+
+
+Calculate the difference in range size.
+```{r}
+cellStats(expertRaster,sum)
+cellStats(real,sum)
+```
+
+
+
+<!-- ========================================================================== -->
+<!-- ========================================================================== -->
+<!-- ========================================================================== -->
+
+# 4. Biotic interactions
 
 ## Background
 The spiny pocket mice (Heteromys spp. and Liomys spp.) are distributed from southern Texas to northern South America. All known species exhibit parapatry with their neighbors, which is likely caused by competition for resources and/or suitable habitat. This situation of congeneric species replacing each other across space is extremely common, and hence the methodology used here could make range estimates much more realistic. This research focuses on the distributions of two species in Ecuador: H. australis and H. teleus. H. australis ranges from Venezuela in the east to Ecuador in the south, but here we use high-quality data for the southern part of its range (Ecuador and southwestern Colombia; this situation of a regional model for part of the range represents a common situation, e.g., country-specific range estimates and modeling efforts that support them). H. teleus, found only in Ecuador, was recently discovered and remains very data-poor, with only 10 documented occurrences of varied spatial uncertainty. Sampling efforts for both species span many years, and neither species has ever been detected far within the range of its neighbor, with only a thin region of possible sympatry (or microparapatry) detectable: two sites of apparent sympatry exist near the estimated range boundary. As IUCN geographical estimates for data-poor species may be vast underestimates if convex hulls around known occurrences are used solely to delimit the extent of occurrence -- and conversely, estimates based on predictive models may vastly overestimate ranges if the distribution of the congeneric species is not taken into account --  we seek to improve estimates for both species using predictive models that are post-processed to consider both abiotic and biotic constraints. Because the congeners presumably have bidirectional effects on each others ranges, they should not be included in calibrating each others SDM (add citations for Soberon/Anderson/Hutchinson in vignette). 
@@ -169,19 +288,50 @@ library(raster)
 dataDir='/Users/ctg/Dropbox/Projects/Wallace/maskedRangeR_Misc/UseCaseData/dataDriven/heteromys/'
 ```
 
+Read in the data. Note that if your SDMs were fit over different regions for each species, you may need to use `extend` or `crop` to ensure they have the same domain for input to the SVM.
 ```{r}
-source('/Users/ctg/Dropbox/Projects/Wallace/maskedRangeR_Misc/UseCaseData/dataDriven/heteromys/rangeSVM.R')
-xy1=read.csv(paste0(dataDir,'H_teleus.csv'))
-xy2=read.csv(paste0(dataDir,'H_australis.csv'))
-sdm1=raster(paste0(dataDir,'H_teleus_sdmPred.tif'))
-sdm2=raster(paste0(dataDir,'H_australis_sdmPred.tif'))
-out=rangeSVM(xy1[,2:3], xy2[,2:3], raster::stack(sdm1, sdm2),nrep=5)
-# nrep should be >5 in practice; default is 100.
+# species occurrence coordinates
+tel.xy=read.csv(paste0(dataDir,'H_teleus.csv'))
+aus.xy=read.csv(paste0(dataDir,'H_australis.csv'))
+
+# species SDMs
+tel.p=raster(paste0(dataDir,'H_teleus_sdmPred.tif'))
+aus.p=raster(paste0(dataDir,'H_australis_sdmPred.tif'))
 ```
 
-Plot the results
-
+Tune the SVM and project it.
 ```{r}
-#plot(out,rbind(xy1[,2:3], xy2[,2:3]))
+svmHYB=rangeSVM(tel.xy[,2:3], aus.xy[,2:3], raster::stack(tel.p,aus.p),nrep=3)
+# nrep should be >3 in practice; default is 100, but that's slow
+spp.svmHYB <- rasterizeRangeSVM(svm = svmHYB, r = tel.p, sdm = stack(tel.p,aus.p))
 ```
+
+Plot the SVM results. Grey indicates locations *more*  suitable for *H.teleus* and green indicates regions more suitable for *H. australis*. 
+
+```{r,fig=T,fig.height=6,fig.width=6}
+plot(spp.svmHYB)
+```
+
+These locations are not necessarily occupied however; we'll use these as masks over the SDM predictions. 
+```{r}
+aus.svmHYB <- spp.svmHYB == 1
+aus.svmHYB[aus.svmHYB == 0] <- NA
+
+tel.svmHYB <- spp.svmHYB == 2
+tel.svmHYB[tel.svmHYB == 0] <- NA
+
+# mask these to species' study extents
+aus.svmHYB.ext <- mask(aus.p, aus.svmHYB)
+tel.svmHYB.ext <- mask(tel.p, tel.svmHYB)
+```
+
+Plot the resulting realized distributions for each species
+```{r,fig=T,fig.height=6,fig.width=6}
+plot(stack(tel.svmHYB.ext,aus.svmHYB.ext))
+```
+
+One could further mask by forest cover, accessible habitat, etc.
+
+
+
 

@@ -55,12 +55,52 @@ maskedRangeR=function(potentialDist,
     }
   } # end if method=='mask'
   
-  out=stack(out,potentialDist,mask.bin)
+  out=raster::stack(out,potentialDist,mask.bin)
   names(out)=c('maskedDist','potentialDist',paste0(names(maskLayers),'Mask'))
   return(out)
 }
 
 
+#==================================================================================
+#==================================================================================
+#' @title Generate and apply multiple masks to a map
+#'
+#' @description Based on a potential distribution, environmental rasters, and bounds for suitable habitat on the environmental rasters
+#' @details
+#' See Examples.
+#' @param expertRaster The binary expert map (1s and 0s), rasterized with the same projection as `maskStack`
+#' @param maskStack A stack of *named* layers from which masks will be made
+#' @param maskBounds A data.frame with columns indicating the layer name (matching the names in maskStack), and the min and max values of that layer to be used for masking.
+# @examples
+#'
+# @return
+#' @author Cory Merow <cory.merow@@gmail.com>,
+# @note 
+# @seealso
+# @references
+# @aliases - a list of additional topic names that will be mapped to
+# this documentation when the user looks them up from the command
+# line.
+# @family - a family name. All functions that have the same family tag will be linked in the documentation.
+#' @export
+
+lotsOfMasks=function(expertRaster,maskStack,maskBounds){
+  if(!any(class(expertRaster)==c('RasterLayer','RasterStack'))) stop('The expertRaster must be a raster')
+  # make all the masks 
+  binaryMasks=raster::stack(lapply(1:raster::nlayers(maskStack),function(x,maskBounds){
+    keep=which(maskBounds[,1]==names(maskStack[[x]]))
+    if(length(keep)==0) stop(paste0('The names in maskBounds may not match names(maskStack). Check ', names(x)))
+    maskBin=(maskStack[[x]]>maskBounds[keep,2] & maskStack[[x]]<maskBounds[keep,3])
+    maskBin[!maskBin==1]=NA
+    maskBin
+  },maskBounds=maskBounds))
+  names(binaryMasks)=names(maskStack)
+  realizedDist=expertRaster
+  for(i in 1:raster::nlayers(binaryMasks)){
+    realizedDist=raster::mask(realizedDist,binaryMasks[[i]])
+  }
+  return(list(realizedDist=realizedDist,binaryMasks=binaryMasks))
+}
 
 
 

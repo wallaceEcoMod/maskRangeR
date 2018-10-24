@@ -135,7 +135,7 @@ rangeSVM <- function(xy1, xy2, sdm = NULL, nrep = 100, weight = FALSE) {
 rasterizeRangeSVM <- function(svm, r, sdm = NULL) {
   # extract coordinates from shared extent
   r.pts <- raster::rasterToPoints(r, spatial = TRUE)
-  r.xy <- raster::coordinates(r.pts)
+  r.xy <- sp::coordinates(r.pts)
   # if sdm prediction raster input, add the values to the matrix 
   if(!is.null(sdm)) {
     sdm.vals <- raster::extract(sdm, r.xy)

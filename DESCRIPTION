@@ -14,7 +14,9 @@ Imports:
     tidyverse,
     lubridate,
     utils,
-    magrittr
+    magrittr,
+    rgdal,
+    stats
 Suggests:
     testthat,
     knitr,
