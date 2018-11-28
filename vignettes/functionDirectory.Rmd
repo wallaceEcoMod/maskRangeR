@@ -19,7 +19,7 @@ For full information on each function, see the associated help file.
 
 * `annotate` Match raster layers to date associated with point and extract the value of the respective raster at each point
 
-* `maskedRanger` Makes a mask and masks a potential distribution. 
+* `maskRanger` Makes a mask and masks a potential distribution. 
 
 
 ##Expert masking 

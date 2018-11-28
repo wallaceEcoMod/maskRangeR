@@ -57,9 +57,9 @@ The Olinguito is a new species of carnivore recently described from museum speci
 
 ```{r}
 library(raster)
-library(maskedRangeR)
+library(maskRangeR)
 library(lubridate)
-dataDir='/Users/ctg/Dropbox/Projects/Wallace/maskedRangeR_Misc/UseCaseData/dataDriven/olinguito/'
+dataDir='/Users/ctg/Dropbox/Projects/Wallace/maskRanger_Misc/UseCaseData/dataDriven/olinguito/'
 # need to move this data to the package when its smaller
 ```
 
@@ -98,7 +98,7 @@ Create the mask and mask the potential distribution.
 logicString=paste0('maskLayers>',quantile(datedOccs$env,prob=.25,na.rm=T))
 forest=env[[5]] # CM:L just grabbed the latest year of forest data arbitrarily. what year are you making the map for in the paper?
 names(forest)='forest'
-maskedDist=maskedRangeR(potentialDist=sdm,maskLayers=forest,logicString=logicString)
+maskedDist=maskRanger(potentialDist=sdm,maskLayers=forest,logicString=logicString)
 ```
 
 Check that there are now fewer cells in the masked map
@@ -143,16 +143,16 @@ In summary the following steps had to be performed to improve the statistical mo
 
 ## Example
 ```{r,results='hide'}
-library(maskedRangeR)
+library(maskRanger)
 library(raster)
 library(rgdal)
-dataDir='/Users/ctg/Dropbox/Projects/Wallace/maskedRangeR_Misc/UseCaseData/dataDriven/Alouatta'
+dataDir='/Users/ctg/Dropbox/Projects/Wallace/maskRanger_Misc/UseCaseData/dataDriven/Alouatta'
 ```
 
 Read in data
 ```{r}
-original=stack('/Users/ctg/Dropbox/Projects/Wallace/maskedRangeR_Misc/UseCaseData/dataDriven/Alouatta/Alouatta_seniculus_0_mx.tif')
-expertAddedPoly=rgdal::readOGR('/Users/ctg/Dropbox/Projects/Wallace/maskedRangeR_Misc/UseCaseData/dataDriven/Alouatta/Alouatta_seniculus_add_HO.shp')
+original=stack('/Users/ctg/Dropbox/Projects/Wallace/maskRanger_Misc/UseCaseData/dataDriven/Alouatta/Alouatta_seniculus_0_mx.tif')
+expertAddedPoly=rgdal::readOGR('/Users/ctg/Dropbox/Projects/Wallace/maskRanger_Misc/UseCaseData/dataDriven/Alouatta/Alouatta_seniculus_add_HO.shp')
 ```
 
 Add a polygon drawn by an expert to an earlier 
@@ -202,10 +202,10 @@ The "swamp forest crab" (*Parathelphusa reticulata*) is a freshwater crab endemi
 ## Example
 
 ```{r,results='hide'}
-library(maskedRangeR)
+library(maskRanger)
 library(raster)
 library(rgdal)
-dataDir='/Users/ctg/Dropbox/Projects/Wallace/maskedRangeR_Misc/UseCaseData/expertDriven/swampForestCrab'
+dataDir='/Users/ctg/Dropbox/Projects/Wallace/maskRanger_Misc/UseCaseData/expertDriven/swampForestCrab'
 ```
 
 <!-- singapore=raster(paste0(dataDir,'/SingaporeRaster.tif')) -->
@@ -283,9 +283,9 @@ Specifically, we estimate IUCN's extent of occurrence (EOO) using convex hulls a
 ## Example
 
 ```{r,results='hide'}
-library(maskedRangeR)
+library(maskRanger)
 library(raster)
-dataDir='/Users/ctg/Dropbox/Projects/Wallace/maskedRangeR_Misc/UseCaseData/dataDriven/heteromys/'
+dataDir='/Users/ctg/Dropbox/Projects/Wallace/maskRanger_Misc/UseCaseData/dataDriven/heteromys/'
 ```
 
 Read in the data. Note that if your SDMs were fit over different regions for each species, you may need to use `extend` or `crop` to ensure they have the same domain for input to the SVM.

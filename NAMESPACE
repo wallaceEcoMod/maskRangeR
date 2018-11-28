@@ -3,6 +3,6 @@
 export(annotate)
 export(cropResampleTrim)
 export(lotsOfMasks)
-export(maskedRangeR)
+export(maskRanger)
 export(rangeSVM)
 export(rasterizeRangeSVM)

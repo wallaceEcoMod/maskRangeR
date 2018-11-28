@@ -19,7 +19,7 @@ knitr::opts_chunk$set(cache = TRUE)
 ```
 
 ```{r}
-library(maskedRangeR)
+library(maskRanger)
 library(raster)
 library(virtualspecies)
 ```
@@ -57,7 +57,7 @@ plot(spB)
 ```
 
 ```{r,fig.width=7,fig.height=4}
-spAnoB=maskedRangeR(potentialDist=spA,
+spAnoB=maskRanger(potentialDist=spA,
                     maskLayers=spB,
                     logicString='maskLayers>0.5',
                     method='mask')
@@ -72,7 +72,7 @@ It also works with multiple time steps. You can either have a different mask for
 spA.t=stack(spA,spA-.1,spA+.1)
 spB.t=stack(spB,spB+.1,spB-.1)
 logicString='maskLayers>0.5'
-spAnoB.t=maskedRangeR(potentialDist=spA.t,maskLayers=spB.t,logicString,method='mask')
+spAnoB.t=maskRanger(potentialDist=spA.t,maskLayers=spB.t,logicString,method='mask')
 plot(stack(spA.t,spB.t,spAnoB.t))
 ```
 
@@ -81,7 +81,7 @@ You can also specify any sort of arbitrary conditional statement (although this 
 ```{r,fig.width=7,fig.height=7}
 # make a demo raster of occurrence probabilities describing the potential distribution over 9 time steps
 logicString='maskLayers>0.5 & maskLayers<0.7'
-spAnoB.t2=maskedRangeR(potentialDist=spA.t,maskLayers=spB.t,logicString,method='mask')
+spAnoB.t2=maskRanger(potentialDist=spA.t,maskLayers=spB.t,logicString,method='mask')
 plot(stack(spA.t,spB.t,spAnoB.t2))
 ```
 

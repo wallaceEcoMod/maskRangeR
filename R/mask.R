@@ -31,7 +31,7 @@
 
 # would we ever have the case where you'd have suitable < X < Y< suitable?
 
-maskedRangeR=function(potentialDist,
+maskRanger=function(potentialDist,
                       maskLayers,
                       logicString,
                       method='mask'){
