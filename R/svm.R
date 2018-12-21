@@ -48,17 +48,17 @@
 
 rangeSVM <- function(xy1, xy2, sdm = NULL, nrep = 100, weight = FALSE) {
   # define class weights
-  # if(weight == TRUE) {
-  #   if(nrow(xy1) != nrow(xy2)) {
-  #     if(nrow(xy1) > nrow(xy2)) {
-  #       cw <- c("0" = 1, "1" = nrow(xy1)/nrow(xy2))
-  #     } else {
-  #       cw <- c("0" = nrow(xy2)/nrow(xy1), "1" = 1)
-  #     }  
-  #   }  
-  # } else {
-  #   cw <- c("0" = 1, "1" = 1)
-  # }
+  if(weight == TRUE) {
+    if(nrow(xy1) != nrow(xy2)) {
+      if(nrow(xy1) > nrow(xy2)) {
+        cw <- c("0" = 1, "1" = nrow(xy1)/nrow(xy2))
+      } else {
+        cw <- c("0" = nrow(xy2)/nrow(xy1), "1" = 1)
+      }
+    }
+  } else {
+    cw <- c("0" = 1, "1" = 1)
+  }
   
   # bind both coordinate matrices
   xy <- rbind(xy1, xy2)
