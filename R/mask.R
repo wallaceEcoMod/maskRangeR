@@ -16,7 +16,16 @@
 #'  \item{mask}{mask cells with values outside the bounds}
 #' }
 # @examples
-#'
+#' \dontrun{
+#' # find suitable bounds
+#' bounds <- min(datedOccs$env)
+#' ## Create mask, and use it on SDM
+#' logicString = paste0('maskLayers >', bounds)
+#' # use 'most recent' environmental variable as base for mask
+#' SDMmask <- env[[5]]
+#' names(SDMmask) <- "SDM_mask"
+#' maskedDist <- maskRanger(potentialDist = sdm, maskLayers = SDMmask, logicString = logicString)
+#' }
 #'
 # @return
 #' @author Cory Merow <cory.merow@@gmail.com>,
