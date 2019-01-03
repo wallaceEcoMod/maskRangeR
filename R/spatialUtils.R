@@ -8,7 +8,9 @@
 #' @param expertMap A binary map, either as a polygon or a raster.
 #' @param maskListRaw A list of rasters, each corresponding to layers from which masks will eventually be made (in another function).
 # @examples
-#'
+#'\dontrun{
+#' 
+#'}
 #'
 # @return
 #' @author Cory Merow <cory.merow@@gmail.com>,

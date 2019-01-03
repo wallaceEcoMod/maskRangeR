@@ -10,7 +10,17 @@
 #' @param envDates a vector of dates the same length as `env`. The vector should have class `POSIXct`, e.g., as obtained from using `lubridate::parse_date_time`
 #' @param dateScale string: 'year', 'month', or 'day'
 # @examples
-#'
+#' \dontrun{
+#' # Declare the date scale
+#' dateScale = "year"
+#' # Declare dates for simulated env data
+#' envDates <- parse_date_time(paste0("",2010:2014, ""), orders = c("Y", "Ym"))
+#' ###  Preparing data
+#' # convert to spatial object
+#' coordinates(datedOccs) <- c("x", "y")
+#' ##  Performing data-driven masking. First find the values of the environment at point locations
+#' datedOccs <- annotate(datedOccs, env, envDates, dateScale)
+#' }
 #'
 # @return
 #' @author Cory Merow <cory.merow@@gmail.com>,
