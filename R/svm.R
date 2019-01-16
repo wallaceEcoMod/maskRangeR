@@ -108,6 +108,11 @@ rangeSVM <- function(xy1, xy2, sdm = NULL, nrep = 100, weight = FALSE) {
   mostFreq <- names(which(table(params_best_df$params) == max(table(params_best_df$params))))
   params_best_df_mostFreq <- params_best_df[params_best_df$params == mostFreq, 1:2]
   
+  # Add error message if there is no most frequent combination of parameters
+  if(nrow(params_best_df_mostFreq) == 0){
+    stop("Tuning did not produce a most frequent combination of SVM parameters. Please increase nrep and try again.")
+  }
+  
   # run final model
   m <- e1071::svm(sp ~ ., data = xy, gamma = params_best_df_mostFreq$gamma[1], 
                   cost = params_best_df_mostFreq$cost[1], class.weights = cw)
