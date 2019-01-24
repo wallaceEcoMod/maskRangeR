@@ -8,6 +8,7 @@
 #'
 #' @param xy1 Matrix or data frame of occurrence coordinates for species 1.
 #' @param xy2 Matrix or data frame of occurrence coordinates for species 2.
+#' @param ... Other matrices or data frames of occurrence coordinates for additional species.
 #' @param sdm Raster or RasterStack representing environmental suitability (can be predictions from SDMs). 
 #' These must have the same extent as both species' occurrence points. Default is NULL.
 #' @param nrep Numeric for number of SVM tuning iterations. Default is 100.
@@ -46,7 +47,10 @@
 # 5. which params are varied and what they mean
 # 6. convey to Cory to make generalizable to more than 2 species
 
-rangeSVM <- function(xy1, xy2, sdm = NULL, nrep = 100, weight = FALSE) {
+rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
+  
+  
+  
   # define class weights
   if(weight == TRUE) {
     if(nrow(xy1) != nrow(xy2)) {
@@ -60,15 +64,21 @@ rangeSVM <- function(xy1, xy2, sdm = NULL, nrep = 100, weight = FALSE) {
     cw <- c("0" = 1, "1" = 1)
   }
   
+  
   # bind both coordinate matrices
   xy <- rbind(xy1, xy2)
+  otherSp <- list(...)
+  nsp <- 2 + length(otherSp)
+  sp.num <- c(nrow(xy1), nrow(xy2), sapply(otherSp, nrow))
+  xy.otherSp <- do.call("rbind", otherSp)
+  xy <- rbind(xy, xy.otherSp)
   # if using sdm prediction rasters as extra predictor variable, add the values to the matrix 
   if(!is.null(sdm)) {
     sdm.vals <- raster::extract(sdm, xy)
     xy <- cbind(xy, sdm = sdm.vals)
   }
   # add a species signifier field
-  xy$sp <- factor(c(rep(0, nrow(xy1)), rep(1, nrow(xy2))))
+  xy$sp <- factor(rep(1:nsp, times=sp.num))
   
   # define a range for parameters C and gamma, which control complexity of fit
   # ranges based on suggestions from https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
@@ -107,6 +117,11 @@ rangeSVM <- function(xy1, xy2, sdm = NULL, nrep = 100, weight = FALSE) {
   params_best_df$params <- paste0(params_best_df$gamma, params_best_df$cost)
   mostFreq <- names(which(table(params_best_df$params) == max(table(params_best_df$params))))
   params_best_df_mostFreq <- params_best_df[params_best_df$params == mostFreq, 1:2]
+  
+  # Add error message if there is no most frequent combination of parameters
+  if(nrow(params_best_df_mostFreq) == 0){
+    stop("Tuning did not produce a most frequent combination of SVM parameters. Please increase nrep and try again.")
+  }
   
   # run final model
   m <- e1071::svm(sp ~ ., data = xy, gamma = params_best_df_mostFreq$gamma[1], 
@@ -161,8 +176,5 @@ rangeSVM_predict <- function(svm, r, sdm = NULL) {
   # convert back to raster
   r.pts$pred <- sp12.svm
   sp12.svm.ras <- raster::rasterize(r.pts, r, "pred")
-  # reassign values to reflect species identity
-  sp12.svm.ras[sp12.svm.ras == 1] <- 2
-  sp12.svm.ras[sp12.svm.ras == 0] <- 1
   return(sp12.svm.ras)
 }
