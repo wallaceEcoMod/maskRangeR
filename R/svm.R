@@ -49,29 +49,31 @@
 
 rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
   
-  
-  
-  # define class weights
-  if(weight == TRUE) {
-    if(nrow(xy1) != nrow(xy2)) {
-      if(nrow(xy1) > nrow(xy2)) {
-        cw <- c("0" = 1, "1" = nrow(xy1)/nrow(xy2))
-      } else {
-        cw <- c("0" = nrow(xy2)/nrow(xy1), "1" = 1)
-      }
-    }
-  } else {
-    cw <- c("0" = 1, "1" = 1)
-  }
+  # 
+  # # define class weights
+  # if(weight == TRUE) {
+  #   if(nrow(xy1) != nrow(xy2)) {
+  #     if(nrow(xy1) > nrow(xy2)) {
+  #       cw <- c("1" = 1, "2" = nrow(xy1)/nrow(xy2))
+  #     } else {
+  #       cw <- c("1" = nrow(xy2)/nrow(xy1), "2" = 1)
+  #     }
+  #   }
+  # } else {
+  #   cw <- c("1" = 1, "2" = 1)
+  # }
   
   
   # bind both coordinate matrices
-  xy <- rbind(xy1, xy2)
+  xy <- as.data.frame(rbind(xy1, xy2))
   otherSp <- list(...)
   nsp <- 2 + length(otherSp)
   sp.num <- c(nrow(xy1), nrow(xy2), sapply(otherSp, nrow))
   xy.otherSp <- do.call("rbind", otherSp)
   xy <- rbind(xy, xy.otherSp)
+  # make sure the column names are x and y
+  names(xy) <- c("x", "y")
+  
   # if using sdm prediction rasters as extra predictor variable, add the values to the matrix 
   if(!is.null(sdm)) {
     sdm.vals <- raster::extract(sdm, xy)
@@ -114,18 +116,18 @@ rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
   # gamma_opt <- getMax(gamma_best)
   # C_opt <- getMax(C_best)
   params_best_df <- do.call(rbind, params_best)
-  params_best_df$params <- paste0(params_best_df$gamma, params_best_df$cost)
-  mostFreq <- names(which(table(params_best_df$params) == max(table(params_best_df$params))))
-  params_best_df_mostFreq <- params_best_df[params_best_df$params == mostFreq, 1:2]
+  params_best_count <- dplyr::count(params_best_df, gamma, cost)
   
   # Add error message if there is no most frequent combination of parameters
-  if(nrow(params_best_df_mostFreq) == 0){
+  if(sum(params_best_count$n > 1) == 0){
     stop("Tuning did not produce a most frequent combination of SVM parameters. Please increase nrep and try again.")
   }
   
+  params_best_sel <- params_best_df[which(params_best_count$n == max(params_best_count$n)),]
+  
   # run final model
-  m <- e1071::svm(sp ~ ., data = xy, gamma = params_best_df_mostFreq$gamma[1], 
-                  cost = params_best_df_mostFreq$cost[1], class.weights = cw)
+  m <- e1071::svm(sp ~ ., data = xy, gamma = params_best_sel$gamma[1], 
+                  cost = params_best_sel$cost[1], class.weights = cw)
   
   return(m)
 }
@@ -168,9 +170,9 @@ rangeSVM_predict <- function(svm, r, sdm = NULL) {
     r.xy <- cbind(r.xy, sdm = sdm.vals)
   }
   # rename column names to match response of svm
-  colnames(r.xy) <- names(svm$x.scale$`scaled:center`)
+  colnames(r.xy) <- c("x", "y")
   # predict species identity of all coordinates with svm
-  sp12.svm <- raster::predict(svm, r.xy)
+  sp12.svm <- predict(svm, r.xy)
   # convert factor response to integer
   sp12.svm <- as.numeric(as.character(sp12.svm))
   # convert back to raster
