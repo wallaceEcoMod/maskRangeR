@@ -165,13 +165,16 @@ rangeSVM_predict <- function(svm, r, sdm = NULL) {
   # extract centroid coordinates from shared extent raster cells
   r.pts <- raster::rasterToPoints(r, spatial = TRUE)
   r.xy <- sp::coordinates(r.pts)
+  # rename column names to match response of svm
+  colnames(r.xy) <- c("x", "y")
   # if sdm prediction raster input, add the values to the matrix 
   if(!is.null(sdm)) {
     sdm.vals <- raster::extract(sdm, r.xy)
     r.xy <- cbind(r.xy, sdm = sdm.vals)
+    sdm.names <- seq(3, 2+ncol(sdm.vals))
+    colnames(r.xy)[sdm.names] <- names(svm$x.scale$`scaled:center`[sdm.names])
   }
-  # rename column names to match response of svm
-  colnames(r.xy) <- c("x", "y")
+  
   # predict species identity of all coordinates with svm
   sp12.svm <- predict(svm, r.xy)
   # convert factor response to integer
