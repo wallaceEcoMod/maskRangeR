@@ -100,7 +100,8 @@ rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
   C_best <- numeric(nrep)
   
   for(i in 1:nrep) {
-    m.tune <- e1071::tune.svm(sp ~ ., data = xy, gamma = gamma_range, cost = C_range, class.weights = cw)  
+    # m.tune <- e1071::tune.svm(sp ~ ., data = xy, gamma = gamma_range, cost = C_range, class.weights = cw)
+    m.tune <- e1071::tune.svm(sp ~ ., data = xy, gamma = gamma_range, cost = C_range)
     # print(sum(as.numeric(as.character(predict(m.tune$best.model, aus.xy)))))
     # print(sum(as.numeric(as.character(predict(m.tune$best.model, tel.xy)))))
     # get optimal parameter values
@@ -126,8 +127,8 @@ rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
   params_best_sel <- params_best_df[which(params_best_count$n == max(params_best_count$n)),]
   
   # run final model
-  m <- e1071::svm(sp ~ ., data = xy, gamma = params_best_sel$gamma[1], 
-                  cost = params_best_sel$cost[1], class.weights = cw)
+  # m <- e1071::svm(sp ~ ., data = xy, gamma = params_best_sel$gamma[1], cost = params_best_sel$cost[1], class.weights = cw)
+  m <- e1071::svm(sp ~ ., data = xy, gamma = params_best_sel$gamma[1], cost = params_best_sel$cost[1])
   
   return(m)
 }
