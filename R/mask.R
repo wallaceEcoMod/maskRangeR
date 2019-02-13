@@ -8,7 +8,7 @@
 #' See Examples.
 #' @param potentialDist A raster stack of binary or continuous values. Supplying more than one layer will be interepreted as different time periods. Layers should follow the naming convention `Y2000`, `Y2001`, etc.
 #' @param maskLayers A single raster or a raster stack. If a single raster, the same mask will be applied to each layer of `potentialDist`. If a stack it must have the same number of layers as potentialDist, and each layer corresponds to a different time period.
-#' @param logicString a character indicating the logical conditions to use for masking
+#' @param logicString a character indicating the logical conditions to use for masking.
 # @param rsLower A list of lower bounds of suitable values in the same order as `rsList`
 # @param rsUpper A list of upper bounds of suitable values in the same order as `rsList`
 #' @param method A list of strings defining methods to be used, in the same order as `rsList`. If a single value is provided it will be applied to all rasters in `rsList`. Options include:
@@ -71,8 +71,6 @@
 # line.
 # @family - a family name. All functions that have the same family tag will be linked in the documentation.
 #' @export
-
-# would we ever have the case where you'd have suitable < X < Y< suitable?
 
 maskRanger=function(potentialDist,
                       maskLayers,

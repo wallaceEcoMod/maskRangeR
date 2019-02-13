@@ -12,7 +12,7 @@
 #' @param sdm Raster or RasterStack representing environmental suitability (can be predictions from SDMs). 
 #' These must have the same extent as both species' occurrence points. Default is NULL.
 #' @param nrep Numeric for number of SVM tuning iterations. Default is 100.
-#' @param weight Boolean. If TRUE, the species with less occurrence records is weighted higher in the SVM.
+#' @param weight Boolean. If TRUE, species with fewer occurrence records are weighted higher in the SVM.
 #' Default is FALSE.
 #' @return The tuned SVM model.
 #' @details The tuning operation uses \code{tune.svm()} from the e1071 package, which performs 10-fold
@@ -93,30 +93,7 @@
 #' 
 #' 
 
-# to clarify:
-# 1. specifics on optimality criterion (weights false positives and false negatives equally?)
-# 2. nothing to break tie (how do we choose when there are ties?)
-# 3. could easily allow users to change k
-# 4. sensitivity to relative number of points near border (and assumes that sampling bias was addressed?)
-# 5. which params are varied and what they mean
-# 6. convey to Cory to make generalizable to more than 2 species
-
 rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
-  
-  # 
-  # # define class weights
-  # if(weight == TRUE) {
-  #   if(nrow(xy1) != nrow(xy2)) {
-  #     if(nrow(xy1) > nrow(xy2)) {
-  #       cw <- c("1" = 1, "2" = nrow(xy1)/nrow(xy2))
-  #     } else {
-  #       cw <- c("1" = nrow(xy2)/nrow(xy1), "2" = 1)
-  #     }
-  #   }
-  # } else {
-  #   cw <- c("1" = 1, "2" = 1)
-  # }
-  
   
   # bind both coordinate matrices
   xy <- as.data.frame(rbind(xy1, xy2))
@@ -181,8 +158,13 @@ rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
   params_best_sel <- params_best_df[which(params_best_count$n == max(params_best_count$n)),]
   
   # run final model
-  # m <- e1071::svm(sp ~ ., data = xy, gamma = params_best_sel$gamma[1], cost = params_best_sel$cost[1], class.weights = cw)
-  m <- e1071::svm(sp ~ ., data = xy, gamma = params_best_sel$gamma[1], cost = params_best_sel$cost[1])
+  if(weight == TRUE) {
+    m <- e1071::svm(sp ~ ., data = xy, gamma = params_best_df_mostFreq$gamma[1], 
+                    cost = params_best_df_mostFreq$cost[1], class.weights = "inverse")
+  } else {
+    m <- e1071::svm(sp ~ ., data = xy, gamma = params_best_df_mostFreq$gamma[1], 
+                    cost = params_best_df_mostFreq$cost[1])
+  }
   
   return(m)
 }
