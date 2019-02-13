@@ -131,8 +131,7 @@ rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
   C_best <- numeric(nrep)
   
   for(i in 1:nrep) {
-    # m.tune <- e1071::tune.svm(sp ~ ., data = xy, gamma = gamma_range, cost = C_range, class.weights = cw)
-    m.tune <- e1071::tune.svm(sp ~ ., data = xy, gamma = gamma_range, cost = C_range)
+    m.tune <- e1071::tune.svm(sp ~ ., data = xy, gamma = gamma_range, cost = C_range)  
     # print(sum(as.numeric(as.character(predict(m.tune$best.model, aus.xy)))))
     # print(sum(as.numeric(as.character(predict(m.tune$best.model, tel.xy)))))
     # get optimal parameter values
@@ -169,9 +168,9 @@ rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
   return(m)
 }
 
-#' Generate binary raster based on predictions of SVM model.
+#' Generate a raster based on predictions of SVM model with values corresponding to the species.
 #'
-#' \code{rangeSVM_predict()} returns a binary raster representing the ranges of the two species
+#' \code{rangeSVM_predict()} returns a raster representing the ranges of the species
 #' predicted by the fitted SVM tuned with \code{rangeSVM()}.
 #'
 #' @param svm Model object for the SVM, returned by \code{rangeSVM()}.
@@ -179,8 +178,8 @@ rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
 #' have non-NA values, but the particular values do not matter.
 #' @param sdm Raster or RasterStack representing environmental suitability (can be predictions from SDMs).
 #' These rasters must match the predictor variables used in the SVM. Default is NULL.
-#' @return The binary Raster representing the SVM predictions.
-#' @details The values of the output raster are 1 and 2, corresponding to xy1 and xy2 for \code{rangeSVM()}.
+#' @return The  Raster representing the SVM predictions.
+#' @details The values of the output raster are 1, 2, ..., corresponding to xy1, xy2, and any additional species used in \code{rangeSVM()}.
 #' These values represent the identities of the species.
 #' 
 #' @examples
