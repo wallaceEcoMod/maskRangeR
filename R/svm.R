@@ -52,17 +52,17 @@ rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
   
   
   # define class weights
-  if(weight == TRUE) {
-    if(nrow(xy1) != nrow(xy2)) {
-      if(nrow(xy1) > nrow(xy2)) {
-        cw <- c("0" = 1, "1" = nrow(xy1)/nrow(xy2))
-      } else {
-        cw <- c("0" = nrow(xy2)/nrow(xy1), "1" = 1)
-      }
-    }
-  } else {
-    cw <- c("0" = 1, "1" = 1)
-  }
+  # if(weight == TRUE) {
+  #   if(nrow(xy1) != nrow(xy2)) {
+  #     if(nrow(xy1) > nrow(xy2)) {
+  #       cw <- c("0" = 1, "1" = nrow(xy1)/nrow(xy2))
+  #     } else {
+  #       cw <- c("0" = nrow(xy2)/nrow(xy1), "1" = 1)
+  #     }
+  #   }
+  # } else {
+  #   cw <- c("0" = 1, "1" = 1)
+  # }
   
   
   # bind both coordinate matrices
@@ -124,8 +124,14 @@ rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
   }
   
   # run final model
-  m <- e1071::svm(sp ~ ., data = xy, gamma = params_best_df_mostFreq$gamma[1], 
-                  cost = params_best_df_mostFreq$cost[1], class.weights = "inverse")
+  if(weight == TRUE) {
+    m <- e1071::svm(sp ~ ., data = xy, gamma = params_best_df_mostFreq$gamma[1], 
+                    cost = params_best_df_mostFreq$cost[1], class.weights = "inverse")
+  } else {
+    m <- e1071::svm(sp ~ ., data = xy, gamma = params_best_df_mostFreq$gamma[1], 
+                    cost = params_best_df_mostFreq$cost[1])
+  }
+  
   
   return(m)
 }
