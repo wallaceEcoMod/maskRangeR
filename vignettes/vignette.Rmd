@@ -1,0 +1,589 @@
+---
+title: "maskRangeR; improving spatial and temporal accuracy of species distribution models"
+author: "Cory Merow, Peter J. Galante, Cecina Babich Morrow, Jamie M. Kass, Alex Moore, Jorge Velasquez, Robert P. Anderson, Mary E. Blair"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    fig_caption: yes
+    toc: true
+    number_sections: true
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{An overview of making rangeModelMetadata objects}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+# navlink: "[NAVTITLE](http://NAVLINK/)"
+# og:
+#   type: "article"
+#   title: "opengraph title"
+#   url: "optional opengraph url"
+#   image: "optional opengraph image link"
+#   toc: true 
+#   toc_depth: 3 
+# footer:
+#   - content: '[link1](http://example.com/) • [link2](http://example.com/)<br/>'
+#   - content: 'Copyright blah blah'
+# date: "`r Sys.Date()`"
+# output: markdowntemplates::skeleton
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+# Introduction 
+
+The goal of masking range maps (or species distribution models) is to improve spatial (and possibly temporal) accuracy by incorporating different types of information. Often statistically-based SDMs are used to identify suitable environmental conditions, as the models detect locations with similar environmental conditions to where the species was observed. Often, these modeled maps are best interpreted as *potential distributions* since other processes besides abiotic conditions may restrict the distribution, such as dispersal, biotic interactions, social dynamics, historical contingencies, or human modification of habitat. In contrast, *realized distributions* describe those locations that are actually occupied by the species (at some spatial resolution) and may be smaller than potential distributions. By starting with potential distributions from any form of SDM, we can use other pieces of information to refine these models to approach realized distributions.
+
+Here, we illustrate methods for estimating realized distributions based on different types of data. Additional information not included as a predictor in the SDM can be described by *masks* that differentiate potential habitat from non-habitat. They represent a conceptual model usually relating to a single variable, e.g., forest cover, occurrence of competing species, dispersal. When appropriate data are not available (e.g. climate data matching occurrence record collection dates), masks can be stacked on existing SDMs to determine places that both models designate as suitable habitat. Using a series of masks is a type of ensemble modeling where complete agreement is required between all component models to denote a location as suitable. Below, we illustrate cases based on forest cover, expert opinion, multiple environmental layers, and occurrence of competing species.
+
+Throughout the package, we use the following definitions:
+
+**Potential distribution** is used to describe maps used as input. The term 'potential' is used because the map is presumed to include possibly suitable locations. These maps may well be the result of a model that includes processes such as dispersal, biotic interactions, social dynamics, historical contingencies, or human modification of habitat, but here we assume that there is further information that can be used to refine the range.
+
+**Realized distribution** is used to describe output maps resulting from masking of potential distributions. While the outputs may still include some ommission/commission errors, they aim to better estimate the realized distribution relative to the input maps by accounting for some additional source of information, e.g. land cover, expert opinion, biotic factors, etc.
+<!-- ========================================================================== -->
+<!-- ========================================================================== -->
+<!-- ========================================================================== -->
+
+In the following use cases, we describe distribution modeling scenarios that require post-processing of the potential distribution to better estimate a species' realized distribution. This post-processing is carried out in the form of masks based on expert opinion or data. For each scenario, we list the components needed to carry out the analysis and provide examples of the process.
+
+# Data Driven: Land Cover Mask
+
+## Issue
+
+When creating SDMs, best practice dictates using environmental data that temporally match the occurrence records. However, this is not always realistic. Often, many occurrence records are from museum specimens that do not have relevant environmental data, e.g. forest cover. In such cases, recent occurrence records may be temporally matched to recent environmental data in order create a mask of values outside of observed ranges. This mask can be applied to the SDM to remove those geographic areas that are unsuitable for the species.
+
+## Needs
+
+These analyses require the following data:
+
+1. SDM: a previously generated species distribution model.
+2. Dated occurrence records: These can be dated yearly, monthly, or daily.
+3. Recent environmental data: These can be dated yearly, monthly, or daily.
+
+## Background
+
+The Olinguito (*Bassaricyon neblina*) is a new species of carnivore described in 2013 from museum specimens that were previously identified as a different species [1]. The Olinguito lives in Northern Andean cloud forests in Colombia and Ecuador, and, according to experts, has strict tolerances for forest cover [2]. Recent occurrence records allow for very simple data-driven masking based on observed ranges of forest cover, but the number of occurrences (n = 18) is likely too few to use in model calibration. The data-driven determination of thresholds for masking using recent records represents a simple, conservative methodology that can be used for many species with limited recent records, and also will prove useful for processing of expert range maps or other pre-existing range estimates that do not take into account human modifications of the environment. 
+ <!-- We tested for any correlation between the forest layers and the climate layers used in the ENM to ensure they are contributing different information.  -->
+
+
+## Methods
+
+A 30 arc-second Bioclimatic-variable climate-based Maxent [1] SDM was tuned for the Olinguito using a mix of historical data paired with field notes, as well as contemporary citizen science records associated with photo-vouchers. The model was trained on 0.7 degree buffered circles around occurrence records and then projected to a 5-degree bounding box around occurrence records. We then removed areas from the SDM representing biogeographic regions where the species has not been documented, like the Eastern Cordillera of Colombia and other small non-contiguous areas.
+
+Next, we used remotely sensed data of the annual percent forest cover for the region (MODIS Vegetation Continuous Fields; 250 m from the years matching the most recent occurrence records: 2006-2016). The MODIS rasters from different years were not all aligned with one another and had to be realigned to create a raster stack. A subset of the more recent occurrence records (2006-2016) were then temporally matched with the forest cover rasters to obtain values of forest cover per occurrence (one record was excluded because it was based on an observation that seemed like roadkill [2]). The forest cover values at occurrence records were then assessed across all years, and the 25th quantile forest cover level was used to generate a forest cover mask for the most recent year (2010). After resampling the SDM to match the resolution of the MODIS data, we applied this forest cover mask to reduce the SDM's spatial prediction to only those climatically suitable areas where forest cover is above the threshold. This reduced model shows a conservative estimation of the species range given current non-climatic variables that represent anthropogenic modification of land cover. 
+
+## References
+
+[1] Phillips, S.J., Anderson, R.P., Schapire, R.E. (2006) Maximum entropy modeling of species geographic distributions. *Ecological Modeling*, **190**, 231 - 259.
+
+[2] Helgen, K.M., Miguel Pinto, C., Kays, R., Helgen, L.E., Tsuchiya, M. T. N., Quinn, A., Wilson, D.E., Maldonado, J.E. (2013) Taxonomic revision of the olingos (*Bassaricyon*), with description of a new species, the Olinguito. *Zookeys*, **324**, 1-83. https://doi.org/10.3897/zookeys.324.5827.
+
+[3] Saavedra-Rodríguez, C. & Rojas-Díaz, V. (2011) Bassaricyon gabbii Allen, 1876 (Carnivora: Procyonidae): new distribution point on western range of Colombian Andes. Check List 7(4), 505–507. http://dx.doi.org/10.15560/7.4.505.
+
+
+## Example
+
+```{r}
+library(raster)
+library(maskRangeR)
+library(lubridate)
+dataDir = '/home/pgalante/Projects/NASA/maskrangeR/UseCaseData/useCases_shrink/dataDriven/olinguito/' # NOTE: Set this to where you have downloaded the data
+```
+
+Read in the environmental and occurrence data.
+
+```{r}
+dateScale <- "year" # or "month", "day"
+env <- stack(list.files(path = paste0(dataDir), pattern = "olinguito_Modis.tif$", full.names = T))
+# this should be a formal date object of class "POSIXct" "POSIXt"
+envDates <- parse_date_time((c('2005','2006','2008','2009','2010')),orders = c("Y", "Ym"))
+datedOccs <- read.csv(paste0(dataDir,'All_new_records_by_year.csv'))
+sdm <- raster(paste0(dataDir,'olinguito_sdm.tif'))
+# crop climate data to study region
+env <- crop(env, extent(sdm))
+```
+
+Prepare the data.
+
+```{r}
+# convert dates to formal date objects
+datedOccs$date <- parse_date_time(datedOccs$date,orders = c("Y", "Ym"))
+# convert to spatial object
+coordinates(datedOccs) <- c('long','lat')
+projection(datedOccs) <- projection(env)
+```
+
+To perform data-driven masking, first find the values of the environmental variable (forest cover in this example) at the occurrence point locations.
+
+```{r}
+datedOccs <- maskRangeR::annotate(datedOccs,env,envDates,dateScale)
+# Note the warnings:
+# [1] "Environmental layers were missing for date 2013"
+# [1] "Environmental layers were missing for date 2016"
+# [1] "Environmental layers were missing for date 2015"
+# These indicate that you have occurrencee records that do not match some environmental data.
+# You may want to look into this, but it is not an issue for using the package.
+```
+
+Then find a suitable lower limit for the mask based on the data.
+
+```{r}
+(bounds <- quantile(datedOccs$env,prob=c(0,.025,.25,.5,.75,.975,1),na.rm=T))
+```
+
+Note that here, there is an occurrence record showing 4% forest cover. This occurrence record comes from a roadkilled specimen, so it is likely not representative of necessary forest cover.
+To simplify for this vignette, we use the 25% observed forest cover as the lower limit.
+
+Create the mask and mask the potential distribution using the most recent year's forest cover.
+
+```{r}
+logicString <- paste0('maskLayers>',quantile(datedOccs$env,prob=.25,na.rm=T))
+forest <- env[[5]]
+names(forest) <- 'forest'
+maskedDist <- maskRangeR::maskRanger(potentialDist=sdm,maskLayers=forest,logicString=logicString)
+```
+
+Check that there are now fewer cells in the masked map.
+
+```{r}
+(nOccupiedCells <- apply(values(maskedDist[[1:2]]),2,sum,na.rm=T))
+```
+
+Plot the results. The first map shows the percent forest cover across the study region in the most recent year. The second map shows regions where forest cover is above the 25th quantile threshold in green and the potential distribution from the SDM in grey. The third map compares the potential distribution 
+(grey) to the masked distribution (red).
+
+```{r,fig=T,fig.height=6,fig.width=7}
+par(mfrow = c(1,3))
+plot(forest,main = 'Raw Forest Data')
+plot(maskedDist[['forestMask']],main = 'Forest Mask + Potential Distribution')
+plot(sdm,add = T,col = c(grey(0,0),grey(.4,.7)))
+plot(maskedDist[[1]],col = c(grey(.6),'red1'),main = 'Masked Distribution')
+```
+
+<!-- ========================================================================== -->
+<!-- ========================================================================== -->
+<!-- ========================================================================== -->
+# Expert Driven: Masking by expert maps
+
+## Issue
+
+Range models may omit areas of presence, or include areas where the species does not exist. Expert knowledge can improve the realism of range models, either by adding suitable regions to a model or removing unsuitable ones. 
+
+## Needs
+
+These analyses require the following data:
+
+1. Expert defined area: This may be an area to add or remove to the species' distribution.
+2. SDM: This may be from an IUCN assessment, a thresholded SDM, or similar binary range indicator.
+
+## Background
+
+### BioModelos
+
+[BioModelos](http://biomodelos.humboldt.org.co/) is a web application for the collaborative development of species distribution models. In BioModelos, taxonomy/ecology/biogeography experts aid in
+
+1. cleaning occurrence data
+2. identifying species' suitable land covers
+3. selecting adequate omission thresholds to create binary models
+4. identifying species' accessible areas as well as areas of model over and underprediction
+5. qualitatively evaluating the biological realism of resulting model predictions. 
+
+A complete description of BioModelos is available [here](https://www.biorxiv.org/content/early/2018/10/05/432617).
+
+Using the web tools available in BioModelos, an expert may draw a polygon on top of a geographic viewer to indicate A) a species' accessible area, B) an area that must be removed from a model, or C) an area that must be added to a model.
+ 
+### Howler Monkey Example
+
+The Howler Monkey, *Alouatta seniculus*, exemplifies a situation in which expert opinion was gathered using BioModelos to make range estimates more realistic. This species occurs in Colombia, Ecuador, Peru, Venezuela and Brazil (IUCN 2018). In Colombia, howler monkeys are widely distributed, occurring from 0-3200 meters. In the Choco biogeographic region, however, they are absent. This pattern is likely due to the dominance of closed canopies in the Choco rather than to any barrier to *A. seniculus* dispersal (Defler 2010) since the mantled howler *Alouatta palliata* is better adapted to closed canopies than *A. seniculus* is.
+
+
+## Methods
+
+Records for *A. seniculus* in Colombia were curated independently by the Colombian Primatology Association and records from outside of Colombia were curated by the Primates Expert Group of BioModelos using the web app. A presence-only model for the distribution of this species was built using a background area spanning from north Peru to south Costa Rica and eastern Ecuador to Venezuela. This region was selected because it contains no known geographic barriers limiting the species' dispersal.
+
+The `ENMeval` package was used to select optimum feature classes/regularization values for the Maxent SDM. Records were partitioned using `checkerboard2`. The final model was run using all available occurrences and the regularization and feature class combination with the highest $AUC_{test}$ in model testing. Experts in the primates group selected the minimum training presence threshold as the threshold that best represented the prevalence of suitable climatic conditions for the species in the country. Once the model was thresholded, they also identified areas of model over- and underprediction. Therefore models were post-processed, as described  [here](https://github.com/LBAB-Humboldt/modeling/tree/master/primates).
+
+The following steps are possible ways to improve the realism of a potential distribution based on expert opinion:
+
+1. **Add polygon**: in some cases an expert may consider that a model underpredicts the suitable area for a species. For example, when modeling the distribution of *A. seniculus* in Colombia, there were gaps in the Amazon that were judged by experts as errors. Those missing areas can be added to the model by directly drawing a polygon onto a map, indicating that model values in the area should be 1, or present.  
+<!-- See link for illustration. -->
+2. **Remove polygon** (not shown here): in some other cases, experts may consider that the model is predicting an area where the species' presence is not possible. Again, for *A. seniculus*, experts considered that predictions of the distribution of this species in the Guajira peninsula were unlikely. They opted to remove that area from the model by drawing a polygon on the map indicating that in the area, model values should be 0, or absent.  
+3. **Mask model**: models may also need to be masked to 1) a drawn polygon; 2) a user provided shapefile; 3) a user-provided list of land covers. For *A. seniculus*, we clipped first by a user-drawn map and later by national boundaries (as we were not interested in predictions beyond Colombia). Later (not shown), we clipped that map using a list of land covers suitable for the species, as defined by experts, using a national land cover map. 
+
+
+## Example
+
+```{r,results='hide'}
+library(devtools)
+library(maskRangeR)
+library(lubridate)
+library(raster)
+library(rgdal)
+dataDir = '/home/pgalante/Projects/NASA/maskrangeR/UseCaseData/useCases_shrink/dataDriven/Alouatta/'
+```
+
+Read in the original SDM and the expert polygon.
+```{r}
+original = stack('/home/pgalante/Projects/NASA/maskrangeR/UseCaseData/useCases_shrink/dataDriven/Alouatta/Alouatta_seniculus_0_mx.tif')
+expertAddedPoly = rgdal::readOGR('/home/pgalante/Projects/NASA/maskrangeR/UseCaseData/useCases_shrink/dataDriven/Alouatta/Alouatta_seniculus_add_HO.shp')
+```
+
+Plot the original SDM.
+
+```{r,fig.height=6,fig.width=7}
+par(mfrow = c(1,1))
+plot(original, main = "Range map")
+```
+
+
+Add the expert polygon to the SDM.
+
+```{r}
+expertAddRaster <- rasterize(expertAddedPoly,original, 1)
+expertAddRaster[is.na(expertAddRaster)] <- 0
+final = original+expertAddRaster
+# remove overlap
+final[final>1] <- 1
+```
+
+Plot the new distribution model with the expert region added.
+```{r,fig.height=6,fig.width=7}
+plot(final, main = "Range map with \n expert area added")
+plot(expertAddedPoly,add = T)
+```
+
+
+Calculate the difference in range size.
+```{r}
+cellStats(original,sum)
+cellStats(final,sum)
+```
+
+
+
+<!-- ========================================================================== -->
+<!-- ========================================================================== -->
+<!-- ========================================================================== -->
+
+# Expert Driven: Multiple expert masks
+
+## Issue 
+
+Some species may not have published occurrence records from which to define environmental tolerances. In these cases, multiple environmental layers are thresholded to the observed tolerances for the species. A range map is then masked by the tolerances, thereby reducing the area of the range map to only those areas suitable based on all environmental data.
+
+## Needs
+
+These analyses require the following data:
+
+1. Environmental layers: These need to be layers deemed important to the species' biology.
+2. Environmental tolerances: These tolerances are used to threshold the environmental layers.
+3. A range map: This map is generally a simplified overestimation of the range of the species and will therefore be reduced through a series of masks.
+
+## Background
+The "swamp forest crab" (*Parathelphusa reticulata*) is a freshwater crab endemic to the Nee Soon Swamp Forest, Singapore's last remaining patch of freshwater swamp forest, and is currently listed as Critically Endangered by the IUCN. Like many freshwater crabs of the Southeast Asia, *P. reticulata* is primarily a scavenger that feeds on coarse organic matter, such as leaf litter. Given its endemic and endangered status, the ideal habitat parameters in which this species is found are highly restricted. However, available distribution information is quite limited: there is only one locality for this species available in GBIF, and the IUCN range map is a coarse overestimate. According to expert opinion, the environmental variables most closely associated with this species' geographic range include distance to forest streams/swamps, pH, dissolved oxygen, temperature, elevation, and canopy cover. However, building a niche-based distribution model is not feasible due to considerable data and sample size limitations that likely violate the assumptions of the approach; the available high quality georeferenced occurrence data (N=1) do not capture the range of habitats occupied by the species. 
+
+## Methods
+
+In this use case, we will perform an expert-driven species range estimate using a series of informed masks that constrain the coarse IUCN range map to a more realistic area of suitable environmental conditions. We will then constrain the range to: areas of soil pH from 5.17-5.79, dissolved oxygen from 27.2-36.6%, daytime air temperature 26-34˚C, elevation 16-26m, and canopy cover 75-100%. These tolerances were developed following Chua et al. (2015), a study that conducted fine-scale sampling in two of the nature reserves in Singapore known to have swamp forest crabs and analyzed the relationship between crab communities and environmental variables. Due to the species' rarity, the occurrence data are not publicly available, however the environmental correlates described above are provided. Data layers include soil pH accessed from soilGrids.org [1], temperature data from worldclim.org [2], elevation from LPDAAC [3], canopy cover from Hansen et al., 2013 [4], and surface water from the global surface water database (Source: EC JRC/Google) [5]. Resolutions differ between layers, so rasters were either resampled or dis/aggregated to match the mask. 
+
+## References
+
+[1] Hengl T, Mendes de Jesus J, Heuvelink GBM, Ruiperez Gonzalez M, Kilibarda M, Blagotić A, et al. (2017) SoilGrids250m: Global gridded soil information based on machine learning. PLoS ONE 12(2): e0169748. https://doi.org/10.1371/journal.pone.0169748  
+[2] Hijmans, R. J., Cameron, S. E., Parra, J. L., Jones, P. G., & Jarvis, A. (2005). Very high resolution interpolated climate surfaces for global land areas. International journal of climatology, 25(15), 1965-1978.  
+[3] NASA/METI/AIST/Japan Space Systems. (2009). ASTER global digital elevation model [data set]. NASA EOSDIS Land Processes DAAC.  
+[4] Hansen, M. C., Potapov, P. V., Moore, R., Hancher, M., Turubanova, S. A. A., Tyukavina, A., ... & Kommareddy, A. (2013). High-resolution global maps of 21st-century forest cover change. science, 342(6160), 850-853.  
+[5] Jean-Francois Pekel, Andrew Cottam, Noel Gorelick, Alan S. Belward, High-resolution mapping of global surface water and its long-term changes. Nature 540, 418-422 (2016). (doi:10.1038/nature20584)_
+
+
+<!-- Chua KWJ, Ng DJJ, Zeng Y, Yeo DCJ. 2015. Habitat characteristics of tropical rainforest freshwater crabs in Singapore. Journal of Crustacean Biology 35(4): 533-539. https://academic.oup.com/jcb/article/35/4/533/2547833  -->
+
+<!-- [1] Hengl T, Mendes de Jesus J, Heuvelink GBM, Ruiperez Gonzalez M, Kilibarda M, Blagotić A, et al. (2017) SoilGrids250m: Global gridded soil information based on machine learning. PLoS ONE 12(2): e0169748. https://doi.org/10.1371/journal.pone.0169748 -->
+<!-- [2] Hijmans, R. J., Cameron, S. E., Parra, J. L., Jones, P. G., & Jarvis, A. (2005). Very high resolution interpolated climate surfaces for global land areas. International journal of climatology, 25(15), 1965-1978. -->
+<!-- [3] NASA/METI/AIST/Japan Space Systems. (2009). ASTER global digital elevation model [data set]. NASA EOSDIS Land Processes DAAC. -->
+<!-- [4] Hansen, M. C., Potapov, P. V., Moore, R., Hancher, M., Turubanova, S. A. A., Tyukavina, A., ... & Kommareddy, A. (2013). High-resolution global maps of 21st-century forest cover change. science, 342(6160), 850-853. -->
+<!-- [5] Jean-Francois Pekel, Andrew Cottam, Noel Gorelick, Alan S. Belward, High-resolution mapping of global surface water and its long-term changes. Nature 540, 418-422 (2016). (doi:10.1038/nature20584) -->
+
+## Example
+
+```{r,results='hide'}
+library(maskRangeR)
+library(raster)
+library(rgdal)
+dataDir = '/home/pgalante/Projects/NASA/maskrangeR/UseCaseData/useCases_shrink/expertDriven/swampForestCrab/'
+```
+
+<!-- singapore=raster(paste0(dataDir,'/SingaporeRaster.tif')) -->
+
+Read in the expert map and the environmental layers.
+```{r}
+expertMap <- readOGR(paste0(dataDir,'IUCNshape/data_0.shp'))
+
+#CM: pH and Water bounds are mutually exclusive, so we can only choose one, otherwise there is no suitable habitat. as I understand it, the soil grids shouldn't be taken too seriously at fine grain
+#masks
+maskListRaw <- list(treeCover = raster(paste0(dataDir,'/Hansen_percent_treecover.tif')), 
+                 dem = raster(paste0(dataDir,'/DEM.tif')),
+                 mat = raster(paste0(dataDir,'/MATsingapore.tif')),
+                 pH = raster(paste0(dataDir,'/PHIHOX_M_sl1_250m.tif')))
+
+# define the limits for each mask
+maskBounds <- read.csv(paste0(dataDir,'/crabInfo.csv'))
+```
+
+Conduct data cleaning to fix names and units.
+```{r}
+# rename the limits to match the raster names in maskListRaw
+maskBounds$Layer <- c('water','treeCover','dem','pH','mat')
+# make sure the units match between the layers and the bounds
+maskListRaw$mat <- maskListRaw$mat/10
+maskListRaw$pH <- maskListRaw$pH/10
+```
+
+Crop rasters to the same extent as the expert map, since we do not need to build masks outside the expert map.
+```{r}
+crt <- maskRangeR::cropResampleTrim(expertMap,maskListRaw)
+```
+
+Create each mask, and mask the expert map.
+```{r}
+expertRaster <- crt$expertRaster
+maskStack <- crt$maskStack
+realized <- maskRangeR::lotsOfMasks(expertRaster,maskStack,maskBounds)
+```
+
+Plot the realized distribution, along with each of masks.
+```{r,fig=T,fig.height=6,fig.width=7}
+plot(stack(realized))
+```
+
+We can zoom in to visualize what is left of the realized distribution after the masking process. The black polygon represents the original expert map and red locations indicate those that remain as suitable habitat after the masks have been applied.
+```{r,fig=T,fig.height=6,fig.width=7}
+real <- raster::trim(realized$realizedDist)
+plot(real,col = c('white','red'))
+plot(expertMap,add = T)
+```
+
+
+Calculate the difference in range size.
+```{r}
+cellStats(expertRaster,sum)
+cellStats(real,sum)
+```
+
+
+
+<!-- ========================================================================== -->
+<!-- ========================================================================== -->
+<!-- ========================================================================== -->
+
+# Data Driven: Masking by biotic interactions
+
+## Issue
+
+In addition to abiotic factors such as forest cover, temperature, elevation, etc., species' distributions are also affected by biotic interactions [1]. For example, putative competitor species often have adjacent but non-overlapping, i.e. parapatric, ranges. In these situations, range estimates based on predictive models may overestimate ranges if the distribution of competitor species is not taken into account. To create more realistic models, we can post-process SDMs for each species to consider biotic constraints, e.g. the presence of a supposed competitor.
+
+## Needs
+
+These analyses require the following data:
+
+1. Occurrence points: georeferenced records for each species.
+2. SDMs for each species: If using a hybrid support vector machine (SVM), i.e. a classifier that accounts for the predicted suitability of habitat from the SDMs, SDM rasters of habitat suitability predictions for each species. The SDMs need to be projected to the same region and the resulting rasters need to have the same extent.
+
+## Background
+
+The three-toed sloths (*Bradypus* spp.) comprise four species distributed across Central and South America. With the exception of *B. pygmaeus*, which is restricted to Isla Escudos de Veraguas, the other three *Bradypus* species range across mainland Central and South America: *B. variegatus* is widely distributed from eastern Honduras to northern Argentina, *B. tridactylus* is found in the Guiana shield region, and *B. torquatus* occurs only in the Brazilian Atlantic Forest. *B. variegatus* and *B. tridactylus* exhibit parapatry, which is likely caused by competition for resources and/or suitable habitat [2]. This situation of congeneric species replacing each other across space is common. *B. variegatus* and *B. torquatus*, on the other hand, are sympatric in regions of the latter's habitat in the Brazilian Atlantic Forest [3]. This analysis delimits the distributions of these three species by masking out regions predicted to be more suitable for the other two species.
+
+## Methods
+
+2.5 arc-minute Bioclimatic-variable climate-based Maxent SDMs were tuned for each species using occurrence data from literature thinned to a distance of 40 km. The SDMs were trained on a background region of 4-degree buffered circles around the thinned occurrence points and projected to a 2-degree bounding box around occurrence records.
+
+After obtaining SDMs for each of the three species, we used the process below to create support vector machines (SVMs) to classify areas predicted to be more suitable for each of the three species. SVMs can be either spatial, using only the occurrence records of each species as predictors, or hybrid, using the habitat suitability from the SDMs as predictors in addition to the occurrence records. These SVMs are then used to mask the SDMs of each species to regions not predicted to be occupied by the other two species.
+
+## References
+
+[1] Anderson, R.P. (2017) When and how should biotic interactions be considered in models of species niches and distributions? Journal of Biogeography, 44(1), 8-17.
+
+[2] de Moraes-Barros, N., Giorgi (2010) Reevaluation of the Geographical Distribution of Bradypus tridactylus Linnaeus, 1758 and B. variegatus Schinz, 1825. Edentata, 11(1), 53-61.
+
+[3] Hirsch, A., Chirello, A.G. (2012) The endangered maned sloth Bradypus torquatus of the Brazilian Atlantic forest: a review and update of geographical distribution and habitat preferences. Mammal Review, 42(1), 35-54.
+
+
+## Example
+
+```{r}
+library(maskRangeR)
+library(raster)
+library(maptools)
+```
+
+Read in the occurrence data and the SDMs for each species. Note that the SDMs must be projected to the same region for input into the hybrid SVMs. For the final step of masking, however, apply the mask to the SDM projected only to the region of biological interest for each species.
+
+```{r}
+dataDir = '/home/pgalante/Projects/NASA/maskrangeR/UseCaseData/useCases_shrink/dataDriven/bradypus/'
+
+# Species occurrence coordinates
+variegatus <- read.csv(paste0(dataDir,'variegatus_occ.csv'))
+tridactylus <- read.csv(paste0(dataDir,'tridactylus_occ.csv'))
+torquatus <- read.csv(paste0(dataDir,'torquatus_occ.csv'))
+
+# SDMs projected to the same extent
+var_sdm <- raster(paste0(dataDir,'variegatus_sdm.tif'))
+tri_sdm <- raster(paste0(dataDir,'tridactylus_sdm.tif'))
+tor_sdm <- raster(paste0(dataDir,'torquatus_sdm.tif'))
+
+# Crop tridactyus SDM to a 2-degree bounding box
+ext_tri <- extent(c(min(tridactylus$longitude)-2, max(tridactylus$longitude)+2, min(tridactylus$latitude)-2, max(tridactylus$latitude)+2))
+tri_sdm_mask <- mask(tri_sdm, as(ext_tri, "SpatialPolygons"))
+
+# Crop torquatus SDM to a 2-degree bounding box
+ext_tor <- extent(c(min(torquatus$longitude)-2, max(torquatus$longitude)+2, min(torquatus$latitude)-2, max(torquatus$latitude)+2))
+tor_sdm_mask <- mask(tor_sdm, as(ext_tor, "SpatialPolygons"))
+```
+
+The following are the SDMs for each species, projected to the same extent and visualized on a map of South America:
+
+```{r,fig.height=6,fig.width=7}
+# Get world map
+data("wrld_simpl")
+# Create list of South American countries for visualization
+country_list <- c("Honduras", "Nicaragua", "Costa Rica", "Panama", "Colombia", "Ecuador", "Peru", "Bolivia", "Chile", "Argentina", "Uruguay", "Paraguay", "Brazil", "French Guiana", "Suriname", "Guyana", "Venezuela")
+
+# Create 3-panel figure
+par(mfrow = c(1,3))
+
+# Plot B. variegatus SDM
+plot(var_sdm, xlim = c(-90, -30), ylim = c(-27, 16))
+plot(wrld_simpl[wrld_simpl$NAME %in% country_list,], add = TRUE)
+# Plot B. tridactylus SDM
+plot(tri_sdm_mask, xlim = c(-70, -49), ylim = c(-6, 11))
+plot(wrld_simpl[wrld_simpl$NAME %in% country_list,], add = TRUE)
+# Plot B. torquatus SDM
+plot(tor_sdm_mask, xlim = c(-46, -34), ylim = c(-24, -8))
+plot(wrld_simpl[wrld_simpl$NAME %in% country_list,], add = TRUE)
+
+# Reset plotting parameters
+par(mfrow = c(1,1))
+```
+
+### Spatial SVMs
+
+Spatial SVMs are created using a classifier trained with the occurrence points of each species, without accounting for habitat suitability according to the SDM.
+
+Tune the model and use it to predict ranges for each of the three species.
+
+```{r, message=FALSE}
+# Create SVM
+svmSP <- rangeSVM(variegatus[,2:3], tridactylus[,2:3], torquatus[,2:3], nrep = 10)
+
+# Use SVM to create a raster of predicted regions
+sloth_svmSP <- rangeSVM_predict(svm = svmSP, r = var_sdm)
+```
+
+Plot the SVM results. The grey areas indicate regions more suitable for *B. variegatus*, the yellow areas indicate regions more suitable for *B. tridactylus*, and the green areas indicate regions more suitable for *B. torquatus*. Black points show the occurrences of *B. variegatus*, red show *B. tridactylus*, and blue show *B. torquatus*.
+
+```{r,fig.height=6,fig.width=7}
+plot(sloth_svmSP, col=c("yellow","pink","lightblue"))
+points(variegatus[,2:3], pch = 20, cex = 0.75, col = "orange")
+points(tridactylus[,2:3], pch = 20, cex = 0.75, col = "red")
+points(torquatus[,2:3], pch = 20, cex = 0.75, col = "blue")
+```
+
+We can use this SVM as a mask over our original SDM predictions.
+
+```{r}
+# masked SDM predictions for variegatus
+var_svmSP <- sloth_svmSP == 1
+var_svmSP[var_svmSP == 0] <- NA
+var_svmSP_mask <- mask(var_sdm, var_svmSP)
+
+# masked SDM predictions for tridactylus
+tri_svmSP <- sloth_svmSP == 2
+tri_svmSP[tri_svmSP == 0] <- NA
+tri_svmSP_mask <- mask(tri_sdm_mask, tri_svmSP)
+
+# masked SDM predictions for torquatus
+tor_svmSP <- sloth_svmSP == 3
+tor_svmSP[tor_svmSP == 0] <- NA
+tor_svmSP_mask <- mask(tor_sdm_mask, tor_svmSP)
+```
+
+Plot the predicted realized distributions for each species.
+
+```{r,fig.height=6,fig.width=7}
+# Create 3-panel figure
+par(mfrow = c(1,3))
+
+plot(var_svmSP_mask, xlim = c(-90, -30), ylim = c(-27, 16))
+plot(wrld_simpl[wrld_simpl$NAME %in% country_list,], add = TRUE)
+plot(tri_svmSP_mask, xlim = c(-70, -49), ylim = c(-6, 11))
+plot(wrld_simpl[wrld_simpl$NAME %in% country_list,], add = TRUE)
+plot(tor_svmSP_mask, xlim = c(-46, -34), ylim = c(-24, -8))
+plot(wrld_simpl[wrld_simpl$NAME %in% country_list,], add = TRUE)
+
+# Reset plotting parameters
+par(mfrow = c(1,1))
+```
+
+### Hybrid SVMs 
+
+Hybrid SVMs take into account the occurrence points of all species as well as the environmental suitability predicted by the species' SDMs.
+
+```{r, message = FALSE}
+# Create SVM
+svmHYB <- rangeSVM(variegatus[,2:3], tridactylus[,2:3], torquatus[,2:3], sdm = raster::stack(var_sdm, tri_sdm, tor_sdm), nrep = 10)
+
+# Use SVM to create a raster of predicted regions
+sloth_svmHYB <- rangeSVM_predict(svm = svmHYB, r = var_sdm, sdm = raster::stack(var_sdm, tri_sdm, tor_sdm))
+```
+
+Plot the SVM results.
+
+```{r,fig.height=6,fig.width=7}
+plot(sloth_svmHYB, col=c("yellow","pink","lightblue"))
+points(variegatus[,2:3], pch = 20, cex = 0.75, col = "orange")
+points(tridactylus[,2:3], pch = 20, cex = 0.75, col = "red")
+points(torquatus[,2:3], pch = 20, cex = 0.75, col = "blue")
+```
+
+Use the hybrid SVM as a mask over our SDM predictions.
+
+```{r}
+# masked SDM predictions for variegatus
+var_svmHYB <- sloth_svmHYB == 1
+var_svmHYB[var_svmHYB == 0] <- NA
+var_svmHYB_mask <- mask(var_sdm, var_svmHYB)
+
+# masked SDM predictions for tridactylus
+tri_svmHYB <- sloth_svmHYB == 2
+tri_svmHYB[tri_svmHYB == 0] <- NA
+tri_svmHYB_mask <- mask(tri_sdm_mask, tri_svmHYB)
+
+# masked SDM predictions for torquatus
+tor_svmHYB <- sloth_svmHYB == 3
+tor_svmHYB[tor_svmHYB == 0] <- NA
+tor_svmHYB_mask <- mask(tor_sdm_mask, tor_svmHYB)
+```
+
+Plot the predicted realized distributions for each species.
+
+```{r,fig.height=6,fig.width=7}
+# Create 3-panel figure
+par(mfrow = c(1,3))
+
+plot(var_svmHYB_mask, xlim = c(-90, -30), ylim = c(-27, 16))
+plot(wrld_simpl[wrld_simpl$NAME %in% country_list,], add = TRUE)
+plot(tri_svmHYB_mask, xlim = c(-70, -49), ylim = c(-6, 11))
+plot(wrld_simpl[wrld_simpl$NAME %in% country_list,], add = TRUE)
+plot(tor_svmHYB_mask, xlim = c(-46, -34), ylim = c(-24, -8))
+plot(wrld_simpl[wrld_simpl$NAME %in% country_list,], add = TRUE)
+
+# Reset plotting parameters
+par(mfrow = c(1,1))
+```
+
+After creating masks such as these based on biotic factors, one could further mask by forest cover, accessible habitat, or other factors.
+

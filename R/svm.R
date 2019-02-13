@@ -12,7 +12,7 @@
 #' @param sdm Raster or RasterStack representing environmental suitability (can be predictions from SDMs). 
 #' These must have the same extent as both species' occurrence points. Default is NULL.
 #' @param nrep Numeric for number of SVM tuning iterations. Default is 100.
-#' @param weight Boolean. If TRUE, the species with less occurrence records is weighted higher in the SVM.
+#' @param weight Boolean. If TRUE, species with fewer occurrence records are weighted higher in the SVM.
 #' Default is FALSE.
 #' @return The tuned SVM model.
 #' @details The tuning operation uses \code{tune.svm()} from the e1071 package, which performs 10-fold
@@ -29,49 +29,82 @@
 #' 
 #' @examples
 #' \dontrun{
-#' # tune SVMs on coordinates only (spatial)
-#' rangeSVM(xy1, xy2)
-#' 
-#' # tune SVMs on coordinates and SDM prediction rasters (spatial + environmental)
-#' rangeSVM(xy1, xy2, raster::stack(sdm1, sdm2))
+#' ########## Maksing by biotic interactions
+#' simulateData()
+#' # Spatial SVMs
+#' svm.SP <- rangeSVM(sp1.xy, sp2.xy, sp3.xy, nrep=10)
+#' # Use SVM to create a raster of predicted regions
+#' rand_svm.SP <- rangeSVM_predict(svm = svm.SP, r = r1.svm)
+#' # Plot the results
+#' plot(rand_svm.SP, col=c("yellow","pink","lightblue"))
+#' points(sp1.xy, pch = 20, cex = 0.75, col = "orange")
+#' points(sp2.xy, pch = 20, cex = 0.75, col = "green")
+#' points(sp3.xy, pch = 20, cex = 0.75, col = "blue")
+#' # We can use this SVM as a mask over our original SDM predictions.
+#' # masked SDM predictions for variegatus
+#' sp1_svm.SP <- rand_svm.SP == 1
+#' sp1_svm.SP[sp1_svm.SP == 0] <- NA
+#' sp1_svmSP_mask <- mask(r1.sdm, sp1_svm.SP)
+#' # masked SDM predictions for tridactylus
+#' sp2_svm.SP <- rand_svm.SP == 2
+#' sp2_svm.SP[sp2_svm.SP == 0] <- NA
+#' sp2_svmSP_mask <- mask(r2.sdm, sp2_svm.SP)
+#' # masked SDM predictions for torquatus
+#' sp3_svm.SP <- rand_svm.SP == 3
+#' sp3_svm.SP[sp3_svm.SP == 0] <- NA
+#' sp3_svmSP_mask <- mask(r3.sdm, sp3_svm.SP)
+#' ##Plot the predicted realized distributions for each species.
+#' # Create 3-panel figure
+#' par(mfrow = c(1,3))
+#' plot(sp1_svmSP_mask)
+#' plot(sp2_svmSP_mask)
+#' plot(sp3_svmSP_mask)
+#' ## Hybrid SVMs
+#' # Create SVM
+#' svmHYB <- rangeSVM(sp1.xy, sp2.xy, sp3.xy, sdm = raster::stack(r1.sdm, r2.sdm, r3.sdm), nrep = 10)
+#' # Use SVM to create a raster of predicted regions
+#' rand_svmHYB <- rangeSVM_predict(svm = svmHYB, r = r1.sdm, sdm = raster::stack(r1.sdm, r2.sdm, r3.sdm))
+#' ## Plot the SVM results.
+#' plot(rand_svmHYB, col=c("yellow","pink","lightblue"))
+#' points(sp1.xy, pch = 20, cex = 0.75, col = "orange")
+#' points(sp2.xy, pch = 20, cex = 0.75, col = "green")
+#' points(sp3.xy, pch = 20, cex = 0.75, col = "blue")
+#' ## Use the hybrid SVM as a mask over our SDM predictions.
+#' # masked SDM predictions for variegatus
+#' sp1_svmHYB <- rand_svmHYB == 1
+#' sp1_svmHYB[rand_svmHYB == 0] <- NA
+#' sp1_svmHYB_mask <- mask(r1.sdm, sp1_svmHYB)
+#' # masked SDM predictions for tridactylus
+#' sp2_svmHYB <- rand_svmHYB == 2
+#' sp2_svmHYB[sp2_svmHYB == 0] <- NA
+#' sp2_svmHYB_mask <- mask(r2.sdm, sp2_svmHYB)
+#' # masked SDM predictions for torquatus
+#' sp3_svmHYB <- rand_svmHYB == 3
+#' sp3_svmHYB[sp3_svmHYB == 0] <- NA
+#' sp3_svmHYB_mask <- mask(r3.sdm, sp3_svmHYB)
+#' ## Plot the predicted realized distributions for each species.
+#' # Create 3-panel figure
+#' par(mfrow = c(1,3))
+#' plot(sp1_svmHYB_mask)
+#' plot(sp2_svmHYB_mask)
+#' plot(sp3_svmHYB_mask)
 #' }
 #' @export
 #' 
 #' 
 
-# to clarify:
-# 1. specifics on optimality criterion (weights false positives and false negatives equally?)
-# 2. nothing to break tie (how do we choose when there are ties?)
-# 3. could easily allow users to change k
-# 4. sensitivity to relative number of points near border (and assumes that sampling bias was addressed?)
-# 5. which params are varied and what they mean
-# 6. convey to Cory to make generalizable to more than 2 species
-
 rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
   
-  
-  
-  # define class weights
-  # if(weight == TRUE) {
-  #   if(nrow(xy1) != nrow(xy2)) {
-  #     if(nrow(xy1) > nrow(xy2)) {
-  #       cw <- c("0" = 1, "1" = nrow(xy1)/nrow(xy2))
-  #     } else {
-  #       cw <- c("0" = nrow(xy2)/nrow(xy1), "1" = 1)
-  #     }
-  #   }
-  # } else {
-  #   cw <- c("0" = 1, "1" = 1)
-  # }
-  
-  
   # bind both coordinate matrices
-  xy <- rbind(xy1, xy2)
+  xy <- as.data.frame(rbind(xy1, xy2))
   otherSp <- list(...)
   nsp <- 2 + length(otherSp)
   sp.num <- c(nrow(xy1), nrow(xy2), sapply(otherSp, nrow))
   xy.otherSp <- do.call("rbind", otherSp)
   xy <- rbind(xy, xy.otherSp)
+  # make sure the column names are x and y
+  names(xy) <- c("x", "y")
+  
   # if using sdm prediction rasters as extra predictor variable, add the values to the matrix 
   if(!is.null(sdm)) {
     sdm.vals <- raster::extract(sdm, xy)
@@ -114,14 +147,14 @@ rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
   # gamma_opt <- getMax(gamma_best)
   # C_opt <- getMax(C_best)
   params_best_df <- do.call(rbind, params_best)
-  params_best_df$params <- paste0(params_best_df$gamma, params_best_df$cost)
-  mostFreq <- names(which(table(params_best_df$params) == max(table(params_best_df$params))))
-  params_best_df_mostFreq <- params_best_df[params_best_df$params == mostFreq, 1:2]
+  params_best_count <- dplyr::count(params_best_df, gamma, cost)
   
   # Add error message if there is no most frequent combination of parameters
-  if(nrow(params_best_df_mostFreq) == 0){
+  if(sum(params_best_count$n > 1) == 0){
     stop("Tuning did not produce a most frequent combination of SVM parameters. Please increase nrep and try again.")
   }
+  
+  params_best_sel <- params_best_df[which(params_best_count$n == max(params_best_count$n)),]
   
   # run final model
   if(weight == TRUE) {
@@ -131,7 +164,6 @@ rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
     m <- e1071::svm(sp ~ ., data = xy, gamma = params_best_df_mostFreq$gamma[1], 
                     cost = params_best_df_mostFreq$cost[1])
   }
-  
   
   return(m)
 }
@@ -168,15 +200,18 @@ rangeSVM_predict <- function(svm, r, sdm = NULL) {
   # extract centroid coordinates from shared extent raster cells
   r.pts <- raster::rasterToPoints(r, spatial = TRUE)
   r.xy <- sp::coordinates(r.pts)
+  # rename column names to match response of svm
+  colnames(r.xy) <- c("x", "y")
   # if sdm prediction raster input, add the values to the matrix 
   if(!is.null(sdm)) {
     sdm.vals <- raster::extract(sdm, r.xy)
     r.xy <- cbind(r.xy, sdm = sdm.vals)
+    sdm.names <- seq(3, 2+ncol(sdm.vals))
+    colnames(r.xy)[sdm.names] <- names(svm$x.scale$`scaled:center`[sdm.names])
   }
-  # rename column names to match response of svm
-  colnames(r.xy) <- names(svm$x.scale$`scaled:center`)
+  
   # predict species identity of all coordinates with svm
-  sp12.svm <- raster::predict(svm, r.xy)
+  sp12.svm <- predict(svm, r.xy)
   # convert factor response to integer
   sp12.svm <- as.numeric(as.character(sp12.svm))
   # convert back to raster
