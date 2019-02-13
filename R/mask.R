@@ -3,7 +3,7 @@
 #==================================================================================
 #' @title Make a matrix of modeling decisions to be used to specify clipping rules
 #'
-#' @description to do
+#' @description Performs data driven masking of potential species distributions.
 #' @details
 #' See Examples.
 #' @param potentialDist A raster stack of binary or continuous values. Supplying more than one layer will be interepreted as different time periods. Layers should follow the naming convention `Y2000`, `Y2001`, etc.
@@ -16,8 +16,51 @@
 #'  \item{mask}{mask cells with values outside the bounds}
 #' }
 # @examples
-#'
-#'
+#' \dontrun{
+#' ########## Forest Cover Mask 
+#' simulateData()
+#' # Declare the date scale
+#' dateScale = "year"
+#' # Declare dates for simulated env data
+#' envDates <- parse_date_time(paste0("",2010:2014, ""), orders = c("Y", "Ym"))
+#' ###  Preparing data
+#' # convert to spatial object
+#' coordinates(datedOccs) <- c("x", "y")
+#' ##  Performing data-driven masking. First find the values of the environment at point locations
+#' datedOccs <- annotate(datedOccs, env, envDates, dateScale)
+#' # find suitable bounds
+#' bounds <- min(datedOccs$env)
+#' ## Create mask, and use it on SDM
+#' logicString = paste0('maskLayers >', bounds)
+#' # use 'most recent' environmental variable as base for mask
+#' SDMmask <- env[[5]]
+#' names(SDMmask) <- "SDM_mask"
+#' maskedDist <- maskRanger(potentialDist = sdm, maskLayers = SDMmask, logicString = logicString)
+#' # Notice that the minimum observed value was masked from the 'most recent' environmental raster
+#' par(mfrow=c(1,3))
+#' plot(SDMmask, main = "Most recent env")
+#' plot(maskedDist[['SDM_maskMask']], main = "Mask + SDM")
+#' plot(sdm, add=T, col = c(grey(0,0), grey(0.4,0.7)))
+#' plot(maskedDist[[1]], col=c(grey(0.6), 'red1'), main = "Masked Distribution")
+#' 
+#' ##########  Multiple Expert Maps
+#' simulateData()
+#' expertRaster <- rasterize(polyg, r1)
+#' maskStack <- stack(env1, env2, env3)
+#' names(maskStack) <- c("env1", "env2", "env3")
+#' # Get list of tolerances for environmental data
+#' env1Vals <- quantile(values(env1), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
+#' env2Vals <- quantile(values(env2), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
+#' env3Vals <- quantile(values(env3), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
+#' maskBounds <- data.frame(rbind(cbind(env1Vals[[3]], env1Vals[[5]]), cbind(env2Vals[[3]], env2Vals[[5]]), cbind(env3Vals[[3]], env3Vals[[5]])))
+#' maskBounds <- cbind(names(maskStack), maskBounds)
+#' colnames(maskBounds) <- c("Layer", "min", "max")
+#' # mask range by these tolerance masks
+#' realized <- lotsOfMasks(expertRaster, maskStack, maskBounds)
+#' plot(stack(realized))
+#' plot(realized$realizedDist)
+#' plot(polyg, add = T)
+#' }
 # @return
 #' @author Cory Merow <cory.merow@@gmail.com>,
 #' @note To apply multiple masks, e.g., elevation and forest cover, use separate calls to maskRS.

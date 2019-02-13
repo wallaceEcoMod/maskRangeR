@@ -1,6 +1,6 @@
 #==================================================================================
 #==================================================================================
-#' @title Annotate point with rasters based on matching dates assoi
+#' @title Annotate point data with rasters based on matching dates.
 #'
 #' @description Annotate point with rasters based on matching dates associated with points to dates associated with raster. Specifically, we're thinking of the points as species observations and the rasters as remotely sensed environmental layers, but they can represent any points and rasters with dates.
 #' @details
