@@ -113,6 +113,13 @@ rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
   # add a species signifier field
   xy$sp <- factor(rep(1:nsp, times=sp.num))
   
+  # define class weights
+  if(weight == TRUE) {
+    cw <- 1/table(xy$sp)
+  } else {
+    cw <- table(xy$sp)/table(xy$sp)
+  }
+  
   # define a range for parameters C and gamma, which control complexity of fit
   # ranges based on suggestions from https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf
   C_range <- 2^seq(-5, 15, 2)
@@ -126,27 +133,18 @@ rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
   # year={2005},
   # publisher={Department of Statistics and Mathematics, WU Vienna University of Economics and Business}
   params_best <- list()
-  # performance_best <- list()
-  gamma_best <- numeric(nrep)
-  C_best <- numeric(nrep)
+  performance_best <- list()
   
   for(i in 1:nrep) {
-    m.tune <- e1071::tune.svm(sp ~ ., data = xy, gamma = gamma_range, cost = C_range)  
-    # print(sum(as.numeric(as.character(predict(m.tune$best.model, aus.xy)))))
-    # print(sum(as.numeric(as.character(predict(m.tune$best.model, tel.xy)))))
+    m.tune <- e1071::tune.svm(sp ~ ., data = xy, gamma = gamma_range, cost = C_range, class.weights = cw)  
     # get optimal parameter values
     params_best[[i]] <- m.tune$best.parameters
-    # performance_best[[i]] <- m.tune$best.performance
-    # gamma_best[i] <- m.tune$best.parameters[[1]]
-    # C_best[i] <- m.tune$best.parameters[[2]]
+    performance_best[[i]] <- m.tune$best.performance
     message(paste("Run", i, "complete."))
   }
   # # function to extract the value of either parameter that was best most often
-  # getMax <- function(x) as.numeric(names(which(table(x) == max(table(x)))))
-  # # get the optimal parameter values based on iterations of svm
-  # gamma_opt <- getMax(gamma_best)
-  # C_opt <- getMax(C_best)
-  params_best_df <- do.call(rbind, params_best)
+  performance_best <- do.call(rbind, performance_best)
+  params_best_df <- cbind(do.call(rbind, params_best)[,1:2], performance_best)
   params_best_count <- dplyr::count(params_best_df, gamma, cost)
   
   # Add error message if there is no most frequent combination of parameters
@@ -154,16 +152,24 @@ rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
     stop("Tuning did not produce a most frequent combination of SVM parameters. Please increase nrep and try again.")
   }
   
-  params_best_sel <- params_best_df[which(params_best_count$n == max(params_best_count$n)),]
+  params_mostFreq <- params_best_count[params_best_count$n == max(params_best_count$n),1:2]
+  
+  if(nrow(params_mostFreq) > 1){
+    mean_performance <- numeric(nrow(params_mostFreq))
+    for (i in 1:nrow(params_mostFreq)) {
+      gamma_i <- as.numeric(params_mostFreq[i, 1])
+      cost_i <- as.numeric(params_mostFreq[i, 2])
+      mostFreq_i <- params_best_df[params_best_df$gamma == gamma_i & params_best_df$cost == cost_i, ]
+      mean_performance[i] <- mean(mostFreq_i$performance_best)
+    }
+    param_combo_best <- params_mostFreq[which.min(mean_performance), ]
+  } else {
+    param_combo_best <- params_mostFreq
+  }
   
   # run final model
-  if(weight == TRUE) {
-    m <- e1071::svm(sp ~ ., data = xy, gamma = params_best_df_mostFreq$gamma[1], 
-                    cost = params_best_df_mostFreq$cost[1], class.weights = "inverse")
-  } else {
-    m <- e1071::svm(sp ~ ., data = xy, gamma = params_best_df_mostFreq$gamma[1], 
-                    cost = params_best_df_mostFreq$cost[1])
-  }
+  m <- e1071::svm(sp ~ ., data = xy, gamma = param_combo_best$gamma, 
+                    cost = param_combo_best$cost, class.weights = cw)
   
   return(m)
 }
