@@ -1,5 +1,5 @@
 ---
-title: "Masking with Forest Cover"
+title: "Masking Species Ranges"
 author: "Cory Merow"
 date: "`r Sys.Date()`"
 output:
@@ -123,11 +123,11 @@ plot(maskedDist[[1]],col=c(grey(.6),'red1'),main='Masked Distribution')
 ## Background 
 BioModelos is a web app for the collaborative development of species distribution models [link](http://biomodelos.humboldt.org.co/). In BioModelos, taxonomic/ecology/biogeography experts aid in
 
-1. cleaning occurrence data
-2. identifying species' suitable land covers
-3. selecting adequate omission thresholds to create binary models
-4. identifying species' accessible areas as well as areas of model over and underprediction
-5. qualitatively evaluating the biological realism of resulting model predictions. 
+  1. cleaning occurrence data
+  2. identifying species' suitable land covers
+  3. selecting adequate omission thresholds to create binary models
+  4. identifying species' accessible areas as well as areas of model over and underprediction
+  5. qualitatively evaluating the biological realism of resulting model predictions. 
 
 A complete description of BioModelos is available [here](https://www.biorxiv.org/content/early/2018/10/05/432617).
 
@@ -136,10 +136,13 @@ This use case concerns processing of expert inputs in step 5. Using web tools av
 Records for *A. seniculus* in Colombia were curated independently by the Colombian Primatology Association and records from outside of Colombia were curated by the Primates Expert Group of BioModelos using the web app. A presence-only model for the distribution of this species was built using a background area from north Peru to south Costa Rica and limiting to the west with Venezuela. The rationale for this was that given the wide altitudinal range of the species it did not seem like there was any geographic barrier limiting *A. seniculus* dispersal in this region, but rather that habitat preferences limit its distribution. Modeling done in Maxent and ENMeval was used to select optimum feature/regularization values using `checkerboard2` to partition records and $AUC_{test}$ as evaluation criterion. The final model was run using all available occurrences and the regularization and feature combination with the highest AUC in model testing. Experts in the primates group selected the minimum training presence threshold as the threshold that best represented the prevalence of suitable climatic conditions for the species in the country. However, they also identified areas of model over and underprediction once the model was thresholded. Therefore models were post-processed, as described  [here](https://github.com/LBAB-Humboldt/modeling/tree/master/primates).
 
 In summary the following steps had to be performed to improve the statistical model:
-1. **Add polygon**: in some cases an expert may consider that a model underpredicts the suitable area for a species. For example, when modeling the Howling Monkey (*A. seniculus*) in Colombia there were gaps in the distribution of this species in the Amazon, that were judged by experts as errors. Therefore, they may add those missing areas to the model by directly drawing a polygon onto a map, indicating that values in the area should change to 1. 
+
+  1. **Add polygon**: in some cases an expert may consider that a model underpredicts the suitable area for a species. For example, when modeling the Howling Monkey (*A. seniculus*) in Colombia there were gaps in the distribution of this species in the Amazon, that were judged by experts as errors. Therefore, they may add those missing areas to the model by directly drawing a polygon onto a map, indicating that values in the area should change to 1. 
+  
 <!-- See link for illustration. -->
-2. **Remove polygon**: in some other cases, experts may consider that the model is predicting an area where the species' presence is not possible. Again, for *A. seniculus*, experts considered that predictions of the distribution of this species in the Guajira peninsula were unlikely. They opted to remove that area from the model by drawing a polygon into the map indicating that in the area model values should be 0.
-3. **Mask model**: models may also need to be masked to 1) drawn polygon; 2) user provided shapefile; 3) user provided list of land covers. In the Howling Monkey example we clipped first by an user drawn map and later by national boundaries (as we were not interested in predictions beyond Colombia). Later (not shown), we clipped that map using a list of land covers suitable for the species, as defined by experts, using a national land cover map. 
+  2. **Remove polygon**: in some other cases, experts may consider that the model is predicting an area where the species' presence is not possible. Again, for *A. seniculus*, experts considered that predictions of the distribution of this species in the Guajira peninsula were unlikely. They opted to remove that area from the model by drawing a polygon into the map indicating that in the area model values should be 0.
+
+  3. **Mask model**: models may also need to be masked to 1) drawn polygon; 2) user provided shapefile; 3) user provided list of land covers. In the Howling Monkey example we clipped first by an user drawn map and later by national boundaries (as we were not interested in predictions beyond Colombia). Later (not shown), we clipped that map using a list of land covers suitable for the species, as defined by experts, using a national land cover map. 
 
 ## Example
 ```{r,results='hide'}
@@ -184,7 +187,7 @@ cellStats(final,sum)
 <!-- ========================================================================== -->
 <!-- ========================================================================== -->
 
-# 2. Multiple expert masks
+# 3. Multiple expert masks
 
 ## Background
 The "swamp forest crab" (*Parathelphusa reticulata*) is a freshwater crab endemic to the Nee Soon Swamp Forest, Singapore's last remaining patch of freshwater swamp forest, and is currently listed as Critically Endangered by the IUCN. Like many freshwater crabs of the region (i.e. Southeast Asia), *P. reticulata* is primarily a scavenger that feeds on coarse organic matter, such as leaf litter. Given its endemic and endangered status, the ideal habitat parameters in which this species is found are highly restricted. However, available distribution information is quite limited: there is only one locality for this species available in GBIF, and the IUCN range map is a coarse overestimate. The environmental variables most closely associated with this species' geographic range, according to expert opinion, include distance to forest streams/swamps, pH, dissolved oxygen, temperature, elevation, and canopy cover. However, building a niche-based distribution model is not feasible due to considerable data and sample size limitations that likely violate the assumptions of the approach (available high quality georeferenced occurrence data (N=1) do not capture the range of habitats occupied by the species). In this use case, we will perform an expert-driven species range estimate using a series of informed masks that constrain the coarse IUCN range map to a more specific area of suitable environmental. We will then constrain the range to: areas of soil pH from 5.17-5.79, dissolved oxygen from 27.2-36.6%, daytime temperature (air) 26-34˚C, elevation 16-26m, and canopy cover 75-100%, following Chua et al. (2015), a study that conducted fine-scale sampling in two of the nature reserves in Singapore known to have swamp forest crabs and analyzed the relationship between crab communities and environmental variables. Due to the species rarity, the occurrence data are not publicly available, however the environmental correlates described above are provided. Data layers include soil pH accessed from soilGrids.org[1], temperature data was accessed from worldclim.org[2], elevation from LPDAAC[3], canopy cover from Hansen et al., 2013[4], and surface water from the global surface water database (Source: EC JRC/Google)[5]. Resolutions differ between layers. Therefore, rasters were either resampled or dis/aggregated to match the mask. 
