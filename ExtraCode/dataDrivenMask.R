@@ -10,14 +10,13 @@
 #' @param Bounds User selects which bounds observed for the species are limiting: "upper", "lower", "both"
 #'         
 #' @author Peter Galante <pgalante@@amnh.org>
-#' 
+#' @export
 ##########################################################################################
 #############################  MASTER FUNCTION TO MASK MODEL OUTPUT  #####################
 ##########################################################################################
 RSmask<-function(datedOccs, RSenv, dateScale, Model, Bounds){
   ###############################################################################
   ### Extract occs into sub-tables based on dates (here, using only year)  ######
-  ##############  Eventually, find online RS data for tutorial  #################
   ##  First parse out the dates into the appropriate dateScale (year, month, date)
   occ1 <- .reDate(datedOccs = datedOccs, dateScale = dateScale)
   ##  Next, for each appropriate dateScale, get unique dates

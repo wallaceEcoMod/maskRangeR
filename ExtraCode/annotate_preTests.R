@@ -1,9 +1,9 @@
 # Testing the annoting function for different time scales
 # this could be turned into formal tests 
-library(maskedRangeR)
+library(maskRanger)
 library(raster)
 library(lubridate)
-dataDir='/Users/ctg/Dropbox/Projects/Wallace/maskedRangeR_Misc/UseCaseData/dataDriven/AmbyOpac'
+dataDir='/Users/ctg/Dropbox/Projects/Wallace/maskRanger_Misc/UseCaseData/dataDriven/AmbyOpac'
 
 datedOccs=read.csv(paste0(dataDir,'/datedOccsAmby.csv'))
 potentialDist=raster(paste0(dataDir,'/AmbyOpac.tif'))

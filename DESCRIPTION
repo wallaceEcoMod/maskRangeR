@@ -1,7 +1,13 @@
-Package: maskedRangeR
+Package: maskRangeR
 Title: Mask Species Geographic Ranges
 Version: 0.0.0.9000
-Authors@R: person("Cory", "Merow", email = "cory.merow@gmail.com", role = c("aut", "cre"))
+Authors@R: as.person(c(
+  "Cory Merow <cory.merow@gmail.com> [aut, cre]",
+  "Peter J. Galante <pgalante@amnh.org> [aut]",
+  "Jamie M. Kass <jamie.m.kass@gmail.com> [aut]",
+  "Cecina Babich Morrow <cbabichmorrow@amnh.org> [aut]",
+  "Valentina Grisales Betancur <vgrisale@eafit.edu.co> [aut]"
+  ))
 Description: This package masks (or clips) ranges based on expert knowledge or remote sensing layers.
 Depends: R (>= 3.4.3)
 License: MIT + file LICENSE
@@ -21,5 +27,5 @@ Suggests:
     testthat,
     knitr,
     rmarkdown    
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 VignetteBuilder: knitr
