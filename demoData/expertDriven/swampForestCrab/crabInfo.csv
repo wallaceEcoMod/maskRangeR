@@ -1,0 +1,6 @@
+Layer,Min Value,Max Value
+StandingWaterPercent,50,100
+Hansen_percent_treecover,75,100
+DEM,16,26
+soilpH,5.17,5.79
+MAT,26,34
