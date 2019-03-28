@@ -27,7 +27,3 @@ getDemoData <- function(path){
   unzip(paste0(path, "/test.zip"))
 }
 
-path = "/home/pgalante/Projects/Garbage"
-
-
-getDemoData(path = path)

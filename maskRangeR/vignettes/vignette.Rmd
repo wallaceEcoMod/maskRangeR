@@ -1,6 +1,6 @@
 ---
 title: "maskRangeR; improving spatial and temporal accuracy of species distribution models"
-author: "Cory Merow, Peter J. Galante, Cecina Babich Morrow, Jamie M. Kass, Alex Moore, Jorge Velasquez, Robert P. Anderson, Mary E. Blair"
+author: "Cory Merow, Peter J. Galante, Cecina Babich Morrow, Jamie M. Kass, Alex Moore, Valentina Grisales-Betancur, Jorge Velasquez, Robert P. Anderson, Mary E. Blair"
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
@@ -85,14 +85,19 @@ Next, we used remotely sensed data of the annual percent forest cover for the re
 
 [3] Saavedra-Rodríguez, C. & Rojas-Díaz, V. (2011) Bassaricyon gabbii Allen, 1876 (Carnivora: Procyonidae): new distribution point on western range of Colombian Andes. Check List 7(4), 505–507. http://dx.doi.org/10.15560/7.4.505.
 
-
+```{r, include=F}
+path = "/home/pgalante/Projects/Garbage"
+```
 ## Example
+
+By setting the pathway to where you saved our canned datasets by using the getDemoData() function, access that data by setting that as the working directory. 
 
 ```{r}
 library(raster)
 library(maskRangeR)
 library(lubridate)
-dataDir = '/home/pgalante/Projects/NASA/maskrangeR/UseCaseData/useCases_shrink/dataDriven/olinguito/' # NOTE: Set this to where you have downloaded the data
+## Remember that the 'path' is the directory in which you saved the demonstration data 
+dataDir = paste0(path, '/dataDriven/olinguito/') 
 ```
 
 Read in the environmental and occurrence data.
@@ -218,19 +223,21 @@ The following steps are possible ways to improve the realism of a potential dist
 
 ## Example
 
+By setting the pathway to where you saved our canned datasets by using the getDemoData() function, access that data by setting that as the working directory. 
+
 ```{r,results='hide'}
 library(devtools)
 library(maskRangeR)
 library(lubridate)
 library(raster)
 library(rgdal)
-dataDir = '/home/pgalante/Projects/NASA/maskrangeR/UseCaseData/useCases_shrink/dataDriven/Alouatta/'
+dataDir = paste0(path, '/dataDriven/Alouatta/')
 ```
 
 Read in the original SDM and the expert polygon.
 ```{r}
-original = stack('/home/pgalante/Projects/NASA/maskrangeR/UseCaseData/useCases_shrink/dataDriven/Alouatta/Alouatta_seniculus_0_mx.tif')
-expertAddedPoly = rgdal::readOGR('/home/pgalante/Projects/NASA/maskrangeR/UseCaseData/useCases_shrink/dataDriven/Alouatta/Alouatta_seniculus_add_HO.shp')
+original = stack(paste0(dataDir, 'Alouatta_seniculus_0_mx.tif'))
+expertAddedPoly = rgdal::readOGR(paste0(dataDir, 'Alouatta_seniculus_add_HO.shp'))
 ```
 
 Plot the original SDM.
@@ -310,11 +317,13 @@ In this use case, we will perform an expert-driven species range estimate using 
 
 ## Example
 
+By setting the pathway to where you saved our canned datasets by using the getDemoData() function, access that data by setting that as the working directory. 
+
 ```{r,results='hide'}
 library(maskRangeR)
 library(raster)
 library(rgdal)
-dataDir = '/home/pgalante/Projects/NASA/maskrangeR/UseCaseData/useCases_shrink/expertDriven/swampForestCrab/'
+dataDir = paste0(path, '/expertDriven/swampForestCrab/')
 ```
 
 <!-- singapore=raster(paste0(dataDir,'/SingaporeRaster.tif')) -->
@@ -414,6 +423,8 @@ After obtaining SDMs for each of the three species, we used the process below to
 
 ## Example
 
+By setting the pathway to where you saved our canned datasets by using the getDemoData() function, access that data by setting that as the working directory. 
+
 ```{r}
 library(maskRangeR)
 library(raster)
@@ -423,7 +434,7 @@ library(maptools)
 Read in the occurrence data and the SDMs for each species. Note that the SDMs must be projected to the same region for input into the hybrid SVMs. For the final step of masking, however, apply the mask to the SDM projected only to the region of biological interest for each species.
 
 ```{r}
-dataDir = '/home/pgalante/Projects/NASA/maskrangeR/UseCaseData/useCases_shrink/dataDriven/bradypus/'
+dataDir = paste0(path, '/dataDriven/bradypus/')
 
 # Species occurrence coordinates
 variegatus <- read.csv(paste0(dataDir,'variegatus_occ.csv'))
