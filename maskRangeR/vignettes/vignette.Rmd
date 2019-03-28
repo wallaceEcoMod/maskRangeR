@@ -200,6 +200,7 @@ These analyses require the following data:
 
 A complete description of BioModelos is available [here](https://www.biorxiv.org/content/early/2018/10/05/432617).
 
+Here, we provide an example of 4. indentifying species' accessible areas as well as areas of model over and underprediction.
 Using the web tools available in BioModelos, an expert may draw a polygon on top of a geographic viewer to indicate A) a species' accessible area, B) an area that must be removed from a model, or C) an area that must be added to a model.
  
 ### Howler Monkey Example
@@ -218,7 +219,7 @@ The following steps are possible ways to improve the realism of a potential dist
 1. **Add polygon**: in some cases an expert may consider that a model underpredicts the suitable area for a species. For example, when modeling the distribution of *A. seniculus* in Colombia, there were gaps in the Amazon that were judged by experts as errors. Those missing areas can be added to the model by directly drawing a polygon onto a map, indicating that model values in the area should be 1, or present.  
 <!-- See link for illustration. -->
 2. **Remove polygon** (not shown here): in some other cases, experts may consider that the model is predicting an area where the species' presence is not possible. Again, for *A. seniculus*, experts considered that predictions of the distribution of this species in the Guajira peninsula were unlikely. They opted to remove that area from the model by drawing a polygon on the map indicating that in the area, model values should be 0, or absent.  
-3. **Mask model**: models may also need to be masked to 1) a drawn polygon; 2) a user provided shapefile; 3) a user-provided list of land covers. For *A. seniculus*, we clipped first by a user-drawn map and later by national boundaries (as we were not interested in predictions beyond Colombia). Later (not shown), we clipped that map using a list of land covers suitable for the species, as defined by experts, using a national land cover map. 
+3. **Mask model**: (not shown) models may also need to be masked to 1) a drawn polygon; 2) a user provided shapefile; 3) a user-provided list of land covers. For *A. seniculus*, we clipped first by a user-drawn map and later by national boundaries (as we were not interested in predictions beyond Colombia; not shown). Later (not shown), we clipped that map using a list of land covers suitable for the species, as defined by experts, using a national land cover map. 
 
 
 ## Example
