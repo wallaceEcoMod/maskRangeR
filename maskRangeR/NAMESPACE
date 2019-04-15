@@ -2,6 +2,7 @@
 
 export(annotate)
 export(cropResampleTrim)
+export(getDemoData)
 export(lotsOfMasks)
 export(maskRanger)
 export(rangeSVM)

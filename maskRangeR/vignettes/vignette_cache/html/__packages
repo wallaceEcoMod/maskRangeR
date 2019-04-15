@@ -1,9 +1,0 @@
-base
-sp
-raster
-maskRangeR
-lubridate
-devtools
-usethis
-rgdal
-maptools

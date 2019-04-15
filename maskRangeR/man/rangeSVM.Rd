@@ -4,7 +4,8 @@
 \alias{rangeSVM}
 \title{Classify species ranges based on occurrence coordinates and SDM scores.}
 \usage{
-rangeSVM(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE)
+rangeSVM(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE,
+  mc.cores = 1)
 }
 \arguments{
 \item{xy1}{Matrix or data frame of occurrence coordinates for species 1.}
@@ -18,8 +19,8 @@ These must have the same extent as both species' occurrence points. Default is N
 
 \item{nrep}{Numeric for number of SVM tuning iterations. Default is 100.}
 
-\item{weight}{Boolean. If TRUE, species with fewer occurrence records are weighted higher in the SVM.
-Default is FALSE.}
+\item{weight}{Boolean. If TRUE, species with fewer occurrence records are weighted higher in the SVM. Default is FALSE.
+#' @param mc.cores Number of cores to use for parallel processing. Default is 1.}
 }
 \value{
 The tuned SVM model.

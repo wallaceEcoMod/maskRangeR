@@ -1,6 +1,6 @@
-#==================================================================================
-#==================================================================================
-#' @title Downloads biolocial data to use in vignette
+#=============================================================================
+#=============================================================================
+#' @title Downloads data to use in vignette
 #'
 #' @description Canned datasets of real case studies for examples to follow along with the vignette
 #' @details The function will download the data from a github repository as a zipped folder and will unzip it in the destination path specifies by 'path'
@@ -12,7 +12,7 @@
 # @return
 #' @author Peter Galante <pgalante@@amnh.org>,
 #' @author Cecina Babich Morrow <cbabichmorrow@@amnh.org>,
-#' @note 
+#' @note These data were to large to serve on CRAN, so this convenience function finds and downloads them automatically.
 # @seealso
 # @references
 # @aliases - a list of additional topic names that will be mapped to
@@ -23,6 +23,7 @@
 
 
 getDemoData <- function(path){
+  # eventually: https://github.com/cmerow/maskRangeR/blob/master/demoData/demoData.zip
   download.file("https://github.com/Pgalante/WorkingCode/raw/master/demoData.zip",destfile = paste0(path, "/test.zip"))
   unzip(paste0(path, "/test.zip"))
 }

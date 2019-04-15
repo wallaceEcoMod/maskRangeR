@@ -12,8 +12,8 @@
 #' @param sdm Raster or RasterStack representing environmental suitability (can be predictions from SDMs). 
 #' These must have the same extent as both species' occurrence points. Default is NULL.
 #' @param nrep Numeric for number of SVM tuning iterations. Default is 100.
-#' @param weight Boolean. If TRUE, species with fewer occurrence records are weighted higher in the SVM.
-#' Default is FALSE.
+#' @param weight Boolean. If TRUE, species with fewer occurrence records are weighted higher in the SVM. Default is FALSE.
+#' #' @param mc.cores Number of cores to use for parallel processing. Default is 1.
 #' @return The tuned SVM model.
 #' @details The tuning operation uses \code{tune.svm()} from the e1071 package, which performs 10-fold
 #' cross validation and selects the best model based on classification error. Ranges of the cost and gamma
@@ -93,7 +93,12 @@
 #' 
 #' 
 
-rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
+rangeSVM <- function(xy1, xy2, ..., 
+                     sdm = NULL, nrep = 100, weight = FALSE, mc.cores=1) {
+  
+  #  for testing
+  #  xy1=variegatus[,2:3]; xy2=tridactylus[,2:3]; xy3= torquatus[,2:3]; otherSp=list(xy3); weight = FALSE;  mc.cores=1; sdm = NULL; nrep=14
+  #  sdm = raster::stack(var_sdm, tri_sdm, tor_sdm) # for hybrid
   
   # bind both coordinate matrices
   xy <- as.data.frame(rbind(xy1, xy2))
@@ -132,16 +137,34 @@ rangeSVM <- function(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE) {
   # author={Karatzoglou, Alexandros and Meyer, David and Hornik, Kurt},
   # year={2005},
   # publisher={Department of Statistics and Mathematics, WU Vienna University of Economics and Business}
-  params_best <- list()
-  performance_best <- list()
-  
-  for(i in 1:nrep) {
-    m.tune <- e1071::tune.svm(sp ~ ., data = xy, gamma = gamma_range, cost = C_range, class.weights = cw)  
+  #params_best <- list()
+  #performance_best <- list()
+  # for(i in 1:nrep) {
+  #   m.tune <- e1071::tune.svm(sp ~ ., data = xy, gamma = gamma_range, 
+  #                             cost = C_range, class.weights = cw)
+  #   # get optimal parameter values
+  #   params_best[[i]] <- m.tune$best.parameters
+  #   performance_best[[i]] <- m.tune$best.performance
+  #   message(paste("Run", i, "complete."))
+  # }
+  # CM: unfortunately mclapply doesn't seem to print the status
+  internalFunc=function(i){
+    m.tune <- e1071::tune.svm(sp ~ ., data = xy, gamma = gamma_range, 
+                              cost = C_range, class.weights = cw)  
+    print(paste("Run", i, "complete."))
     # get optimal parameter values
-    params_best[[i]] <- m.tune$best.parameters
-    performance_best[[i]] <- m.tune$best.performance
-    message(paste("Run", i, "complete."))
+    list( m.tune$best.parameters, m.tune$best.performance)
   }
+  if(mc.cores>1){
+    out=parallel::mclapply(1:nrep,function(i) {
+                              internalFunc(i) 
+                            },mc.cores=mc.cores)
+  } else {
+    out=lapply(1:nrep,function(i) {internalFunc(i)})
+  }
+  params_best=lapply(out,function(x) x[[1]])
+  performance_best=lapply(out,function(x) x[[2]])
+  
   # # function to extract the value of either parameter that was best most often
   performance_best <- do.call(rbind, performance_best)
   params_best_df <- cbind(do.call(rbind, params_best)[,1:2], performance_best)

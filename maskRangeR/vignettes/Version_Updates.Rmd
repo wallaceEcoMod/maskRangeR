@@ -1,0 +1,32 @@
+---
+title: "Version Updates"
+author: "Cory Merow"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    fig_caption: yes
+    toc: true
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{rangeModelMetadata R package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+***
+# Current version 0.0.0.9000
+
+__Possibly useful stuff__
+
+* 
+
+__Boring stuff__
+
+* Version updates vignette added
+* Parallelized SVM
+
+
+

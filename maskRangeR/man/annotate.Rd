@@ -16,7 +16,7 @@ annotate(datedOccs, env, envDates, dateScale)
 \item{dateScale}{string: 'year', 'month', or 'day'}
 }
 \description{
-Annotate point with rasters based on matching dates associated with points to dates associated with raster. Specifically, we're thinking of the points as species observations and the rasters as remotely sensed environmental layers, but they can represent any points and rasters with dates.
+Annotate point data with rasters based on matching dates associated with points to dates associated with rasters. Specifically, we're thinking of the points as species observations and the rasters as remotely sensed environmental layers, but they can represent any points and rasters with dates.
 }
 \details{
 See Examples.

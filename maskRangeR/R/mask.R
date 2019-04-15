@@ -1,6 +1,6 @@
 
-#==================================================================================
-#==================================================================================
+#=============================================================================
+#=============================================================================
 #' @title Make a matrix of modeling decisions to be used to specify clipping rules
 #'
 #' @description Performs data driven masking of potential species distributions.
@@ -73,9 +73,9 @@
 #' @export
 
 maskRanger=function(potentialDist,
-                      maskLayers,
-                      logicString,
-                      method='mask'){
+                    maskLayers,
+                    logicString,
+                    method='mask'){
   #  for testing
   #  potentialDist=stack(spA,spA-.1,spA+.1); maskLayers=stack(spB,spB+.1,spB-.1); logicString='maskLayers>0.5'
   
@@ -102,8 +102,8 @@ maskRanger=function(potentialDist,
 }
 
 
-#==================================================================================
-#==================================================================================
+#============================================================================
+#============================================================================
 #' @title Generate and apply multiple masks to a map
 #'
 #' @description Based on a potential distribution, environmental rasters, and bounds for suitable habitat on the environmental rasters
@@ -131,7 +131,8 @@ lotsOfMasks=function(expertRaster,maskStack,maskBounds){
   binaryMasks=raster::stack(lapply(1:raster::nlayers(maskStack),function(x,maskBounds){
     keep=which(maskBounds[,1]==names(maskStack[[x]]))
     if(length(keep)==0) stop(paste0('The names in maskBounds may not match names(maskStack). Check ', names(x)))
-    maskBin=(maskStack[[x]]>maskBounds[keep,2] & maskStack[[x]]<maskBounds[keep,3])
+    maskBin=(maskStack[[x]]>maskBounds[keep,2] & 
+            maskStack[[x]]<maskBounds[keep,3])
     maskBin[!maskBin==1]=NA
     maskBin
   },maskBounds=maskBounds))
