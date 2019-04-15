@@ -9,7 +9,7 @@ output:
     number_sections: true
     toc_depth: 3
 vignette: >
-  %\VignetteIndexEntry{An overview of making rangeModelMetadata objects}
+  %\VignetteIndexEntry{maskRangeR: Improving spatial and temporal accuracy of species distribution models}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 # navlink: "[NAVTITLE](http://NAVLINK/)"
