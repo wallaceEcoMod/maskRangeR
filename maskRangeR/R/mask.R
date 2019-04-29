@@ -11,11 +11,12 @@
 #' @param logicString a character indicating the logical conditions to use for masking.
 # @param rsLower A list of lower bounds of suitable values in the same order as `rsList`
 # @param rsUpper A list of upper bounds of suitable values in the same order as `rsList`
-#' @param method A list of strings defining methods to be used, in the same order as `rsList`. If a single value is provided it will be applied to all rasters in `rsList`. Options include:
+#' @param method A list of strings defining methods to be used, in the same order as `rsList`. 
+#' If a single value is provided it will be applied to all rasters in `rsList`. Options include:
 #' \itemize{
 #'  \item{mask}{mask cells with values outside the bounds}
 #' }
-# @examples
+#' @examples
 #' \dontrun{
 #' ########## Forest Cover Mask 
 #' simulateData()
@@ -52,7 +53,9 @@
 #' env1Vals <- quantile(values(env1), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
 #' env2Vals <- quantile(values(env2), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
 #' env3Vals <- quantile(values(env3), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
-#' maskBounds <- data.frame(rbind(cbind(env1Vals[[3]], env1Vals[[5]]), cbind(env2Vals[[3]], env2Vals[[5]]), cbind(env3Vals[[3]], env3Vals[[5]])))
+#' maskBounds <- data.frame(rbind(cbind(env1Vals[[3]], env1Vals[[5]]), 
+#'                          cbind(env2Vals[[3]], env2Vals[[5]]),
+#'                          cbind(env3Vals[[3]], env3Vals[[5]])))
 #' maskBounds <- cbind(names(maskStack), maskBounds)
 #' colnames(maskBounds) <- c("Layer", "min", "max")
 #' # mask range by these tolerance masks

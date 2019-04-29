@@ -9,11 +9,16 @@ Authors@R: as.person(c(
   "Valentina Grisales Betancur <vgrisale@eafit.edu.co> [aut]"
   ))
 Description: This package masks (or clips) ranges based on expert knowledge or remote sensing layers.
-Depends: R (>= 3.4.3)
+Depends: R (>= 3.4.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
+    ncdf4,
+    MODIS,
+    gdalUtils,
+    dplyr,
+    devtools,
     wallace,
     raster,
     virtualspecies,
@@ -22,7 +27,10 @@ Imports:
     utils,
     magrittr,
     rgdal,
-    stats
+    stats,
+    dismo,
+    e1071,
+    sp
 Suggests:
     testthat,
     knitr,

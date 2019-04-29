@@ -13,17 +13,19 @@ getModis(localSavePath, datedOccs, dateScale, dataset)
 
 \item{dateScale}{string: 'year', 'month', or 'day'}
 
-\item{dataset}{MODIS product of interest. Available are: “Percent tree cover”, “Percent nontree vegetation”, “Percent nonvegetated”, “Quality”, “Percent tree cover 50”, “Percent nonvegetated sd”
-\dontrun{
-simulateData()
-getModis(localSavePath = '', datedOccs, dateScale = "year", dataset = "Percent tree cover")
-}}
+\item{dataset}{MODIS product of interest. Available are: “Percent tree cover”, “Percent nontree vegetation”, “Percent nonvegetated”, “Quality”, “Percent tree cover 50”, “Percent nonvegetated sd”}
 }
 \description{
 Accesses yearly (2000 - 2017) MODIS products based on geographic location and date
 }
 \details{
 See Examples.
+}
+\examples{
+\dontrun{
+simulateData()
+getModis(localSavePath = '', datedOccs, dateScale = "year", dataset = "Percent tree cover")
+}
 }
 \author{
 Peter Galante <pgalante@amnh.org>,

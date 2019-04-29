@@ -24,7 +24,7 @@
 
 getDemoData <- function(path){
   # eventually: https://github.com/cmerow/maskRangeR/blob/master/demoData/demoData.zip
-  download.file("https://github.com/Pgalante/WorkingCode/raw/master/demoData.zip",destfile = paste0(path, "/test.zip"))
-  unzip(paste0(path, "/test.zip"))
+  utils::download.file("https://github.com/cmerow/maskRangeR/tree/master/demoData/demoData.zip",destfile = paste0(path, "/test.zip"))
+  utils::unzip(paste0(path, "/test.zip"))
 }
 

@@ -11,7 +11,8 @@ Run function with no arguments to generate example data for all of the use cases
 }
 \details{
 See Examples
-
+}
+\examples{
 \dontrun{
 ########## Forest Cover Mask 
 # Declare the date scale
@@ -57,7 +58,12 @@ names(maskStack) <- c("env1", "env2", "env3")
 env1Vals <- quantile(values(env1), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
 env2Vals <- quantile(values(env2), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
 env3Vals <- quantile(values(env3), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
-maskBounds <- data.frame(rbind(cbind(env1Vals[[3]], env1Vals[[5]]), cbind(env2Vals[[3]], env2Vals[[5]]), cbind(env3Vals[[3]], env3Vals[[5]])))
+maskBounds <- data.frame(rbind(cbind(env1Vals[[3]], 
+                                     env1Vals[[5]]), 
+                                     cbind(env2Vals[[3]], 
+                                     env2Vals[[5]]), 
+                                     cbind(env3Vals[[3]], 
+                                     env3Vals[[5]])))
 maskBounds <- cbind(names(maskStack), maskBounds)
 colnames(maskBounds) <- c("Layer", "min", "max")
 # mask range by these tolerance masks
@@ -99,7 +105,9 @@ plot(sp3_svmSP_mask)
 # Create SVM
 svmHYB <- rangeSVM(sp1.xy, sp2.xy, sp3.xy, sdm = raster::stack(r1.sdm, r2.sdm, r3.sdm), nrep = 10)
 # Use SVM to create a raster of predicted regions
-rand_svmHYB <- rangeSVM_predict(svm = svmHYB, r = r1.sdm, sdm = raster::stack(r1.sdm, r2.sdm, r3.sdm))
+rand_svmHYB <- rangeSVM_predict(svm = svmHYB, 
+                                r = r1.sdm, 
+                                sdm = raster::stack(r1.sdm, r2.sdm, r3.sdm))
 ## Plot the SVM results.
 plot(rand_svmHYB, col=c("yellow","pink","lightblue"))
 points(sp1.xy, pch = 20, cex = 0.75, col = "orange")

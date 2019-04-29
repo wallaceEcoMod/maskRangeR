@@ -11,60 +11,55 @@
 #' @param dateScale string: 'year', 'month', or 'day'
 #' @param dataset MODIS product of interest. Available are: “Percent tree cover”, “Percent nontree vegetation”, “Percent nonvegetated”, “Quality”, “Percent tree cover 50”, “Percent nonvegetated sd”
 
-# @examples
+#' @examples
 #' \dontrun{
 #' simulateData()
 #' getModis(localSavePath = '', datedOccs, dateScale = "year", dataset = "Percent tree cover")
 #' }
 # @return
 #' @author Peter Galante <pgalante@@amnh.org>,
-#'  
+#' 
 # @seealso
 # @references
 #' @export
 
 
 getModis <- function(localSavePath, datedOccs, dateScale, dataset){
-  require(dplyr)
-  require(ncdf4)
-  require(MODIS)
-  require(gdalUtils)
-  require(raster)
-  require(rgdal)
+
   # serapate date by date scale  
-  occ1 <-reDate(datedOccs = datedOccs, dateScale = dateScale)
+  occ1 <-.reDate(datedOccs = datedOccs, dateScale = dateScale)
   # get list of unique dates
-  unidate <- uniDates(occ1 = occ1, dateScale = dateScale)
+  unidate <- .uniDates(occ1 = occ1, dateScale = dateScale)
   # create sub tables for occs by each datescale (e.g., by year)
-  dateParse <-parseDate(dateScale = dateScale, occ1 = occ1, uniqueDates = unidate)
+  dateParse <-.parseDate(dateScale = dateScale, occ1 = occ1, uniqueDates = unidate)
   
-  MODISoptions(localArcPath = localSavePath, quiet = FALSE)
+  MODIS::MODISoptions(localArcPath = localSavePath, quiet = FALSE)
   # Set extent
-  colnames(occs) <- c("x","y")
-  e <- extent(occs)
+  colnames(datedOccs) <- c("x","y")
+  e <- raster::extent(datedOccs)
   # Look up in which tiles occur your occurrences 
-  tileH <- getTile(e)@tileH
-  tileV <- getTile(e)@tileV
+  tileH <- MODIS::getTile(e)@tileH
+  tileV <- MODIS::getTile(e)@tileV
   # Date Range
   years <- unidate$years
   # Download as hdf
   print('downloading hdf files from MODIS- give it a minute!')
-  hdf = getHdf("MOD44B", collection = "006",
-               tileH = tileH, tileV = tileV,
-               begin = paste0(years[1],".08.28"), end = paste0(tail(years,1),".08.31"), 
-               extent = e)
+  hdf = MODIS::getHdf("MOD44B", collection = "006",
+                      tileH = tileH, tileV = tileV,
+                      begin = paste0(years[1],".08.28"), end = paste0(utils::tail(years,1),".08.31"), 
+                      extent = e)
   print('done')
   # Extract available datasets and only pull out the first one - percent forest cover. 
   print('extracting dataset of interest')
   pos.data <- as.data.frame(cbind(c(1:7), c("Percent tree cover", "Percent nontree vegetation", "Percent nonvegetated", "Quality", "Percent tree cover 50", "Percent nonvegetated sd", "Cloud")))
-  dset <- pos.data %>% filter(V2 == dataset)
+  dset <- pos.data %>% dplyr::filter(pos.data$V2 == dataset)
   dataset.number <-dset[[1]]
-  sds <- sapply(lapply(hdf$MOD44B.006, get_subdatasets), "[", dataset.number)
+  sds <- sapply(lapply(hdf$MOD44B.006, gdalUtils::get_subdatasets), "[", dataset.number)
   # Sort datasets by years 
   sds.byDate <- lapply(years, function(x) unique(grep(paste(x, collapse="|"), sds, value=T)))
   # convert to raster
-  rgdals <- lapply(sds.byDate, sapply, readGDAL)
-  rrs <- lapply(rgdals, sapply, raster)
+  rgdals <- lapply(sds.byDate, sapply, rgdal::readGDAL)
+  rrs <- lapply(rgdals, sapply, raster::raster)
   ## Merge tiles of same year, then stack years
   ####3make rrs.list a true list of lists
   # list them correctly
@@ -72,15 +67,15 @@ getModis <- function(localSavePath, datedOccs, dateScale, dataset){
   x})
   # Merge by year
   print('merging tiles')
-  merged.rrs <- lapply(rrs, function(x) do.call(merge, x))
-  stack.merged.rrs <- stack(merged.rrs)
+  merged.rrs <- lapply(rrs, function(x) do.call(raster::merge, x))
+  stack.merged.rrs <- raster::stack(merged.rrs)
   print('finished merging')
   # reproject to wgs84
   print('reprojecting rasters to wgs84')
-  rrs.repro <- projectRaster(stack.merged.rrs, crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ")
+  rrs.repro <- raster::projectRaster(stack.merged.rrs, crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ")
   print('finished reprojecting')
   # Rename rasters
   names(rrs.repro) <- paste0("y", years)
   # Save rasters
-  writeRaster(rrs.repro, filename = paste0(localSavePath, names(rrs.repro)), bylayer=T, format = "GTiff", overwrite=T)
+  raster::writeRaster(rrs.repro, filename = paste0(localSavePath, names(rrs.repro)), bylayer=T, format = "GTiff", overwrite=T)
 }

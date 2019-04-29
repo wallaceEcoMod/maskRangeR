@@ -2,7 +2,7 @@
 % Please edit documentation in R/continuousMask.R
 \name{continuousMask}
 \alias{continuousMask}
-\title{Update a binary raster (specie range map) to continuous values that describe the proportion of cell that is suitable or the quality of the cell.}
+\title{Update a binary raster (species range map) to continuous values that describe the proportion of cell that is suitable or the quality of the cell.}
 \usage{
 continuousMask(contStack, suitable, binaryRange, maskValue = NA, ...)
 }

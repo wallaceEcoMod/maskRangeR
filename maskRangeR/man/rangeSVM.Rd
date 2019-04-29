@@ -19,8 +19,9 @@ These must have the same extent as both species' occurrence points. Default is N
 
 \item{nrep}{Numeric for number of SVM tuning iterations. Default is 100.}
 
-\item{weight}{Boolean. If TRUE, species with fewer occurrence records are weighted higher in the SVM. Default is FALSE.
-#' @param mc.cores Number of cores to use for parallel processing. Default is 1.}
+\item{weight}{Boolean. If TRUE, species with fewer occurrence records are weighted higher in the SVM. Default is FALSE.}
+
+\item{mc.cores}{Number of cores to use for parallel processing. Default is 1.}
 }
 \value{
 The tuned SVM model.
@@ -82,7 +83,9 @@ svmHYB <- rangeSVM(sp1.xy, sp2.xy, sp3.xy,
                    sdm = raster::stack(r1.sdm, r2.sdm, r3.sdm), 
                    nrep = 10)
 # Use SVM to create a raster of predicted regions
-rand_svmHYB <- rangeSVM_predict(svm = svmHYB, r = r1.sdm, sdm = raster::stack(r1.sdm, r2.sdm, r3.sdm))
+rand_svmHYB <- rangeSVM_predict(svm = svmHYB, 
+                                r = r1.sdm, 
+                                sdm = raster::stack(r1.sdm, r2.sdm, r3.sdm))
 ## Plot the SVM results.
 plot(rand_svmHYB, col=c("yellow","pink","lightblue"))
 points(sp1.xy, pch = 20, cex = 0.75, col = "orange")

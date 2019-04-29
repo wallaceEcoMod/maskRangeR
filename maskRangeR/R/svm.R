@@ -13,7 +13,7 @@
 #' These must have the same extent as both species' occurrence points. Default is NULL.
 #' @param nrep Numeric for number of SVM tuning iterations. Default is 100.
 #' @param weight Boolean. If TRUE, species with fewer occurrence records are weighted higher in the SVM. Default is FALSE.
-#' #' @param mc.cores Number of cores to use for parallel processing. Default is 1.
+#' @param mc.cores Number of cores to use for parallel processing. Default is 1.
 #' @return The tuned SVM model.
 #' @details The tuning operation uses \code{tune.svm()} from the e1071 package, which performs 10-fold
 #' cross validation and selects the best model based on classification error. Ranges of the cost and gamma
@@ -65,7 +65,9 @@
 #'                    sdm = raster::stack(r1.sdm, r2.sdm, r3.sdm), 
 #'                    nrep = 10)
 #' # Use SVM to create a raster of predicted regions
-#' rand_svmHYB <- rangeSVM_predict(svm = svmHYB, r = r1.sdm, sdm = raster::stack(r1.sdm, r2.sdm, r3.sdm))
+#' rand_svmHYB <- rangeSVM_predict(svm = svmHYB, 
+#'                                 r = r1.sdm, 
+#'                                 sdm = raster::stack(r1.sdm, r2.sdm, r3.sdm))
 #' ## Plot the SVM results.
 #' plot(rand_svmHYB, col=c("yellow","pink","lightblue"))
 #' points(sp1.xy, pch = 20, cex = 0.75, col = "orange")
@@ -242,7 +244,7 @@ rangeSVM_predict <- function(svm, r, sdm = NULL) {
   }
   
   # predict species identity of all coordinates with svm
-  sp12.svm <- predict(svm, r.xy)
+  sp12.svm <- raster::predict(svm, r.xy)
   # convert factor response to integer
   sp12.svm <- as.numeric(as.character(sp12.svm))
   # convert back to raster

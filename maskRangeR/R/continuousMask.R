@@ -1,6 +1,6 @@
 #=============================================================================
 #=============================================================================
-#' @title Update a binary raster (specie range map) to continuous values that describe the proportion of cell that is suitable or the quality of the cell.
+#' @title Update a binary raster (species range map) to continuous values that describe the proportion of cell that is suitable or the quality of the cell.
 #'
 #' @description The use case envision is updating a binary map to continuous values that describe the proportion of the cell that is suitable, based on land  use/land cover classes
 #' @details
@@ -35,7 +35,7 @@ continuousMask=function(contStack,suitable,binaryRange,maskValue=NA,...){
     print("Maps didn't line up perfectly, so I resampled the binaryRange. Probably has only a little effect at range edges.")
   }
   cont.keep=mapply(function(x){grep(x,names(contStack))},suitable)
-  suitable.cont=calc(contStack.c[[cont.keep]],sum,na.rm=T)
+  suitable.cont=raster::calc(contStack.c[[cont.keep]],sum,na.rm=T)
   raster::mask(suitable.cont,binaryRange,maskValue=maskValue,...)
 }
 
