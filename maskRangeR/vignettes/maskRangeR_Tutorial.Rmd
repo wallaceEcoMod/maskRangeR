@@ -32,6 +32,8 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(cache = F)
+knitr::opts_chunk$set(eval = F)
+mc.cores=1
 ```
 
 # Introduction 
@@ -494,7 +496,7 @@ Tune the model and use it to predict ranges for each of the three species.
 set.seed(1234) # to reproduce our exact results
 # Create SVM
 svmSP <- rangeSVM(variegatus[,2:3], tridactylus[,2:3], 
-                  torquatus[,2:3], nrep = 8, mc.cores=8)
+                  torquatus[,2:3], nrep = 8, mc.cores=mc.cores)
 
 # Use SVM to create a raster of predicted regions
 sloth_svmSP <- rangeSVM_predict(svm = svmSP, r = var_sdm)
@@ -551,7 +553,7 @@ set.seed(1234)
 # Create SVM: we used a few more reps here to be sure a set of optimal parameters was found
 svmHYB <- rangeSVM(variegatus[,2:3], tridactylus[,2:3], torquatus[,2:3], 
                    sdm = raster::stack(var_sdm, tri_sdm, tor_sdm), 
-                   nrep = 14, mc.cores=7)
+                   nrep = 14, mc.cores=mc.cores)
 
 # Use SVM to create a raster of predicted regions
 sloth_svmHYB <- rangeSVM_predict(svm = svmHYB, r = var_sdm, 

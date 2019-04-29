@@ -78,7 +78,9 @@ plot(sp2_svmSP_mask)
 plot(sp3_svmSP_mask)
 ## Hybrid SVMs
 # Create SVM
-svmHYB <- rangeSVM(sp1.xy, sp2.xy, sp3.xy, sdm = raster::stack(r1.sdm, r2.sdm, r3.sdm), nrep = 10)
+svmHYB <- rangeSVM(sp1.xy, sp2.xy, sp3.xy, 
+                   sdm = raster::stack(r1.sdm, r2.sdm, r3.sdm), 
+                   nrep = 10)
 # Use SVM to create a raster of predicted regions
 rand_svmHYB <- rangeSVM_predict(svm = svmHYB, r = r1.sdm, sdm = raster::stack(r1.sdm, r2.sdm, r3.sdm))
 ## Plot the SVM results.
