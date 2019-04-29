@@ -36,20 +36,21 @@ knitr::opts_chunk$set(cache = F)
 
 # Introduction 
 
-The goal of masking range maps (or species distribution models) is to improve spatial (and possibly temporal) accuracy by incorporating different types of information. Often statistically-based SDMs are used to identify suitable environmental conditions, as the models detect locations with similar environmental conditions to where the species was observed. Often, these modeled maps are best interpreted as *potential distributions* since other processes besides abiotic conditions may restrict the distribution, such as dispersal, biotic interactions, social dynamics, historical contingencies, or human modification of habitat. In contrast, *realized distributions* describe those locations that are actually occupied by the species (at some spatial resolution) and may be smaller than potential distributions. By starting with potential distributions from any form of SDM, we can use other pieces of information to refine these models to approach realized distributions.
+The goal of masking range maps (or species distribution models) is to improve spatial (and possibly temporal) accuracy by incorporating different types of information. Often statistically-based SDMs are used to identify suitable environmental conditions, as the models detect locations with similar environmental conditions to where the species was observed. Often, these modeled maps are best interpreted as potential distributions since other processes besides abiotic conditions may restrict the distribution, such as dispersal, biotic interactions, social dynamics, historical contingencies, or human modification of habitat. In contrast, realized distributions describe those locations that are actually occupied by the species (at some spatial resolution) and may be smaller than potential distributions. By starting with potential distributions from any form of SDM, we can use other pieces of information to refine these models to approach realized distributions.
 
-Here, we illustrate methods for estimating realized distributions based on different types of data. Additional information not included as a predictor in the SDM can be described by *masks* that differentiate potential habitat from non-habitat. They represent a conceptual model usually relating to a single variable, e.g., forest cover, occurrence of competing species, dispersal. When appropriate data are not available (e.g. climate data matching occurrence record collection dates), masks can be stacked on existing SDMs to determine places that both models designate as suitable habitat. Using a series of masks is a type of ensemble modeling where complete agreement is required between all component models to denote a location as suitable. Below, we illustrate cases based on forest cover, expert opinion, multiple environmental layers, and occurrence of competing species.
+Here, we illustrate methods for estimating realized distributions based on different types of data. Additional information not included as a predictor in the SDM can be described by masks that differentiate potential habitat from non-habitat. They represent a conceptual model usually relating to a single variable, e.g., forest cover, occurrence of competing species, dispersal. When appropriate data are not available (e.g. climate data matching occurrence record collection dates), masks can be stacked on existing SDMs to determine places that both models designate as suitable habitat. Using a series of masks is a type of ensemble modeling where complete agreement is required between all component models to denote a location as suitable. Below, we illustrate cases based on forest cover, expert opinion, multiple environmental layers, and occurrence of competing species.
 
 Throughout the package, we use the following definitions:
 
-**Potential distribution** is used to describe maps used as input. The term 'potential' is used because the map is presumed to include possibly suitable locations. These maps may well be the result of a model that includes processes such as dispersal, biotic interactions, social dynamics, historical contingencies, or human modification of habitat, but here we assume that there is further information that can be used to refine the range.
+**Potential distribution** is used to describe maps used as input. The term ‘potential’ is used because the map is presumed to include possibly suitable locations. These maps may well be the result of a model that includes processes such as dispersal, biotic interactions, social dynamics, historical contingencies, or human modification of habitat, but here we assume that there is further information that can be used to refine the range.
 
-**Realized distribution** is used to describe output maps resulting from masking of potential distributions. While the outputs may still include some ommission/commission errors, they aim to better estimate the realized distribution relative to the input maps by accounting for some additional source of information, e.g. land cover, expert opinion, biotic factors, etc.
+**Realized distribution** is used to describe output maps resulting from masking of potential distributions. While the outputs may still include some ommission/commission errors, they aim to better estimate the realized distribution relative to the input maps by accounting for some additional source of information, e.g. land cover, expert opinion, biotic factors, etc. 
+
 <!-- ================================================================== -->
 <!-- ================================================================== -->
 <!-- ================================================================== -->
 
-In the following use cases, we describe distribution modeling scenarios that require post-processing of the potential distribution to better estimate a species' realized distribution. This post-processing is carried out in the form of masks based on expert opinion or data. For each scenario, we list the components needed to carry out the analysis and provide examples of the process.
+In the following use cases, we describe distribution modeling scenarios that require post-processing of the potential distribution to better estimate a species’ realized distribution. This post-processing is carried out in the form of masks based on expert opinion or data. For each scenario, we list the components needed to carry out the analysis and provide examples of the process.
 
 # Data Driven: Land Cover Mask
 
@@ -68,14 +69,14 @@ These analyses require the following data:
 ## Background
 
 The Olinguito (*Bassaricyon neblina*) is a new species of carnivore described in 2013 from museum specimens that were previously identified as a different species [1]. The Olinguito lives in Northern Andean cloud forests in Colombia and Ecuador, and, according to experts, has strict tolerances for forest cover [2]. Recent occurrence records allow for very simple data-driven masking based on observed ranges of forest cover, but the number of occurrences (n = 18) is likely too few to use in model calibration. The data-driven determination of thresholds for masking using recent records represents a simple, conservative methodology that can be used for many species with limited recent records, and also will prove useful for processing of expert range maps or other pre-existing range estimates that do not take into account human modifications of the environment. 
- <!-- We tested for any correlation between the forest layers and the climate layers used in the ENM to ensure they are contributing different information.  -->
+<!-- We tested for any correlation between the forest layers and the climate layers used in the ENM to ensure they are contributing different information.  -->
 
 
 ## Methods
 
 A 30 arc-second Bioclimatic-variable climate-based Maxent [1] SDM was tuned for the Olinguito using a mix of historical data paired with field notes, as well as contemporary citizen science records associated with photo-vouchers. The model was trained on 0.7 degree buffered circles around occurrence records and then projected to a 5-degree bounding box around occurrence records. We then removed areas from the SDM representing biogeographic regions where the species has not been documented, like the Eastern Cordillera of Colombia and other small non-contiguous areas.
 
-Next, we used remotely sensed data of the annual percent forest cover for the region (MODIS Vegetation Continuous Fields; 250 m from the years matching the most recent occurrence records: 2006-2016). The MODIS rasters from different years were not all aligned with one another and had to be realigned to create a raster stack. A subset of the more recent occurrence records (2006-2016) were then temporally matched with the forest cover rasters to obtain values of forest cover per occurrence (one record was excluded because it was based on an observation that seemed like roadkill [2]). The forest cover values at occurrence records were then assessed across all years, and the 25th quantile forest cover level was used to generate a forest cover mask for the most recent year (2010). After resampling the SDM to match the resolution of the MODIS data, we applied this forest cover mask to reduce the SDM's spatial prediction to only those climatically suitable areas where forest cover is above the threshold. This reduced model shows a conservative estimation of the species range given current non-climatic variables that represent anthropogenic modification of land cover. 
+Next, we used remotely sensed data of the annual percent forest cover for the region (MODIS Vegetation Continuous Fields; 250 m from the years matching the most recent occurrence records: 2006-2016). The MODIS rasters from different years were not all aligned with one another and had to be realigned to create a raster stack. A subset of the more recent occurrence records (2006-2016) were then temporally matched with the forest cover rasters to obtain values of forest cover per occurrence (one record was excluded because it was based on an observation that stemmed from a likely roadkilled specimen [2]). The forest cover values at occurrence records were then assessed across all years, and the 25th quantile forest cover level was used to generate a forest cover mask for the most recent year (2010). After resampling the SDM to match the resolution of the MODIS data, we applied this forest cover mask to reduce the SDM’s spatial prediction to only those climatically suitable areas where forest cover is above the threshold. This reduced model shows a conservative estimation of the species range given current non-climatic variables that represent anthropogenic modification of land cover.
 
 ## References
 
@@ -86,7 +87,7 @@ Next, we used remotely sensed data of the annual percent forest cover for the re
 [3] Saavedra-Rodríguez, C. & Rojas-Díaz, V. (2011) Bassaricyon gabbii Allen, 1876 (Carnivora: Procyonidae): new distribution point on western range of Colombian Andes. Check List 7(4), 505–507. http://dx.doi.org/10.15560/7.4.505.
 
 ```{r, include=F}
-path = "/home/pgalante/Projects/Garbage"
+path = "/home/pgalante/Projects/NASA/maskrangeR/UseCaseData"
 if(Sys.info()['user']=='ctg') path ='/Users/ctg/Dropbox/Projects/Wallace/MymaskRangeR/demoData'
 ```
 ## Example
@@ -109,7 +110,7 @@ env <- stack(list.files(path = paste0(dataDir), pattern = "olinguito_Modis.tif$"
 # this should be a formal date object of class "POSIXct" "POSIXt"
 envDates <- parse_date_time((c('2005','2006','2008','2009','2010')),orders = c("Y", "Ym"))
 datedOccs <- read.csv(paste0(dataDir,'All_new_records_by_year.csv'))
-sdm <- raster(paste0(dataDir,'olinguito_sdm.tif'))
+sdm <- raster(paste0(dataDir,'olinguito_SDM.tif'))
 # crop climate data to study region
 env <- crop(env, extent(sdm))
 ```
@@ -178,7 +179,7 @@ plot(maskedDist[[1]],col = c(grey(.6),'red1'),main = 'Masked Distribution')
 
 ## Issue
 
-Range models may omit areas of presence, or include areas where the species does not exist. Expert knowledge can improve the realism of range models, either by adding suitable regions to a model or removing unsuitable ones. 
+Range models may omit areas of presence, or include areas where the species does not exist. Expert knowledge can improve the realism of range models, either by adding suitable regions to a model or removing unsuitable ones.
 
 ## Needs
 
@@ -201,12 +202,11 @@ These analyses require the following data:
 
 A complete description of BioModelos is available [here](https://www.biorxiv.org/content/early/2018/10/05/432617).
 
-Here, we provide an example of 4. indentifying species' accessible areas as well as areas of model over and underprediction.
-Using the web tools available in BioModelos, an expert may draw a polygon on top of a geographic viewer to indicate A) a species' accessible area, B) an area that must be removed from a model, or C) an area that must be added to a model.
+Here, we provide an example of 4. indentifying species’ accessible areas as well as areas of model over and underprediction. Using the web tools available in BioModelos, an expert may draw a polygon on top of a geographic viewer to indicate A) a species’ accessible area, B) an area that must be removed from a model, or C) an area that must be added to a model. 
  
 ### Howler Monkey Example
 
-The Howler Monkey, *Alouatta seniculus*, exemplifies a situation in which expert opinion was gathered using BioModelos to make range estimates more realistic. This species occurs in Colombia, Ecuador, Peru, Venezuela and Brazil (IUCN 2018). In Colombia, howler monkeys are widely distributed, occurring from 0-3200 meters. In the Choco biogeographic region, however, they are absent. This pattern is likely due to the dominance of closed canopies in the Choco rather than to any barrier to *A. seniculus* dispersal (Defler 2010) since the mantled howler *Alouatta palliata* is better adapted to closed canopies than *A. seniculus* is.
+The Howler Monkey, *Alouatta seniculus*, exemplifies a situation in which expert opinion was gathered using BioModelos to make range estimates more realistic. This species occurs in Colombia, Ecuador, Peru, Venezuela and Brazil (IUCN 2018). In Colombia, howler monkeys are widely distributed, occurring from 0-3200 meters. In the Choco biogeographic region, however, they are absent. This pattern is likely due to the dominance of closed canopies in the Choco rather than to any barrier to *A. seniculus* dispersal (Defler, 2010) since the mantled howler *Alouatta palliata* is better adapted to closed canopies than is *A. seniculus*.
 
 
 ## Methods
@@ -217,7 +217,7 @@ The `ENMeval` package was used to select optimum feature classes/regularization 
 
 The following steps are possible ways to improve the realism of a potential distribution based on expert opinion:
 
-1. **Add polygon**: in some cases an expert may consider that a model underpredicts the suitable area for a species. For example, when modeling the distribution of *A. seniculus* in Colombia, there were gaps in the Amazon that were judged by experts as errors. Those missing areas can be added to the model by directly drawing a polygon onto a map, indicating that model values in the area should be 1, or present.  
+1. **Add polygon**: in some cases an expert may consider that a model underpredicts the suitable area for a species. For example, when modeling the distribution of *A. seniculus* in Colombia, there were gaps in the Amazon that were judged by experts as errors. Those missing areas can be added to the model by directly adding a polygon onto a GIS, indicating that model values in the area should be 1, or present.  
 <!-- See link for illustration. -->
 2. **Remove polygon** (not shown here): in some other cases, experts may consider that the model is predicting an area where the species' presence is not possible. Again, for *A. seniculus*, experts considered that predictions of the distribution of this species in the Guajira peninsula were unlikely. They opted to remove that area from the model by drawing a polygon on the map indicating that in the area, model values should be 0, or absent.  
 3. **Mask model**: (not shown) models may also need to be masked to 1) a drawn polygon; 2) a user provided shapefile; 3) a user-provided list of land covers. For *A. seniculus*, we clipped first by a user-drawn map and later by national boundaries (as we were not interested in predictions beyond Colombia; not shown). Later (not shown), we clipped that map using a list of land covers suitable for the species, as defined by experts, using a national land cover map. 

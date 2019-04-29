@@ -29,5 +29,4 @@ vignettes/demos_cache/*
 .Rproj.user
 ForestCoverMask_cache/
 demos_cache/
-DESCRIPTION
 vignettes/UseCases_cache/
