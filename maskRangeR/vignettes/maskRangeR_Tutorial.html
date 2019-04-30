@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Cory Merow, Peter J. Galante, Cecina Babich Morrow, Jamie M. Kass, Alex Moore, Valentina Grisales-Betancur, Jorge Velasquez, Robert P. Anderson, Mary E. Blair" />
+
+<meta name="date" content="2019-04-30" />
+
+<title>maskRangeR: Improving spatial and temporal accuracy of species distribution models</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">maskRangeR: Improving spatial and temporal accuracy of species distribution models</h1>
+<h4 class="author">Cory Merow, Peter J. Galante, Cecina Babich Morrow, Jamie M. Kass, Alex Moore, Valentina Grisales-Betancur, Jorge Velasquez, Robert P. Anderson, Mary E. Blair</h4>
+<h4 class="date">2019-04-30</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction"><span class="toc-section-number">1</span> Introduction</a></li>
+<li><a href="#data-driven-land-cover-mask"><span class="toc-section-number">2</span> Data Driven: Land Cover Mask</a><ul>
+<li><a href="#issue"><span class="toc-section-number">2.1</span> Issue</a></li>
+<li><a href="#needs"><span class="toc-section-number">2.2</span> Needs</a></li>
+<li><a href="#background"><span class="toc-section-number">2.3</span> Background</a></li>
+<li><a href="#methods"><span class="toc-section-number">2.4</span> Methods</a></li>
+<li><a href="#references"><span class="toc-section-number">2.5</span> References</a></li>
+<li><a href="#example"><span class="toc-section-number">2.6</span> Example</a></li>
+</ul></li>
+<li><a href="#expert-driven-masking-by-expert-maps"><span class="toc-section-number">3</span> Expert Driven: Masking by expert maps</a><ul>
+<li><a href="#issue-1"><span class="toc-section-number">3.1</span> Issue</a></li>
+<li><a href="#needs-1"><span class="toc-section-number">3.2</span> Needs</a></li>
+<li><a href="#background-1"><span class="toc-section-number">3.3</span> Background</a><ul>
+<li><a href="#biomodelos"><span class="toc-section-number">3.3.1</span> BioModelos</a></li>
+<li><a href="#howler-monkey-example"><span class="toc-section-number">3.3.2</span> Howler Monkey Example</a></li>
+</ul></li>
+<li><a href="#methods-1"><span class="toc-section-number">3.4</span> Methods</a></li>
+<li><a href="#example-1"><span class="toc-section-number">3.5</span> Example</a></li>
+</ul></li>
+<li><a href="#expert-driven-multiple-expert-masks"><span class="toc-section-number">4</span> Expert Driven: Multiple expert masks</a><ul>
+<li><a href="#issue-2"><span class="toc-section-number">4.1</span> Issue</a></li>
+<li><a href="#needs-2"><span class="toc-section-number">4.2</span> Needs</a></li>
+<li><a href="#background-2"><span class="toc-section-number">4.3</span> Background</a></li>
+<li><a href="#methods-2"><span class="toc-section-number">4.4</span> Methods</a></li>
+<li><a href="#references-1"><span class="toc-section-number">4.5</span> References</a></li>
+<li><a href="#example-2"><span class="toc-section-number">4.6</span> Example</a></li>
+</ul></li>
+<li><a href="#data-driven-masking-by-biotic-interactions"><span class="toc-section-number">5</span> Data Driven: Masking by biotic interactions</a><ul>
+<li><a href="#issue-3"><span class="toc-section-number">5.1</span> Issue</a></li>
+<li><a href="#needs-3"><span class="toc-section-number">5.2</span> Needs</a></li>
+<li><a href="#background-3"><span class="toc-section-number">5.3</span> Background</a></li>
+<li><a href="#methods-3"><span class="toc-section-number">5.4</span> Methods</a></li>
+<li><a href="#references-2"><span class="toc-section-number">5.5</span> References</a></li>
+<li><a href="#example-3"><span class="toc-section-number">5.6</span> Example</a><ul>
+<li><a href="#spatial-svms"><span class="toc-section-number">5.6.1</span> Spatial SVMs</a></li>
+<li><a href="#hybrid-svms"><span class="toc-section-number">5.6.2</span> Hybrid SVMs</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+
+<div id="introduction" class="section level1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
+<p>The goal of masking range maps (or species distribution models) is to improve spatial (and possibly temporal) accuracy by incorporating different types of information. Often statistically-based SDMs are used to identify suitable environmental conditions, as the models detect locations with similar environmental conditions to where the species was observed. Often, these modeled maps are best interpreted as potential distributions since other processes besides abiotic conditions may restrict the distribution, such as dispersal, biotic interactions, social dynamics, historical contingencies, or human modification of habitat. In contrast, realized distributions describe those locations that are actually occupied by the species (at some spatial resolution) and may be smaller than potential distributions. By starting with potential distributions from any form of SDM, we can use other pieces of information to refine these models to approach realized distributions.</p>
+<p>Here, we illustrate methods for estimating realized distributions based on different types of data. Additional information not included as a predictor in the SDM can be described by masks that differentiate potential habitat from non-habitat. They represent a conceptual model usually relating to a single variable, e.g., forest cover, occurrence of competing species, dispersal. When appropriate data are not available (e.g. climate data matching occurrence record collection dates), masks can be stacked on existing SDMs to determine places that both models designate as suitable habitat. Using a series of masks is a type of ensemble modeling where complete agreement is required between all component models to denote a location as suitable. Below, we illustrate cases based on forest cover, expert opinion, multiple environmental layers, and occurrence of competing species.</p>
+<p>Throughout the package, we use the following definitions:</p>
+<p><strong>Potential distribution</strong> is used to describe maps used as input. The term ‘potential’ is used because the map is presumed to include possibly suitable locations. These maps may well be the result of a model that includes processes such as dispersal, biotic interactions, social dynamics, historical contingencies, or human modification of habitat, but here we assume that there is further information that can be used to refine the range.</p>
+<p><strong>Realized distribution</strong> is used to describe output maps resulting from masking of potential distributions. While the outputs may still include some ommission/commission errors, they aim to better estimate the realized distribution relative to the input maps by accounting for some additional source of information, e.g. land cover, expert opinion, biotic factors, etc.</p>
+<!-- ================================================================== -->
+<!-- ================================================================== -->
+<!-- ================================================================== -->
+<p>In the following use cases, we describe distribution modeling scenarios that require post-processing of the potential distribution to better estimate a species’ realized distribution. This post-processing is carried out in the form of masks based on expert opinion or data. For each scenario, we list the components needed to carry out the analysis and provide examples of the process.</p>
+</div>
+<div id="data-driven-land-cover-mask" class="section level1">
+<h1><span class="header-section-number">2</span> Data Driven: Land Cover Mask</h1>
+<div id="issue" class="section level2">
+<h2><span class="header-section-number">2.1</span> Issue</h2>
+<p>When creating SDMs, best practice dictates using environmental data that temporally match the occurrence records. However, this is not always realistic. Often, many occurrence records are from museum specimens that do not have relevant environmental data, e.g. forest cover. In such cases, recent occurrence records may be temporally matched to recent environmental data in order create a mask of values outside of observed ranges. This mask can be applied to the SDM to remove those geographic areas that are unsuitable for the species.</p>
+</div>
+<div id="needs" class="section level2">
+<h2><span class="header-section-number">2.2</span> Needs</h2>
+<p>These analyses require the following data:</p>
+<ol style="list-style-type: decimal">
+<li>SDM: a previously generated species distribution model.</li>
+<li>Dated occurrence records: These can be dated yearly, monthly, or daily.</li>
+<li>Recent environmental data: These can be dated yearly, monthly, or daily.</li>
+</ol>
+</div>
+<div id="background" class="section level2">
+<h2><span class="header-section-number">2.3</span> Background</h2>
+<p>The Olinguito (<em>Bassaricyon neblina</em>) is a new species of carnivore described in 2013 from museum specimens that were previously identified as a different species [1]. The Olinguito lives in Northern Andean cloud forests in Colombia and Ecuador, and, according to experts, has strict tolerances for forest cover [1]. Recent occurrence records allow for very simple data-driven masking based on observed ranges of forest cover, but the number of occurrences (n = 18) is likely too few to use in model calibration. The data-driven determination of thresholds for masking using recent records represents a simple, conservative methodology that can be used for many species with limited recent records, and also will prove useful for processing of expert range maps or other pre-existing range estimates that do not take into account human modifications of the environment. <!-- We tested for any correlation between the forest layers and the climate layers used in the ENM to ensure they are contributing different information.  --></p>
+</div>
+<div id="methods" class="section level2">
+<h2><span class="header-section-number">2.4</span> Methods</h2>
+<p>A 30 arc-second Bioclimatic-variable climate-based Maxent [2] SDM was tuned for the Olinguito using a mix of historical data paired with field notes, as well as contemporary citizen science records associated with photo-vouchers [3]. The model was trained on 0.7 degree buffered circles around occurrence records and then projected to a 5-degree bounding box around occurrence records. We then removed areas from the SDM representing biogeographic regions where the species has not been documented, like the Eastern Cordillera of Colombia and other small non-contiguous areas [3].</p>
+<p>Next, we used remotely sensed data of the annual percent forest cover for the region (MODIS Vegetation Continuous Fields; 250 m from the years matching the most recent occurrence records: 2006-2016). The MODIS rasters from different years were not all aligned with one another and had to be realigned to create a raster stack. A subset of the more recent occurrence records (2006-2016) were then temporally matched with the forest cover rasters to obtain values of forest cover per occurrence (one record was excluded because it was based on an observation that stemmed from a likely roadkilled specimen [4]). The forest cover values at occurrence records were then assessed across all years, and the 25th quantile forest cover level was used to generate a forest cover mask for the most recent year (2010). After resampling the SDM to match the resolution of the MODIS data, we applied this forest cover mask to reduce the SDM’s spatial prediction to only those climatically suitable areas where forest cover is above the threshold. This reduced model shows a conservative estimation of the species range given current non-climatic variables that represent anthropogenic modification of land cover.</p>
+</div>
+<div id="references" class="section level2">
+<h2><span class="header-section-number">2.5</span> References</h2>
+<p>[1] Helgen, K.M., Miguel Pinto, C., Kays, R., Helgen, L.E., Tsuchiya, M. T. N., Quinn, A., Wilson, D.E., Maldonado, J.E. (2013) Taxonomic revision of the olingos (<em>Bassaricyon</em>), with description of a new species, the Olinguito. <em>Zookeys</em>, <strong>324</strong>, 1-83. <a href="https://doi.org/10.3897/zookeys.324.5827" class="uri">https://doi.org/10.3897/zookeys.324.5827</a>.</p>
+<p>[2] Phillips, S.J., Anderson, R.P., Schapire, R.E. (2006) Maximum entropy modeling of species geographic distributions. <em>Ecological Modeling</em>, <strong>190</strong>, 231 - 259.</p>
+<p>[3] Gerstner, B. E., Kass, J. M., Kays, R., Helgen, K. M. &amp; Anderson, R. P. (2018) Revised distributional estimates for the recently discovered olinguito (<em>Bassaricyon neblina</em>), with comments on natural and taxonomic history. <em>Journal of Mammalogy</em> 99, 321–332. <a href="https://doi.org/10.1093/jmammal/gyy012" class="uri">https://doi.org/10.1093/jmammal/gyy012</a></p>
+<p>[4] Saavedra-Rodríguez, C. &amp; Rojas-Díaz, V. (2011) Bassaricyon gabbii Allen, 1876 (Carnivora: Procyonidae): new distribution point on western range of Colombian Andes. <em>Check List</em> 7(4), 505–507. <a href="http://dx.doi.org/10.15560/7.4.505" class="uri">http://dx.doi.org/10.15560/7.4.505</a>.</p>
+</div>
+<div id="example" class="section level2">
+<h2><span class="header-section-number">2.6</span> Example</h2>
+<p>By setting the pathway to where you saved our canned datasets by using the getDemoData() function, access that data by setting that as the working directory.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(raster)
+<span class="kw">library</span>(maskRangeR)
+<span class="kw">library</span>(lubridate)
+## Remember that the 'path' is the directory in which you saved the demonstration data 
+dataDir =<span class="st"> </span><span class="kw">paste0</span>(path, <span class="st">'/dataDriven/olinguito/'</span>) </code></pre></div>
+<p>Read in the environmental and occurrence data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dateScale &lt;-<span class="st"> &quot;year&quot;</span> <span class="co"># or &quot;month&quot;, &quot;day&quot;</span>
+env &lt;-<span class="st"> </span><span class="kw">stack</span>(<span class="kw">list.files</span>(<span class="dt">path =</span> <span class="kw">paste0</span>(dataDir), <span class="dt">pattern =</span> <span class="st">&quot;olinguito_Modis.tif$&quot;</span>, <span class="dt">full.names =</span> T))
+<span class="co"># this should be a formal date object of class &quot;POSIXct&quot; &quot;POSIXt&quot;</span>
+envDates &lt;-<span class="st"> </span><span class="kw">parse_date_time</span>((<span class="kw">c</span>(<span class="st">'2005'</span>,<span class="st">'2006'</span>,<span class="st">'2008'</span>,<span class="st">'2009'</span>,<span class="st">'2010'</span>)),<span class="dt">orders =</span> <span class="kw">c</span>(<span class="st">&quot;Y&quot;</span>, <span class="st">&quot;Ym&quot;</span>))
+datedOccs &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="kw">paste0</span>(dataDir,<span class="st">'All_new_records_by_year.csv'</span>))
+sdm &lt;-<span class="st"> </span><span class="kw">raster</span>(<span class="kw">paste0</span>(dataDir,<span class="st">'olinguito_SDM.tif'</span>))
+<span class="co"># crop climate data to study region</span>
+env &lt;-<span class="st"> </span><span class="kw">crop</span>(env, <span class="kw">extent</span>(sdm))</code></pre></div>
+<p>Prepare the data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># convert dates to formal date objects</span>
+datedOccs<span class="op">$</span>date &lt;-<span class="st"> </span><span class="kw">parse_date_time</span>(datedOccs<span class="op">$</span>date,<span class="dt">orders =</span> <span class="kw">c</span>(<span class="st">&quot;Y&quot;</span>, <span class="st">&quot;Ym&quot;</span>))
+<span class="co"># convert to spatial object</span>
+<span class="kw">coordinates</span>(datedOccs) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">'long'</span>,<span class="st">'lat'</span>)
+<span class="kw">projection</span>(datedOccs) &lt;-<span class="st"> </span><span class="kw">projection</span>(env)</code></pre></div>
+<p>To perform data-driven masking, first find the values of the environmental variable (forest cover in this example) at the occurrence point locations.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">datedOccs &lt;-<span class="st"> </span>maskRangeR<span class="op">::</span><span class="kw">annotate</span>(datedOccs,env,envDates,dateScale)
+<span class="co"># Note the warnings:</span>
+<span class="co"># [1] &quot;Environmental layers were missing for date 2013&quot;</span>
+<span class="co"># [1] &quot;Environmental layers were missing for date 2016&quot;</span>
+<span class="co"># [1] &quot;Environmental layers were missing for date 2015&quot;</span>
+<span class="co"># These indicate that you have occurrencee records that do not match some environmental data.</span>
+<span class="co"># You may want to look into this, but it is not an issue for using the package.</span></code></pre></div>
+<p>Then find a suitable lower limit for the mask based on the data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(bounds &lt;-<span class="st"> </span><span class="kw">quantile</span>(datedOccs<span class="op">$</span>env,<span class="dt">prob=</span><span class="kw">c</span>(<span class="dv">0</span>,.<span class="dv">025</span>,.<span class="dv">25</span>,.<span class="dv">5</span>,.<span class="dv">75</span>,.<span class="dv">975</span>,<span class="dv">1</span>),<span class="dt">na.rm=</span>T))</code></pre></div>
+<p>Note that here, there is an occurrence record showing 4% forest cover. This occurrence record comes from a roadkilled specimen, so it is likely not representative of necessary forest cover. To simplify for this vignette, we use the 25% observed forest cover as the lower limit.</p>
+<p>Create the mask and mask the potential distribution using the most recent year’s forest cover.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">logicString &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">'maskLayers&gt;'</span>,<span class="kw">quantile</span>(datedOccs<span class="op">$</span>env,<span class="dt">prob=</span>.<span class="dv">25</span>,<span class="dt">na.rm=</span>T))
+forest &lt;-<span class="st"> </span>env[[<span class="dv">5</span>]]
+<span class="kw">names</span>(forest) &lt;-<span class="st"> 'forest'</span>
+maskedDist &lt;-<span class="st"> </span>maskRangeR<span class="op">::</span><span class="kw">maskRanger</span>(<span class="dt">potentialDist=</span>sdm,<span class="dt">maskLayers=</span>forest,<span class="dt">logicString=</span>logicString)</code></pre></div>
+<p>Check that there are now fewer cells in the masked map.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(nOccupiedCells &lt;-<span class="st"> </span><span class="kw">apply</span>(<span class="kw">values</span>(maskedDist[[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]]),<span class="dv">2</span>,sum,<span class="dt">na.rm=</span>T))</code></pre></div>
+<p>Plot the results. The first map shows the percent forest cover across the study region in the most recent year. The second map shows regions where forest cover is above the 25th quantile threshold in green and the potential distribution from the SDM in grey. The third map compares the potential distribution (grey) to the masked distribution (red).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>))
+<span class="kw">plot</span>(forest,<span class="dt">main =</span> <span class="st">'Raw Forest Data'</span>)
+<span class="kw">plot</span>(maskedDist[[<span class="st">'forestMask'</span>]],<span class="dt">main =</span> <span class="st">'Forest Mask + Potential Distribution'</span>)
+<span class="kw">plot</span>(sdm,<span class="dt">add =</span> T,<span class="dt">col =</span> <span class="kw">c</span>(<span class="kw">grey</span>(<span class="dv">0</span>,<span class="dv">0</span>),<span class="kw">grey</span>(.<span class="dv">4</span>,.<span class="dv">7</span>)))
+<span class="kw">plot</span>(maskedDist[[<span class="dv">1</span>]],<span class="dt">col =</span> <span class="kw">c</span>(<span class="kw">grey</span>(.<span class="dv">6</span>),<span class="st">'red1'</span>),<span class="dt">main =</span> <span class="st">'Masked Distribution'</span>)</code></pre></div>
+<!-- ================================================================== -->
+<!-- ================================================================== -->
+<!-- ================================================================== -->
+</div>
+</div>
+<div id="expert-driven-masking-by-expert-maps" class="section level1">
+<h1><span class="header-section-number">3</span> Expert Driven: Masking by expert maps</h1>
+<div id="issue-1" class="section level2">
+<h2><span class="header-section-number">3.1</span> Issue</h2>
+<p>Range models may omit areas of presence, or include areas where the species does not exist. Expert knowledge can improve the realism of range models, either by adding suitable regions to a model or removing unsuitable ones.</p>
+</div>
+<div id="needs-1" class="section level2">
+<h2><span class="header-section-number">3.2</span> Needs</h2>
+<p>These analyses require the following data:</p>
+<ol style="list-style-type: decimal">
+<li>Expert defined area: This may be an area to add or remove to the species’ distribution.</li>
+<li>SDM: This may be from an IUCN assessment, a thresholded SDM, or similar binary range indicator.</li>
+</ol>
+</div>
+<div id="background-1" class="section level2">
+<h2><span class="header-section-number">3.3</span> Background</h2>
+<div id="biomodelos" class="section level3">
+<h3><span class="header-section-number">3.3.1</span> BioModelos</h3>
+<p><a href="http://biomodelos.humboldt.org.co/">BioModelos</a> is a web application for the collaborative development of species distribution models. In BioModelos, taxonomy/ecology/biogeography experts aid in</p>
+<ol style="list-style-type: decimal">
+<li>cleaning occurrence data</li>
+<li>identifying species’ suitable land covers</li>
+<li>selecting adequate omission thresholds to create binary models</li>
+<li>identifying species’ accessible areas as well as areas of model over and underprediction</li>
+<li>qualitatively evaluating the biological realism of resulting model predictions.</li>
+</ol>
+<p>A complete description of BioModelos is available <a href="https://www.biorxiv.org/content/early/2018/10/05/432617">here</a>.</p>
+<p>Here, we provide an example of 4. identifying species’ accessible areas as well as areas of model over and underprediction. Using the web tools available in BioModelos, an expert may draw a polygon on top of a geographic viewer to indicate A) a species’ accessible area, B) an area that must be removed from a model, or C) an area that must be added to a model.</p>
+</div>
+<div id="howler-monkey-example" class="section level3">
+<h3><span class="header-section-number">3.3.2</span> Howler Monkey Example</h3>
+<p>The Howler Monkey, <em>Alouatta seniculus</em>, exemplifies a situation in which expert opinion was gathered using BioModelos to make range estimates more realistic. This species occurs in Colombia, Ecuador, Peru, Venezuela and Brazil (IUCN 2018). In Colombia, howler monkeys are widely distributed, occurring from 0-3200 meters. In the Choco biogeographic region, however, they are absent. This pattern is likely due to the dominance of closed canopies in the Choco rather than to any barrier to <em>A. seniculus</em> dispersal (Defler, 2010) since the mantled howler <em>Alouatta palliata</em> is better adapted to closed canopies than is <em>A. seniculus</em>.</p>
+</div>
+</div>
+<div id="methods-1" class="section level2">
+<h2><span class="header-section-number">3.4</span> Methods</h2>
+<p>Records for <em>A. seniculus</em> in Colombia were curated independently by the Colombian Primatology Association and records from outside of Colombia were curated by the Primates Expert Group of BioModelos using the web app. A presence-only model for the distribution of this species was built using a background area spanning from north Peru to south Costa Rica and eastern Ecuador to Venezuela. This region was selected because it contains no known geographic barriers limiting the species’ dispersal.</p>
+<p>The <code>ENMeval</code> package was used to select optimum feature classes/regularization values for the Maxent SDM. Records were partitioned using <code>checkerboard2</code>. The final model was run using all available occurrences and the regularization and feature class combination with the highest <span class="math inline">\(AUC_{test}\)</span> in model testing. Experts in the primates group selected the minimum training presence threshold as the threshold that best represented the prevalence of suitable climatic conditions for the species in the country. Once the model was thresholded, they also identified areas of model over- and underprediction. Therefore models were post-processed, as described <a href="https://github.com/LBAB-Humboldt/modeling/tree/master/primates">here</a>.</p>
+<p>The following steps are possible ways to improve the realism of a potential distribution based on expert opinion:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Add polygon</strong>: in some cases an expert may consider that a model underpredicts the suitable area for a species. For example, when modeling the distribution of <em>A. seniculus</em> in Colombia, there were gaps in the Amazon that were judged by experts as errors. Those missing areas can be added to the model by directly adding a polygon onto a GIS, indicating that model values in the area should be 1, or present.<br />
+<!-- See link for illustration. --></li>
+<li><strong>Remove polygon</strong> (not shown here): in some other cases, experts may consider that the model is predicting an area where the species’ presence is not possible. Again, for <em>A. seniculus</em>, experts considered that predictions of the distribution of this species in the Guajira peninsula were unlikely. They opted to remove that area from the model by drawing a polygon on the map indicating that in the area, model values should be 0, or absent.<br />
+</li>
+<li><strong>Mask model</strong>: (not shown) models may also need to be masked to 1) a drawn polygon; 2) a user provided shapefile; 3) a user-provided list of land covers. For <em>A. seniculus</em>, we clipped first by a user-drawn map and later by national boundaries (as we were not interested in predictions beyond Colombia; not shown). Later (not shown), we clipped that map using a list of land covers suitable for the species, as defined by experts, using a national land cover map.</li>
+</ol>
+</div>
+<div id="example-1" class="section level2">
+<h2><span class="header-section-number">3.5</span> Example</h2>
+<p>By setting the pathway to where you saved our canned datasets by using the getDemoData() function, access that data by setting that as the working directory.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(devtools)
+<span class="kw">library</span>(maskRangeR)
+<span class="kw">library</span>(lubridate)
+<span class="kw">library</span>(raster)
+<span class="kw">library</span>(rgdal)
+dataDir =<span class="st"> </span><span class="kw">paste0</span>(path, <span class="st">'/dataDriven/Alouatta/'</span>)</code></pre></div>
+<p>Read in the original SDM and the expert polygon.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">original =<span class="st"> </span><span class="kw">stack</span>(<span class="kw">paste0</span>(dataDir, <span class="st">'Alouatta_seniculus_0_mx.tif'</span>))
+expertAddedPoly =<span class="st"> </span>rgdal<span class="op">::</span><span class="kw">readOGR</span>(<span class="kw">paste0</span>(dataDir, <span class="st">'Alouatta_seniculus_add_HO.shp'</span>))</code></pre></div>
+<p>Plot the original SDM.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))
+<span class="kw">plot</span>(original, <span class="dt">main =</span> <span class="st">&quot;Range map&quot;</span>)</code></pre></div>
+<p>Add the expert polygon to the SDM.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">expertAddRaster &lt;-<span class="st"> </span><span class="kw">rasterize</span>(expertAddedPoly,original, <span class="dv">1</span>)
+expertAddRaster[<span class="kw">is.na</span>(expertAddRaster)] &lt;-<span class="st"> </span><span class="dv">0</span>
+final =<span class="st"> </span>original<span class="op">+</span>expertAddRaster
+<span class="co"># remove overlap</span>
+final[final<span class="op">&gt;</span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="dv">1</span></code></pre></div>
+<p>Plot the new distribution model with the expert region added.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(final, <span class="dt">main =</span> <span class="st">&quot;Range map with </span><span class="ch">\n</span><span class="st"> expert area added&quot;</span>)
+<span class="kw">plot</span>(expertAddedPoly,<span class="dt">add =</span> T)</code></pre></div>
+<p>Calculate the difference in range size.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cellStats</span>(original,sum)
+<span class="kw">cellStats</span>(final,sum)</code></pre></div>
+<!-- ================================================================== -->
+<!-- ================================================================== -->
+<!-- ================================================================== -->
+</div>
+</div>
+<div id="expert-driven-multiple-expert-masks" class="section level1">
+<h1><span class="header-section-number">4</span> Expert Driven: Multiple expert masks</h1>
+<div id="issue-2" class="section level2">
+<h2><span class="header-section-number">4.1</span> Issue</h2>
+<p>Some species may not have published occurrence records from which to define environmental tolerances. In these cases, multiple environmental layers are thresholded to the observed tolerances for the species. A range map is then masked by the tolerances, thereby reducing the area of the range map to only those areas suitable based on all environmental data.</p>
+</div>
+<div id="needs-2" class="section level2">
+<h2><span class="header-section-number">4.2</span> Needs</h2>
+<p>These analyses require the following data:</p>
+<ol style="list-style-type: decimal">
+<li>Environmental layers: These need to be layers deemed important to the species’ biology.</li>
+<li>Environmental tolerances: These tolerances are used to threshold the environmental layers.</li>
+<li>A range map: This map is generally a simplified overestimation of the range of the species and will therefore be reduced through a series of masks.</li>
+</ol>
+</div>
+<div id="background-2" class="section level2">
+<h2><span class="header-section-number">4.3</span> Background</h2>
+<p>The “swamp forest crab” (<em>Parathelphusa reticulata</em>) is a freshwater crab endemic to the Nee Soon Swamp Forest, Singapore’s last remaining patch of freshwater swamp forest, and is currently listed as Critically Endangered by the IUCN. Like many freshwater crabs of the Southeast Asia, <em>P. reticulata</em> is primarily a scavenger that feeds on coarse organic matter, such as leaf litter. Given its endemic and endangered status, the ideal habitat parameters in which this species is found are highly restricted. However, available distribution information is quite limited: there is only one locality for this species available in GBIF, and the IUCN range map is a coarse overestimate. According to expert opinion, the environmental variables most closely associated with this species’ geographic range include distance to forest streams/swamps, pH, dissolved oxygen, temperature, elevation, and canopy cover. However, building a niche-based distribution model is not feasible due to considerable data and sample size limitations that likely violate the assumptions of the approach; the available high quality georeferenced occurrence data (N=1) do not capture the range of habitats occupied by the species.</p>
+</div>
+<div id="methods-2" class="section level2">
+<h2><span class="header-section-number">4.4</span> Methods</h2>
+<p>In this use case, we will perform an expert-driven species range estimate using a series of informed masks that constrain the coarse IUCN range map to a more realistic area of suitable environmental conditions. We will then constrain the range to: areas of soil pH from 5.17-5.79, dissolved oxygen from 27.2-36.6%, daytime air temperature 26-34˚C, elevation 16-26m, and canopy cover 75-100%. These tolerances were developed following Chua et al. (2015) [1], a study that conducted fine-scale sampling in two of the nature reserves in Singapore known to have swamp forest crabs and analyzed the relationship between crab communities and environmental variables. Due to the species’ rarity, the occurrence data are not publicly available, however the environmental correlates described above are provided. Data layers include soil pH accessed from soilGrids.org [1], temperature data from worldclim.org [2], elevation from LPDAAC [3], canopy cover from Hansen et al., 2013 [4], and surface water from the global surface water database (Source: EC JRC/Google) [5]. Resolutions differ between layers, so rasters were either resampled or dis/aggregated to match the mask.</p>
+</div>
+<div id="references-1" class="section level2">
+<h2><span class="header-section-number">4.5</span> References</h2>
+<p>[1]Chua KWJ, Ng DJJ, Zeng Y, Yeo DCJ. 2015. Habitat characteristics of tropical rainforest freshwater crabs in Singapore. Journal of Crustacean Biology 35(4): 533-539. <a href="https://academic.oup.com/jcb/article/35/4/533/2547833" class="uri">https://academic.oup.com/jcb/article/35/4/533/2547833</a> [2] Hengl T, Mendes de Jesus J, Heuvelink GBM, Ruiperez Gonzalez M, Kilibarda M, Blagotić A, et al. (2017) SoilGrids250m: Global gridded soil information based on machine learning. PLoS ONE 12(2): e0169748. <a href="https://doi.org/10.1371/journal.pone.0169748" class="uri">https://doi.org/10.1371/journal.pone.0169748</a><br />
+[3] Hijmans, R. J., Cameron, S. E., Parra, J. L., Jones, P. G., &amp; Jarvis, A. (2005). Very high resolution interpolated climate surfaces for global land areas. International journal of climatology, 25(15), 1965-1978.<br />
+[4] NASA/METI/AIST/Japan Space Systems. (2009). ASTER global digital elevation model [data set]. NASA EOSDIS Land Processes DAAC.<br />
+[5] Hansen, M. C., Potapov, P. V., Moore, R., Hancher, M., Turubanova, S. A. A., Tyukavina, A., … &amp; Kommareddy, A. (2013). High-resolution global maps of 21st-century forest cover change. science, 342(6160), 850-853.<br />
+[6] Jean-Francois Pekel, Andrew Cottam, Noel Gorelick, Alan S. Belward, High-resolution mapping of global surface water and its long-term changes. Nature 540, 418-422 (2016). (<a href="doi:10.1038/nature20584)_" class="uri">doi:10.1038/nature20584)_</a></p>
+<!-- [1]Chua KWJ, Ng DJJ, Zeng Y, Yeo DCJ. 2015. Habitat characteristics of tropical rainforest freshwater crabs in Singapore. Journal of Crustacean Biology 35(4): 533-539. https://academic.oup.com/jcb/article/35/4/533/2547833  -->
+<!-- [2] Hengl T, Mendes de Jesus J, Heuvelink GBM, Ruiperez Gonzalez M, Kilibarda M, Blagotić A, et al. (2017) SoilGrids250m: Global gridded soil information based on machine learning. PLoS ONE 12(2): e0169748. https://doi.org/10.1371/journal.pone.0169748 -->
+<!-- [3] Hijmans, R. J., Cameron, S. E., Parra, J. L., Jones, P. G., & Jarvis, A. (2005). Very high resolution interpolated climate surfaces for global land areas. International journal of climatology, 25(15), 1965-1978. -->
+<!-- [4] NASA/METI/AIST/Japan Space Systems. (2009). ASTER global digital elevation model [data set]. NASA EOSDIS Land Processes DAAC. -->
+<!-- [5] Hansen, M. C., Potapov, P. V., Moore, R., Hancher, M., Turubanova, S. A. A., Tyukavina, A., ... & Kommareddy, A. (2013). High-resolution global maps of 21st-century forest cover change. science, 342(6160), 850-853. -->
+<!-- [6] Jean-Francois Pekel, Andrew Cottam, Noel Gorelick, Alan S. Belward, High-resolution mapping of global surface water and its long-term changes. Nature 540, 418-422 (2016). (doi:10.1038/nature20584) -->
+</div>
+<div id="example-2" class="section level2">
+<h2><span class="header-section-number">4.6</span> Example</h2>
+<p>By setting the pathway to where you saved our canned datasets by using the getDemoData() function, access that data by setting that as the working directory.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(maskRangeR)
+<span class="kw">library</span>(raster)
+<span class="kw">library</span>(rgdal)
+dataDir =<span class="st"> </span><span class="kw">paste0</span>(path, <span class="st">'/expertDriven/swampForestCrab/'</span>)</code></pre></div>
+<p>Read in the expert map and the environmental layers.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">expertMap &lt;-<span class="st"> </span><span class="kw">readOGR</span>(<span class="kw">paste0</span>(dataDir,<span class="st">'IUCNshape/data_0.shp'</span>))
+
+<span class="co">#CM: pH and Water bounds are mutually exclusive, so we can only choose one, otherwise there is no suitable habitat. as I understand it, the soil grids shouldn't be taken too seriously at fine grain</span>
+<span class="co">#masks</span>
+maskListRaw &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">treeCover =</span> <span class="kw">raster</span>(<span class="kw">paste0</span>(dataDir,<span class="st">'/Hansen_percent_treecover.tif'</span>)), 
+                    <span class="dt">dem =</span> <span class="kw">raster</span>(<span class="kw">paste0</span>(dataDir,<span class="st">'/DEM.tif'</span>)),
+                    <span class="dt">mat =</span> <span class="kw">raster</span>(<span class="kw">paste0</span>(dataDir,<span class="st">'/MATsingapore.tif'</span>)),
+                    <span class="dt">pH =</span> <span class="kw">raster</span>(<span class="kw">paste0</span>(dataDir,<span class="st">'/PHIHOX_M_sl1_250m.tif'</span>)))
+
+<span class="co"># define the limits for each mask</span>
+maskBounds &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="kw">paste0</span>(dataDir,<span class="st">'/crabInfo.csv'</span>))</code></pre></div>
+<p>Conduct data cleaning to fix names and units.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># rename the limits to match the raster names in maskListRaw</span>
+maskBounds<span class="op">$</span>Layer &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">'water'</span>,<span class="st">'treeCover'</span>,<span class="st">'dem'</span>,<span class="st">'pH'</span>,<span class="st">'mat'</span>)
+<span class="co"># make sure the units match between the layers and the bounds</span>
+maskListRaw<span class="op">$</span>mat &lt;-<span class="st"> </span>maskListRaw<span class="op">$</span>mat<span class="op">/</span><span class="dv">10</span>
+maskListRaw<span class="op">$</span>pH &lt;-<span class="st"> </span>maskListRaw<span class="op">$</span>pH<span class="op">/</span><span class="dv">10</span></code></pre></div>
+<p>Crop rasters to the same extent as the expert map, since we do not need to build masks outside the expert map.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">crt &lt;-<span class="st"> </span>maskRangeR<span class="op">::</span><span class="kw">cropResampleTrim</span>(expertMap,maskListRaw)</code></pre></div>
+<p>Create each mask, and mask the expert map.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">expertRaster &lt;-<span class="st"> </span>crt<span class="op">$</span>expertRaster
+maskStack &lt;-<span class="st"> </span>crt<span class="op">$</span>maskStack
+realized &lt;-<span class="st"> </span>maskRangeR<span class="op">::</span><span class="kw">lotsOfMasks</span>(expertRaster,maskStack,maskBounds)</code></pre></div>
+<p>Plot the realized distribution, along with each of masks.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(<span class="kw">stack</span>(realized))</code></pre></div>
+<p>We can zoom in to visualize what is left of the realized distribution after the masking process. The black polygon represents the original expert map and red locations indicate those that remain as suitable habitat after the masks have been applied.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">real &lt;-<span class="st"> </span>raster<span class="op">::</span><span class="kw">trim</span>(realized<span class="op">$</span>realizedDist)
+<span class="kw">plot</span>(real,<span class="dt">col =</span> <span class="kw">c</span>(<span class="st">'white'</span>,<span class="st">'red'</span>))
+<span class="kw">plot</span>(expertMap,<span class="dt">add =</span> T)</code></pre></div>
+<p>Calculate the difference in range size.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cellStats</span>(expertRaster,sum)
+<span class="kw">cellStats</span>(real,sum)</code></pre></div>
+<!-- ================================================================== -->
+<!-- ================================================================== -->
+<!-- ================================================================== -->
+</div>
+</div>
+<div id="data-driven-masking-by-biotic-interactions" class="section level1">
+<h1><span class="header-section-number">5</span> Data Driven: Masking by biotic interactions</h1>
+<div id="issue-3" class="section level2">
+<h2><span class="header-section-number">5.1</span> Issue</h2>
+<p>In addition to abiotic factors such as forest cover, temperature, elevation, etc., species’ distributions are also affected by biotic interactions [1]. For example, putative competitor species often have adjacent but non-overlapping, i.e. parapatric, ranges. In these situations, range estimates based on predictive models may overestimate ranges if the distribution of competitor species is not taken into account. To create more realistic models, we can post-process SDMs for each species to consider biotic constraints, e.g. the presence of a supposed competitor.</p>
+</div>
+<div id="needs-3" class="section level2">
+<h2><span class="header-section-number">5.2</span> Needs</h2>
+<p>These analyses require the following data:</p>
+<ol style="list-style-type: decimal">
+<li>Occurrence points: georeferenced records for each species.</li>
+<li>SDMs for each species: If using a hybrid support vector machine (SVM), i.e. a classifier that accounts for the predicted suitability of habitat from the SDMs, SDM rasters of habitat suitability predictions for each species. The SDMs need to be projected to the same region and the resulting rasters need to have the same extent.</li>
+</ol>
+</div>
+<div id="background-3" class="section level2">
+<h2><span class="header-section-number">5.3</span> Background</h2>
+<p>The three-toed sloths (<em>Bradypus</em> spp.) comprise four species distributed across Central and South America. With the exception of <em>B. pygmaeus</em>, which is restricted to Isla Escudos de Veraguas, the other three <em>Bradypus</em> species range across mainland Central and South America: <em>B. variegatus</em> is widely distributed from eastern Honduras to northern Argentina, <em>B. tridactylus</em> is found in the Guiana shield region, and <em>B. torquatus</em> occurs only in the Brazilian Atlantic Forest. <em>B. variegatus</em> and <em>B. tridactylus</em> exhibit parapatry, which is likely caused by competition for resources and/or suitable habitat [2]. This situation of congeneric species replacing each other across space is common. <em>B. variegatus</em> and <em>B. torquatus</em>, on the other hand, are sympatric in regions of the latter’s habitat in the Brazilian Atlantic Forest [3]. This analysis delimits the distributions of these three species by masking out regions predicted to be more suitable for the other two species.</p>
+</div>
+<div id="methods-3" class="section level2">
+<h2><span class="header-section-number">5.4</span> Methods</h2>
+<p>2.5 arc-minute Bioclimatic-variable climate-based Maxent SDMs were tuned for each species using occurrence data from literature thinned to a distance of 40 km. The SDMs were trained on a background region of 4-degree buffered circles around the thinned occurrence points and projected to a 2-degree bounding box around occurrence records.</p>
+<p>After obtaining SDMs for each of the three species, we used the process below to create support vector machines (SVMs) to classify areas predicted to be more suitable for each of the three species. SVMs can be either spatial, using only the occurrence records of each species as predictors, or hybrid, using the habitat suitability from the SDMs as predictors in addition to the occurrence records. These SVMs are then used to mask the SDMs of each species to regions not predicted to be occupied by the other two species.</p>
+</div>
+<div id="references-2" class="section level2">
+<h2><span class="header-section-number">5.5</span> References</h2>
+<p>[1] Anderson, R.P. (2017) When and how should biotic interactions be considered in models of species niches and distributions? Journal of Biogeography, 44(1), 8-17.</p>
+<p>[2] de Moraes-Barros, N., Giorgi (2010) Reevaluation of the Geographical Distribution of Bradypus tridactylus Linnaeus, 1758 and B. variegatus Schinz, 1825. Edentata, 11(1), 53-61.</p>
+<p>[3] Hirsch, A., Chirello, A.G. (2012) The endangered maned sloth Bradypus torquatus of the Brazilian Atlantic forest: a review and update of geographical distribution and habitat preferences. Mammal Review, 42(1), 35-54.</p>
+<p>Occurrence Records from:</p>
+<p><em>B. variegatus</em>:<br />
+[1] Anderson, R. P., and C. O. Handley. 2001. A new species of three-toed sloth (Mammalia: Xenarthra) from Panama, with a review of the genus <em>Bradypus</em>. <em>Proceedings of the Biological Society of Washington</em> 114:1–33.</p>
+<p>[2] de Moraes Barros, N., J. A. B. Silva, and J. S. Morgante. 2011. Morphology, molecular phylogeny, and taxonomic inconsistencies in the study of <em>Bradypus</em> sloths (Pilosa: Bradypodidae). <em>Journal of Mammalogy</em> 92:86–100.</p>
+<p>[3] de Moraes-Barros, N., C. Y. Miyaki, and J. S. Morgante. 2007. Identifying management units in non-endangered species: the example of the sloth <em>Bradypus variegatus</em> Schinz, 1825. <em>Brazilian Journal of Biology</em> 67:829–837.</p>
+<p>[4] Silva, S. M., J. A. Dávila, B. Voirin, S. Lopes, N. Ferrand, and N. Moraes-Barros. 2018. The curious case of <em>Bradypus variegatus</em> sloths: populations in threatened habitats are biodiversity components needing protection. <em>Biodiversity and Conservation</em> 27:1291–1308.</p>
+<p><em>B. tridactylus</em>:<br />
+[1] Anderson, R. P., and C. O. Handley. 2001. A new species of three-toed sloth (Mammalia: Xenarthra) from Panama, with a review of the genus <em>Bradypus</em>. <em>Proceedings of the Biological Society of Washington</em> 114:1–33.</p>
+<p>[2] de Moraes Barros, N., J. A. B. Silva, and J. S. Morgante. 2011. Morphology, molecular phylogeny, and taxonomic inconsistencies in the study of <em>Bradypus</em> sloths (Pilosa: Bradypodidae). <em>Journal of Mammalogy</em> 92:86–100.</p>
+<p><em>B. torquatus</em>:<br />
+[1] Anderson, R. P., and C. O. Handley. 2001. A new species of three-toed sloth (Mammalia: Xenarthra) from Panama, with a review of the genus <em>Bradypus</em>. <em>Proceedings of the Biological Society of Washington</em> 114:1–33.</p>
+<p>[2] Moreira, D. de O., G. R. Leite, M. F. de Siqueira, B. R. Coutinho, M. S. Zanon, and S. L. Mendes. 2014. The distributional ecology of the maned sloth: Environmental influences on its distribution and gaps in knowledge. <em>PLOS ONE</em> 9:e110929.</p>
+</div>
+<div id="example-3" class="section level2">
+<h2><span class="header-section-number">5.6</span> Example</h2>
+<p>By setting the pathway to where you saved our canned datasets by using the getDemoData() function, access that data by setting that as the working directory.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(maskRangeR)
+<span class="kw">library</span>(raster)
+<span class="kw">library</span>(maptools)</code></pre></div>
+<p>Read in the occurrence data and the SDMs for each species. Note that the SDMs must be projected to the same region for input into the hybrid SVMs. For the final step of masking, however, apply the mask to the SDM projected only to the region of biological interest for each species.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dataDir =<span class="st"> </span><span class="kw">paste0</span>(path, <span class="st">'/dataDriven/bradypus/'</span>)
+
+<span class="co"># Species occurrence coordinates</span>
+variegatus &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="kw">paste0</span>(dataDir,<span class="st">'variegatus_occ.csv'</span>))
+tridactylus &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="kw">paste0</span>(dataDir,<span class="st">'tridactylus_occ.csv'</span>))
+torquatus &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="kw">paste0</span>(dataDir,<span class="st">'torquatus_occ.csv'</span>))
+
+<span class="co"># SDMs projected to the same extent</span>
+var_sdm &lt;-<span class="st"> </span><span class="kw">raster</span>(<span class="kw">paste0</span>(dataDir,<span class="st">'variegatus_sdm.tif'</span>))
+tri_sdm &lt;-<span class="st"> </span><span class="kw">raster</span>(<span class="kw">paste0</span>(dataDir,<span class="st">'tridactylus_sdm.tif'</span>))
+tor_sdm &lt;-<span class="st"> </span><span class="kw">raster</span>(<span class="kw">paste0</span>(dataDir,<span class="st">'torquatus_sdm.tif'</span>))
+
+<span class="co"># Crop tridactyus SDM to a 2-degree bounding box</span>
+ext_tri &lt;-<span class="st"> </span><span class="kw">extent</span>(<span class="kw">c</span>(<span class="kw">min</span>(tridactylus<span class="op">$</span>longitude)<span class="op">-</span><span class="dv">2</span>, <span class="kw">max</span>(tridactylus<span class="op">$</span>longitude)<span class="op">+</span><span class="dv">2</span>, <span class="kw">min</span>(tridactylus<span class="op">$</span>latitude)<span class="op">-</span><span class="dv">2</span>, <span class="kw">max</span>(tridactylus<span class="op">$</span>latitude)<span class="op">+</span><span class="dv">2</span>))
+tri_sdm_mask &lt;-<span class="st"> </span><span class="kw">mask</span>(tri_sdm, <span class="kw">as</span>(ext_tri, <span class="st">&quot;SpatialPolygons&quot;</span>))
+
+<span class="co"># Crop torquatus SDM to a 2-degree bounding box</span>
+ext_tor &lt;-<span class="st"> </span><span class="kw">extent</span>(<span class="kw">c</span>(<span class="kw">min</span>(torquatus<span class="op">$</span>longitude)<span class="op">-</span><span class="dv">2</span>, <span class="kw">max</span>(torquatus<span class="op">$</span>longitude)<span class="op">+</span><span class="dv">2</span>, <span class="kw">min</span>(torquatus<span class="op">$</span>latitude)<span class="op">-</span><span class="dv">2</span>, <span class="kw">max</span>(torquatus<span class="op">$</span>latitude)<span class="op">+</span><span class="dv">2</span>))
+tor_sdm_mask &lt;-<span class="st"> </span><span class="kw">mask</span>(tor_sdm, <span class="kw">as</span>(ext_tor, <span class="st">&quot;SpatialPolygons&quot;</span>))</code></pre></div>
+<p>The following are the SDMs for each species, projected to the same extent and visualized on a map of South America:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Get world map</span>
+<span class="kw">data</span>(<span class="st">&quot;wrld_simpl&quot;</span>)
+<span class="co"># Create list of South American countries for visualization</span>
+country_list &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Honduras&quot;</span>, <span class="st">&quot;Nicaragua&quot;</span>, <span class="st">&quot;Costa Rica&quot;</span>, <span class="st">&quot;Panama&quot;</span>, <span class="st">&quot;Colombia&quot;</span>,
+                  <span class="st">&quot;Ecuador&quot;</span>, <span class="st">&quot;Peru&quot;</span>, <span class="st">&quot;Bolivia&quot;</span>, <span class="st">&quot;Chile&quot;</span>, <span class="st">&quot;Argentina&quot;</span>, <span class="st">&quot;Uruguay&quot;</span>,
+                  <span class="st">&quot;Paraguay&quot;</span>, <span class="st">&quot;Brazil&quot;</span>, <span class="st">&quot;French Guiana&quot;</span>, <span class="st">&quot;Suriname&quot;</span>, <span class="st">&quot;Guyana&quot;</span>,
+                  <span class="st">&quot;Venezuela&quot;</span>)
+
+<span class="co"># Create 3-panel figure</span>
+<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>))
+
+<span class="co"># Plot B. variegatus SDM</span>
+<span class="kw">plot</span>(var_sdm, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">90</span>, <span class="op">-</span><span class="dv">30</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">27</span>, <span class="dv">16</span>))
+<span class="kw">plot</span>(wrld_simpl[wrld_simpl<span class="op">$</span>NAME <span class="op">%in%</span><span class="st"> </span>country_list,], <span class="dt">add =</span> <span class="ot">TRUE</span>)
+<span class="co"># Plot B. tridactylus SDM</span>
+<span class="kw">plot</span>(tri_sdm_mask, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">70</span>, <span class="op">-</span><span class="dv">49</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">6</span>, <span class="dv">11</span>))
+<span class="kw">plot</span>(wrld_simpl[wrld_simpl<span class="op">$</span>NAME <span class="op">%in%</span><span class="st"> </span>country_list,], <span class="dt">add =</span> <span class="ot">TRUE</span>)
+<span class="co"># Plot B. torquatus SDM</span>
+<span class="kw">plot</span>(tor_sdm_mask, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">46</span>, <span class="op">-</span><span class="dv">34</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">24</span>, <span class="op">-</span><span class="dv">8</span>))
+<span class="kw">plot</span>(wrld_simpl[wrld_simpl<span class="op">$</span>NAME <span class="op">%in%</span><span class="st"> </span>country_list,], <span class="dt">add =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<!-- # Reset plotting parameters -->
+<!-- par(mfrow = c(1,1)) -->
+<div id="spatial-svms" class="section level3">
+<h3><span class="header-section-number">5.6.1</span> Spatial SVMs</h3>
+<p>Spatial SVMs are created using a classifier trained with the occurrence points of each species, without accounting for habitat suitability according to the SDM.</p>
+<p>Tune the model and use it to predict ranges for each of the three species.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1234</span>) <span class="co"># to reproduce our exact results</span>
+<span class="co"># Create SVM</span>
+svmSP &lt;-<span class="st"> </span><span class="kw">rangeSVM</span>(variegatus[,<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>], tridactylus[,<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>], 
+                  torquatus[,<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>], <span class="dt">nrep =</span> <span class="dv">8</span>, <span class="dt">mc.cores=</span>mc.cores)
+
+<span class="co"># Use SVM to create a raster of predicted regions</span>
+sloth_svmSP &lt;-<span class="st"> </span><span class="kw">rangeSVM_predict</span>(<span class="dt">svm =</span> svmSP, <span class="dt">r =</span> var_sdm)</code></pre></div>
+<p>Plot the SVM results. The grey areas indicate regions more suitable for <em>B. variegatus</em>, the yellow areas indicate regions more suitable for <em>B. tridactylus</em>, and the green areas indicate regions more suitable for <em>B. torquatus</em>. Black points show the occurrences of <em>B. variegatus</em>, red show <em>B. tridactylus</em>, and blue show <em>B. torquatus</em>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(sloth_svmSP, <span class="dt">col=</span><span class="kw">c</span>(<span class="st">&quot;yellow&quot;</span>,<span class="st">&quot;pink&quot;</span>,<span class="st">&quot;lightblue&quot;</span>))
+<span class="kw">points</span>(variegatus[,<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>], <span class="dt">pch =</span> <span class="dv">20</span>, <span class="dt">cex =</span> <span class="fl">0.75</span>, <span class="dt">col =</span> <span class="st">&quot;orange&quot;</span>)
+<span class="kw">points</span>(tridactylus[,<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>], <span class="dt">pch =</span> <span class="dv">20</span>, <span class="dt">cex =</span> <span class="fl">0.75</span>, <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>)
+<span class="kw">points</span>(torquatus[,<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>], <span class="dt">pch =</span> <span class="dv">20</span>, <span class="dt">cex =</span> <span class="fl">0.75</span>, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>)</code></pre></div>
+<p>We can use this SVM as a mask over our original SDM predictions.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># masked SDM predictions for variegatus</span>
+var_svmSP &lt;-<span class="st"> </span>sloth_svmSP <span class="op">==</span><span class="st"> </span><span class="dv">1</span>
+var_svmSP[var_svmSP <span class="op">==</span><span class="st"> </span><span class="dv">0</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
+var_svmSP_mask &lt;-<span class="st"> </span><span class="kw">mask</span>(var_sdm, var_svmSP)
+
+<span class="co"># masked SDM predictions for tridactylus</span>
+tri_svmSP &lt;-<span class="st"> </span>sloth_svmSP <span class="op">==</span><span class="st"> </span><span class="dv">2</span>
+tri_svmSP[tri_svmSP <span class="op">==</span><span class="st"> </span><span class="dv">0</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
+tri_svmSP_mask &lt;-<span class="st"> </span><span class="kw">mask</span>(tri_sdm_mask, tri_svmSP)
+
+<span class="co"># masked SDM predictions for torquatus</span>
+tor_svmSP &lt;-<span class="st"> </span>sloth_svmSP <span class="op">==</span><span class="st"> </span><span class="dv">3</span>
+tor_svmSP[tor_svmSP <span class="op">==</span><span class="st"> </span><span class="dv">0</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
+tor_svmSP_mask &lt;-<span class="st"> </span><span class="kw">mask</span>(tor_sdm_mask, tor_svmSP)</code></pre></div>
+<p>Plot the predicted realized distributions for each species.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create 3-panel figure</span>
+<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>))
+
+<span class="kw">plot</span>(var_svmSP_mask, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">90</span>, <span class="op">-</span><span class="dv">30</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">27</span>, <span class="dv">16</span>))
+<span class="kw">plot</span>(wrld_simpl[wrld_simpl<span class="op">$</span>NAME <span class="op">%in%</span><span class="st"> </span>country_list,], <span class="dt">add =</span> <span class="ot">TRUE</span>)
+<span class="kw">plot</span>(tri_svmSP_mask, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">70</span>, <span class="op">-</span><span class="dv">49</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">6</span>, <span class="dv">11</span>))
+<span class="kw">plot</span>(wrld_simpl[wrld_simpl<span class="op">$</span>NAME <span class="op">%in%</span><span class="st"> </span>country_list,], <span class="dt">add =</span> <span class="ot">TRUE</span>)
+<span class="kw">plot</span>(tor_svmSP_mask, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">46</span>, <span class="op">-</span><span class="dv">34</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">24</span>, <span class="op">-</span><span class="dv">8</span>))
+<span class="kw">plot</span>(wrld_simpl[wrld_simpl<span class="op">$</span>NAME <span class="op">%in%</span><span class="st"> </span>country_list,], <span class="dt">add =</span> <span class="ot">TRUE</span>)</code></pre></div>
+</div>
+<div id="hybrid-svms" class="section level3">
+<h3><span class="header-section-number">5.6.2</span> Hybrid SVMs</h3>
+<p>Hybrid SVMs take into account the occurrence points of all species as well as the environmental suitability predicted by the species’ SDMs.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">1234</span>)
+<span class="co"># Create SVM: we used a few more reps here to be sure a set of optimal parameters was found</span>
+svmHYB &lt;-<span class="st"> </span><span class="kw">rangeSVM</span>(variegatus[,<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>], tridactylus[,<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>], torquatus[,<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>], 
+                   <span class="dt">sdm =</span> raster<span class="op">::</span><span class="kw">stack</span>(var_sdm, tri_sdm, tor_sdm), 
+                   <span class="dt">nrep =</span> <span class="dv">14</span>, <span class="dt">mc.cores=</span>mc.cores)
+
+<span class="co"># Use SVM to create a raster of predicted regions</span>
+sloth_svmHYB &lt;-<span class="st"> </span><span class="kw">rangeSVM_predict</span>(<span class="dt">svm =</span> svmHYB, <span class="dt">r =</span> var_sdm, 
+                                 <span class="dt">sdm =</span> raster<span class="op">::</span><span class="kw">stack</span>(var_sdm, tri_sdm, tor_sdm))</code></pre></div>
+<p>Plot the SVM results.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(sloth_svmHYB, <span class="dt">col=</span><span class="kw">c</span>(<span class="st">&quot;yellow&quot;</span>,<span class="st">&quot;pink&quot;</span>,<span class="st">&quot;lightblue&quot;</span>))
+<span class="kw">points</span>(variegatus[,<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>], <span class="dt">pch =</span> <span class="dv">20</span>, <span class="dt">cex =</span> <span class="fl">0.75</span>, <span class="dt">col =</span> <span class="st">&quot;orange&quot;</span>)
+<span class="kw">points</span>(tridactylus[,<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>], <span class="dt">pch =</span> <span class="dv">20</span>, <span class="dt">cex =</span> <span class="fl">0.75</span>, <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>)
+<span class="kw">points</span>(torquatus[,<span class="dv">2</span><span class="op">:</span><span class="dv">3</span>], <span class="dt">pch =</span> <span class="dv">20</span>, <span class="dt">cex =</span> <span class="fl">0.75</span>, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>)</code></pre></div>
+<p>Use the hybrid SVM as a mask over our SDM predictions.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># masked SDM predictions for variegatus</span>
+var_svmHYB &lt;-<span class="st"> </span>sloth_svmHYB <span class="op">==</span><span class="st"> </span><span class="dv">1</span>
+var_svmHYB[var_svmHYB <span class="op">==</span><span class="st"> </span><span class="dv">0</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
+var_svmHYB_mask &lt;-<span class="st"> </span><span class="kw">mask</span>(var_sdm, var_svmHYB)
+
+<span class="co"># masked SDM predictions for tridactylus</span>
+tri_svmHYB &lt;-<span class="st"> </span>sloth_svmHYB <span class="op">==</span><span class="st"> </span><span class="dv">2</span>
+tri_svmHYB[tri_svmHYB <span class="op">==</span><span class="st"> </span><span class="dv">0</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
+tri_svmHYB_mask &lt;-<span class="st"> </span><span class="kw">mask</span>(tri_sdm_mask, tri_svmHYB)
+
+<span class="co"># masked SDM predictions for torquatus</span>
+tor_svmHYB &lt;-<span class="st"> </span>sloth_svmHYB <span class="op">==</span><span class="st"> </span><span class="dv">3</span>
+tor_svmHYB[tor_svmHYB <span class="op">==</span><span class="st"> </span><span class="dv">0</span>] &lt;-<span class="st"> </span><span class="ot">NA</span>
+tor_svmHYB_mask &lt;-<span class="st"> </span><span class="kw">mask</span>(tor_sdm_mask, tor_svmHYB)</code></pre></div>
+<p>Plot the predicted realized distributions for each species.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create 3-panel figure</span>
+<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>))
+
+<span class="kw">plot</span>(var_svmHYB_mask, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">90</span>, <span class="op">-</span><span class="dv">30</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">27</span>, <span class="dv">16</span>))
+<span class="kw">plot</span>(wrld_simpl[wrld_simpl<span class="op">$</span>NAME <span class="op">%in%</span><span class="st"> </span>country_list,], <span class="dt">add =</span> <span class="ot">TRUE</span>)
+<span class="kw">plot</span>(tri_svmHYB_mask, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">70</span>, <span class="op">-</span><span class="dv">49</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">6</span>, <span class="dv">11</span>))
+<span class="kw">plot</span>(wrld_simpl[wrld_simpl<span class="op">$</span>NAME <span class="op">%in%</span><span class="st"> </span>country_list,], <span class="dt">add =</span> <span class="ot">TRUE</span>)
+<span class="kw">plot</span>(tor_svmHYB_mask, <span class="dt">xlim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">46</span>, <span class="op">-</span><span class="dv">34</span>), <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="op">-</span><span class="dv">24</span>, <span class="op">-</span><span class="dv">8</span>))
+<span class="kw">plot</span>(wrld_simpl[wrld_simpl<span class="op">$</span>NAME <span class="op">%in%</span><span class="st"> </span>country_list,], <span class="dt">add =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<p>After creating masks such as these based on biotic factors, one could further mask by forest cover, accessible habitat, or other factors.</p>
+</div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

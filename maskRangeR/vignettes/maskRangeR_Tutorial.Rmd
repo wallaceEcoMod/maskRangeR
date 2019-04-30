@@ -19,7 +19,7 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(cache = F)
-knitr::opts_chunk$set(eval = F)
+knitr::opts_chunk$set(eval = T)
 mc.cores=1
 ```
 
@@ -57,23 +57,27 @@ These analyses require the following data:
 
 ## Background
 
-The Olinguito (*Bassaricyon neblina*) is a new species of carnivore described in 2013 from museum specimens that were previously identified as a different species [1]. The Olinguito lives in Northern Andean cloud forests in Colombia and Ecuador, and, according to experts, has strict tolerances for forest cover [2]. Recent occurrence records allow for very simple data-driven masking based on observed ranges of forest cover, but the number of occurrences (n = 18) is likely too few to use in model calibration. The data-driven determination of thresholds for masking using recent records represents a simple, conservative methodology that can be used for many species with limited recent records, and also will prove useful for processing of expert range maps or other pre-existing range estimates that do not take into account human modifications of the environment. 
+The Olinguito (*Bassaricyon neblina*) is a new species of carnivore described in 2013 from museum specimens that were previously identified as a different species [1]. The Olinguito lives in Northern Andean cloud forests in Colombia and Ecuador, and, according to experts, has strict tolerances for forest cover [1]. Recent occurrence records allow for very simple data-driven masking based on observed ranges of forest cover, but the number of occurrences (n = 18) is likely too few to use in model calibration. The data-driven determination of thresholds for masking using recent records represents a simple, conservative methodology that can be used for many species with limited recent records, and also will prove useful for processing of expert range maps or other pre-existing range estimates that do not take into account human modifications of the environment. 
 <!-- We tested for any correlation between the forest layers and the climate layers used in the ENM to ensure they are contributing different information.  -->
 
 
 ## Methods
 
-A 30 arc-second Bioclimatic-variable climate-based Maxent [1] SDM was tuned for the Olinguito using a mix of historical data paired with field notes, as well as contemporary citizen science records associated with photo-vouchers. The model was trained on 0.7 degree buffered circles around occurrence records and then projected to a 5-degree bounding box around occurrence records. We then removed areas from the SDM representing biogeographic regions where the species has not been documented, like the Eastern Cordillera of Colombia and other small non-contiguous areas.
+A 30 arc-second Bioclimatic-variable climate-based Maxent [2] SDM was tuned for the Olinguito using a mix of historical data paired with field notes, as well as contemporary citizen science records associated with photo-vouchers [3]. The model was trained on 0.7 degree buffered circles around occurrence records and then projected to a 5-degree bounding box around occurrence records. We then removed areas from the SDM representing biogeographic regions where the species has not been documented, like the Eastern Cordillera of Colombia and other small non-contiguous areas [3].
 
-Next, we used remotely sensed data of the annual percent forest cover for the region (MODIS Vegetation Continuous Fields; 250 m from the years matching the most recent occurrence records: 2006-2016). The MODIS rasters from different years were not all aligned with one another and had to be realigned to create a raster stack. A subset of the more recent occurrence records (2006-2016) were then temporally matched with the forest cover rasters to obtain values of forest cover per occurrence (one record was excluded because it was based on an observation that stemmed from a likely roadkilled specimen [2]). The forest cover values at occurrence records were then assessed across all years, and the 25th quantile forest cover level was used to generate a forest cover mask for the most recent year (2010). After resampling the SDM to match the resolution of the MODIS data, we applied this forest cover mask to reduce the SDM’s spatial prediction to only those climatically suitable areas where forest cover is above the threshold. This reduced model shows a conservative estimation of the species range given current non-climatic variables that represent anthropogenic modification of land cover.
+Next, we used remotely sensed data of the annual percent forest cover for the region (MODIS Vegetation Continuous Fields; 250 m from the years matching the most recent occurrence records: 2006-2016). The MODIS rasters from different years were not all aligned with one another and had to be realigned to create a raster stack. A subset of the more recent occurrence records (2006-2016) were then temporally matched with the forest cover rasters to obtain values of forest cover per occurrence (one record was excluded because it was based on an observation that stemmed from a likely roadkilled specimen [4]). The forest cover values at occurrence records were then assessed across all years, and the 25th quantile forest cover level was used to generate a forest cover mask for the most recent year (2010). After resampling the SDM to match the resolution of the MODIS data, we applied this forest cover mask to reduce the SDM’s spatial prediction to only those climatically suitable areas where forest cover is above the threshold. This reduced model shows a conservative estimation of the species range given current non-climatic variables that represent anthropogenic modification of land cover.
 
 ## References
 
-[1] Phillips, S.J., Anderson, R.P., Schapire, R.E. (2006) Maximum entropy modeling of species geographic distributions. *Ecological Modeling*, **190**, 231 - 259.
+[1] Helgen, K.M., Miguel Pinto, C., Kays, R., Helgen, L.E., Tsuchiya, M. T. N., Quinn, A., Wilson, D.E., Maldonado, J.E. (2013) Taxonomic revision of the olingos (*Bassaricyon*), with description of a new species, the Olinguito. *Zookeys*, **324**, 1-83. https://doi.org/10.3897/zookeys.324.5827.
 
-[2] Helgen, K.M., Miguel Pinto, C., Kays, R., Helgen, L.E., Tsuchiya, M. T. N., Quinn, A., Wilson, D.E., Maldonado, J.E. (2013) Taxonomic revision of the olingos (*Bassaricyon*), with description of a new species, the Olinguito. *Zookeys*, **324**, 1-83. https://doi.org/10.3897/zookeys.324.5827.
+[2] Phillips, S.J., Anderson, R.P., Schapire, R.E. (2006) Maximum entropy modeling of species geographic distributions. *Ecological Modeling*, **190**, 231 - 259.
 
-[3] Saavedra-Rodríguez, C. & Rojas-Díaz, V. (2011) Bassaricyon gabbii Allen, 1876 (Carnivora: Procyonidae): new distribution point on western range of Colombian Andes. Check List 7(4), 505–507. http://dx.doi.org/10.15560/7.4.505.
+[3] Gerstner, B. E., Kass, J. M., Kays, R., Helgen, K. M. & Anderson, R. P. (2018) Revised distributional estimates for the recently discovered olinguito (*Bassaricyon neblina*), with comments on natural and taxonomic history. *Journal of Mammalogy* 99, 321–332. https://doi.org/10.1093/jmammal/gyy012
+
+[4] Saavedra-Rodríguez, C. & Rojas-Díaz, V. (2011) Bassaricyon gabbii Allen, 1876 (Carnivora: Procyonidae): new distribution point on western range of Colombian Andes. *Check List* 7(4), 505–507. http://dx.doi.org/10.15560/7.4.505.
+
+
 
 ```{r, include=F}
 path = "/home/pgalante/Projects/NASA/maskrangeR/UseCaseData"
@@ -191,7 +195,7 @@ These analyses require the following data:
 
 A complete description of BioModelos is available [here](https://www.biorxiv.org/content/early/2018/10/05/432617).
 
-Here, we provide an example of 4. indentifying species’ accessible areas as well as areas of model over and underprediction. Using the web tools available in BioModelos, an expert may draw a polygon on top of a geographic viewer to indicate A) a species’ accessible area, B) an area that must be removed from a model, or C) an area that must be added to a model. 
+Here, we provide an example of 4. identifying species’ accessible areas as well as areas of model over and underprediction. Using the web tools available in BioModelos, an expert may draw a polygon on top of a geographic viewer to indicate A) a species’ accessible area, B) an area that must be removed from a model, or C) an area that must be added to a model. 
  
 ### Howler Monkey Example
 
@@ -287,24 +291,24 @@ The "swamp forest crab" (*Parathelphusa reticulata*) is a freshwater crab endemi
 
 ## Methods
 
-In this use case, we will perform an expert-driven species range estimate using a series of informed masks that constrain the coarse IUCN range map to a more realistic area of suitable environmental conditions. We will then constrain the range to: areas of soil pH from 5.17-5.79, dissolved oxygen from 27.2-36.6%, daytime air temperature 26-34˚C, elevation 16-26m, and canopy cover 75-100%. These tolerances were developed following Chua et al. (2015), a study that conducted fine-scale sampling in two of the nature reserves in Singapore known to have swamp forest crabs and analyzed the relationship between crab communities and environmental variables. Due to the species' rarity, the occurrence data are not publicly available, however the environmental correlates described above are provided. Data layers include soil pH accessed from soilGrids.org [1], temperature data from worldclim.org [2], elevation from LPDAAC [3], canopy cover from Hansen et al., 2013 [4], and surface water from the global surface water database (Source: EC JRC/Google) [5]. Resolutions differ between layers, so rasters were either resampled or dis/aggregated to match the mask. 
+In this use case, we will perform an expert-driven species range estimate using a series of informed masks that constrain the coarse IUCN range map to a more realistic area of suitable environmental conditions. We will then constrain the range to: areas of soil pH from 5.17-5.79, dissolved oxygen from 27.2-36.6%, daytime air temperature 26-34˚C, elevation 16-26m, and canopy cover 75-100%. These tolerances were developed following Chua et al. (2015) [1], a study that conducted fine-scale sampling in two of the nature reserves in Singapore known to have swamp forest crabs and analyzed the relationship between crab communities and environmental variables. Due to the species' rarity, the occurrence data are not publicly available, however the environmental correlates described above are provided. Data layers include soil pH accessed from soilGrids.org [1], temperature data from worldclim.org [2], elevation from LPDAAC [3], canopy cover from Hansen et al., 2013 [4], and surface water from the global surface water database (Source: EC JRC/Google) [5]. Resolutions differ between layers, so rasters were either resampled or dis/aggregated to match the mask. 
 
 ## References
 
-[1] Hengl T, Mendes de Jesus J, Heuvelink GBM, Ruiperez Gonzalez M, Kilibarda M, Blagotić A, et al. (2017) SoilGrids250m: Global gridded soil information based on machine learning. PLoS ONE 12(2): e0169748. https://doi.org/10.1371/journal.pone.0169748  
-[2] Hijmans, R. J., Cameron, S. E., Parra, J. L., Jones, P. G., & Jarvis, A. (2005). Very high resolution interpolated climate surfaces for global land areas. International journal of climatology, 25(15), 1965-1978.  
-[3] NASA/METI/AIST/Japan Space Systems. (2009). ASTER global digital elevation model [data set]. NASA EOSDIS Land Processes DAAC.  
-[4] Hansen, M. C., Potapov, P. V., Moore, R., Hancher, M., Turubanova, S. A. A., Tyukavina, A., ... & Kommareddy, A. (2013). High-resolution global maps of 21st-century forest cover change. science, 342(6160), 850-853.  
-[5] Jean-Francois Pekel, Andrew Cottam, Noel Gorelick, Alan S. Belward, High-resolution mapping of global surface water and its long-term changes. Nature 540, 418-422 (2016). (doi:10.1038/nature20584)_
+[1]Chua KWJ, Ng DJJ, Zeng Y, Yeo DCJ. 2015. Habitat characteristics of tropical rainforest freshwater crabs in Singapore. Journal of Crustacean Biology 35(4): 533-539. https://academic.oup.com/jcb/article/35/4/533/2547833
+[2] Hengl T, Mendes de Jesus J, Heuvelink GBM, Ruiperez Gonzalez M, Kilibarda M, Blagotić A, et al. (2017) SoilGrids250m: Global gridded soil information based on machine learning. PLoS ONE 12(2): e0169748. https://doi.org/10.1371/journal.pone.0169748  
+[3] Hijmans, R. J., Cameron, S. E., Parra, J. L., Jones, P. G., & Jarvis, A. (2005). Very high resolution interpolated climate surfaces for global land areas. International journal of climatology, 25(15), 1965-1978.  
+[4] NASA/METI/AIST/Japan Space Systems. (2009). ASTER global digital elevation model [data set]. NASA EOSDIS Land Processes DAAC.  
+[5] Hansen, M. C., Potapov, P. V., Moore, R., Hancher, M., Turubanova, S. A. A., Tyukavina, A., ... & Kommareddy, A. (2013). High-resolution global maps of 21st-century forest cover change. science, 342(6160), 850-853.  
+[6] Jean-Francois Pekel, Andrew Cottam, Noel Gorelick, Alan S. Belward, High-resolution mapping of global surface water and its long-term changes. Nature 540, 418-422 (2016). (doi:10.1038/nature20584)_
 
 
-<!-- Chua KWJ, Ng DJJ, Zeng Y, Yeo DCJ. 2015. Habitat characteristics of tropical rainforest freshwater crabs in Singapore. Journal of Crustacean Biology 35(4): 533-539. https://academic.oup.com/jcb/article/35/4/533/2547833  -->
-
-<!-- [1] Hengl T, Mendes de Jesus J, Heuvelink GBM, Ruiperez Gonzalez M, Kilibarda M, Blagotić A, et al. (2017) SoilGrids250m: Global gridded soil information based on machine learning. PLoS ONE 12(2): e0169748. https://doi.org/10.1371/journal.pone.0169748 -->
-<!-- [2] Hijmans, R. J., Cameron, S. E., Parra, J. L., Jones, P. G., & Jarvis, A. (2005). Very high resolution interpolated climate surfaces for global land areas. International journal of climatology, 25(15), 1965-1978. -->
-<!-- [3] NASA/METI/AIST/Japan Space Systems. (2009). ASTER global digital elevation model [data set]. NASA EOSDIS Land Processes DAAC. -->
-<!-- [4] Hansen, M. C., Potapov, P. V., Moore, R., Hancher, M., Turubanova, S. A. A., Tyukavina, A., ... & Kommareddy, A. (2013). High-resolution global maps of 21st-century forest cover change. science, 342(6160), 850-853. -->
-<!-- [5] Jean-Francois Pekel, Andrew Cottam, Noel Gorelick, Alan S. Belward, High-resolution mapping of global surface water and its long-term changes. Nature 540, 418-422 (2016). (doi:10.1038/nature20584) -->
+<!-- [1]Chua KWJ, Ng DJJ, Zeng Y, Yeo DCJ. 2015. Habitat characteristics of tropical rainforest freshwater crabs in Singapore. Journal of Crustacean Biology 35(4): 533-539. https://academic.oup.com/jcb/article/35/4/533/2547833  -->
+<!-- [2] Hengl T, Mendes de Jesus J, Heuvelink GBM, Ruiperez Gonzalez M, Kilibarda M, Blagotić A, et al. (2017) SoilGrids250m: Global gridded soil information based on machine learning. PLoS ONE 12(2): e0169748. https://doi.org/10.1371/journal.pone.0169748 -->
+<!-- [3] Hijmans, R. J., Cameron, S. E., Parra, J. L., Jones, P. G., & Jarvis, A. (2005). Very high resolution interpolated climate surfaces for global land areas. International journal of climatology, 25(15), 1965-1978. -->
+<!-- [4] NASA/METI/AIST/Japan Space Systems. (2009). ASTER global digital elevation model [data set]. NASA EOSDIS Land Processes DAAC. -->
+<!-- [5] Hansen, M. C., Potapov, P. V., Moore, R., Hancher, M., Turubanova, S. A. A., Tyukavina, A., ... & Kommareddy, A. (2013). High-resolution global maps of 21st-century forest cover change. science, 342(6160), 850-853. -->
+<!-- [6] Jean-Francois Pekel, Andrew Cottam, Noel Gorelick, Alan S. Belward, High-resolution mapping of global surface water and its long-term changes. Nature 540, 418-422 (2016). (doi:10.1038/nature20584) -->
 
 ## Example
 
@@ -316,8 +320,6 @@ library(raster)
 library(rgdal)
 dataDir = paste0(path, '/expertDriven/swampForestCrab/')
 ```
-
-<!-- singapore=raster(paste0(dataDir,'/SingaporeRaster.tif')) -->
 
 Read in the expert map and the environmental layers.
 ```{r}
@@ -410,6 +412,27 @@ After obtaining SDMs for each of the three species, we used the process below to
 [2] de Moraes-Barros, N., Giorgi (2010) Reevaluation of the Geographical Distribution of Bradypus tridactylus Linnaeus, 1758 and B. variegatus Schinz, 1825. Edentata, 11(1), 53-61.
 
 [3] Hirsch, A., Chirello, A.G. (2012) The endangered maned sloth Bradypus torquatus of the Brazilian Atlantic forest: a review and update of geographical distribution and habitat preferences. Mammal Review, 42(1), 35-54.
+
+Occurrence Records from:
+
+*B. variegatus*:  
+[1] Anderson, R. P., and C. O. Handley. 2001. A new species of three-toed sloth (Mammalia: Xenarthra) from Panama, with a review of the genus *Bradypus*. *Proceedings of the Biological Society of Washington* 114:1–33.
+
+[2] de Moraes Barros, N., J. A. B. Silva, and J. S. Morgante. 2011. Morphology, molecular phylogeny, and taxonomic inconsistencies in the study of *Bradypus* sloths (Pilosa: Bradypodidae). *Journal of Mammalogy* 92:86–100.
+
+[3] de Moraes-Barros, N., C. Y. Miyaki, and J. S. Morgante. 2007. Identifying management units in non-endangered species: the example of the sloth *Bradypus variegatus* Schinz, 1825. *Brazilian Journal of Biology* 67:829–837.
+
+[4] Silva, S. M., J. A. Dávila, B. Voirin, S. Lopes, N. Ferrand, and N. Moraes-Barros. 2018. The curious case of *Bradypus variegatus* sloths: populations in threatened habitats are biodiversity components needing protection. *Biodiversity and Conservation* 27:1291–1308.
+
+*B. tridactylus*:  
+[1] Anderson, R. P., and C. O. Handley. 2001. A new species of three-toed sloth (Mammalia: Xenarthra) from Panama, with a review of the genus *Bradypus*. *Proceedings of the Biological Society of Washington* 114:1–33.
+
+[2] de Moraes Barros, N., J. A. B. Silva, and J. S. Morgante. 2011. Morphology, molecular phylogeny, and taxonomic inconsistencies in the study of *Bradypus* sloths (Pilosa: Bradypodidae). *Journal of Mammalogy* 92:86–100.
+
+*B. torquatus*:  
+[1] Anderson, R. P., and C. O. Handley. 2001. A new species of three-toed sloth (Mammalia: Xenarthra) from Panama, with a review of the genus *Bradypus*. *Proceedings of the Biological Society of Washington* 114:1–33.
+
+[2] Moreira, D. de O., G. R. Leite, M. F. de Siqueira, B. R. Coutinho, M. S. Zanon, and S. L. Mendes. 2014. The distributional ecology of the maned sloth: Environmental influences on its distribution and gaps in knowledge. *PLOS ONE* 9:e110929.
 
 
 ## Example
