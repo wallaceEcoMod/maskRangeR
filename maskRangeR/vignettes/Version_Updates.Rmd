@@ -17,11 +17,12 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 ***
-# Current version 0.0.0.9000
+# Current version 0.1.0
 
 __Possibly useful stuff__
 
-* 
+* Added functionality to process MODIS data
+* Added tools to caclulate focal statistics for a range of window sizes
 
 __Boring stuff__
 

@@ -181,6 +181,7 @@ rangeSVM <- function(xy1, xy2, ...,
   # # function to extract the value of either parameter that was best most often
   performance_best <- do.call(rbind, performance_best)
   params_best_df <- cbind(do.call(rbind, params_best)[,1:2], performance_best)
+  cost=C_range
   params_best_count <- dplyr::count(params_best_df, gamma, cost)
   
   # Add error message if there is no most frequent combination of parameters
