@@ -1,0 +1,35 @@
+Meta-data and citation sources for data used in the vignette for the
+R package, maskRangeR.
+
+Data Driven: Land Cover Mask sources
+2005_olinguito_Modis.tif: C. Dimiceli, M. Carroll, R. Sohlberg, D.H. Kim, M. Kelly, J.R.G. Townshend. 2015. MOD44B MODIS/Terra Vegetation Continuous Fields Yearly L3 Global 250m SIN Grid V006. NASA EOSDIS Land Processes DAAC. https://doi.org/10.5067/MODIS/MOD44B.006
+2006_olinguito_Modis.tif: C. Dimiceli, M. Carroll, R. Sohlberg, D.H. Kim, M. Kelly, J.R.G. Townshend. 2015. MOD44B MODIS/Terra Vegetation Continuous Fields Yearly L3 Global 250m SIN Grid V006. NASA EOSDIS Land Processes DAAC. https://doi.org/10.5067/MODIS/MOD44B.006
+2008_olinguito_Modis.tif: C. Dimiceli, M. Carroll, R. Sohlberg, D.H. Kim, M. Kelly, J.R.G. Townshend. 2015. MOD44B MODIS/Terra Vegetation Continuous Fields Yearly L3 Global 250m SIN Grid V006. NASA EOSDIS Land Processes DAAC. https://doi.org/10.5067/MODIS/MOD44B.006
+2009_olinguito_Modis.tif: C. Dimiceli, M. Carroll, R. Sohlberg, D.H. Kim, M. Kelly, J.R.G. Townshend. 2015. MOD44B MODIS/Terra Vegetation Continuous Fields Yearly L3 Global 250m SIN Grid V006. NASA EOSDIS Land Processes DAAC. https://doi.org/10.5067/MODIS/MOD44B.006
+2010_olinguito_Modis.tif: C. Dimiceli, M. Carroll, R. Sohlberg, D.H. Kim, M. Kelly, J.R.G. Townshend. 2015. MOD44B MODIS/Terra Vegetation Continuous Fields Yearly L3 Global 250m SIN Grid V006. NASA EOSDIS Land Processes DAAC. https://doi.org/10.5067/MODIS/MOD44B.006
+All_new_records_by_year.csv: Gerstner, B. E., Kass, J. M., Kays, R., Helgen, K. M. & Anderson, R. P. (2018) Revised distributional estimates for the recently discovered olinguito (*Bassaricyon neblina*), with comments on natural and taxonomic history. Journal of Mammalogy 99, 321–332. https://doi.org/10.1093/jmammal/gyy012
+olinguito_sdmm.tif: Gerstner, B. E., Kass, J. M., Kays, R., Helgen, K. M. & Anderson, R. P. (2018) Revised distributional estimates for the recently discovered olinguito (Bassaricyon neblina), with comments on natural and taxonomic history. Journal of Mammalogy 99, 321–332. https://doi.org/10.1093/jmammal/gyy012
+
+Data Driven: Masking by Biotic Interactions
+variegatus_occ.csv: 
+    Data retrieved from: Anderson, R. P., and C. O. Handley. 2001. A new species of three-toed sloth (Mammalia: Xenarthra) from Panama, with a review of the genus Bradypus. Proceedings of the Biological Society of Washington 114:1–33.
+                         de Moraes Barros, N., J. A. B. Silva, and J. S. Morgante. 2011. Morphology, molecular phylogeny, and taxonomic inconsistencies in the study of Bradypus sloths (Pilosa: Bradypodidae). Journal of Mammalogy 92:86–100.
+                         de Moraes-Barros, N., C. Y. Miyaki, and J. S. Morgante. 2007. Identifying management units in non-endangered species: the example of the sloth Bradypus variegatus Schinz, 1825. Brazilian Journal of Biology 67:829–837.
+                         Silva, S. M., J. A. Dávila, B. Voirin, S. Lopes, N. Ferrand, and N. Moraes-Barros. 2018. The curious case of Bradypus variegatus sloths: populations in threatened habitats are biodiversity components needing protection. Biodiversity and Conservation 27:1291–1308.
+tridactylus_occ.csv:
+    Data retrieved from: Anderson, R. P., and C. O. Handley. 2001. A new species of three-toed sloth (Mammalia: Xenarthra) from Panama, with a review of the genus Bradypus. Proceedings of the Biological Society of Washington 114:1–33.
+                         de Moraes Barros, N., J. A. B. Silva, and J. S. Morgante. 2011. Morphology, molecular phylogeny, and taxonomic inconsistencies in the study of Bradypus sloths (Pilosa: Bradypodidae). Journal of Mammalogy 92:86–100.
+torquatus_occ.csv:
+    Data retrieved from: Anderson, R. P., and C. O. Handley. 2001. A new species of three-toed sloth (Mammalia: Xenarthra) from Panama, with a review of the genus Bradypus. Proceedings of the Biological Society of Washington 114:1–33.
+                         Moreira, D. de O., G. R. Leite, M. F. de Siqueira, B. R. Coutinho, M. S. Zanon, and S. L. Mendes. 2014. The distributional ecology of the maned sloth: Environmental influences on its distribution and gaps in knowledge. PLOS ONE 9:e110929.
+Bradypus distribution models were tuned using the occurrence records provided here. 
+
+Expert Driven: Multiple Expert Masks
+IUCNshape: N. Cumberlidge & IUCN/SSC Crab Specialist Group. The IUCN Red List of Threatened Species. Version 3. http://www.iucnredlist.org. Downloaded on 26 September, 2018. 
+crabInfo.csv: taken from Chua KWJ, Ng DJJ, Zeng Y, Yeo DCJ. 2015. Habitat characteristics of tropical rainforest freshwater crabs in Singapore. Journal of Crustacean Biology 35(4): 533-539. https://academic.oup.com/jcb/article/35/4/533/2547833
+DEM.tif: NASA/METI/AIST/Japan Space Systems. (2009). ASTER global digital elevation model [data set]. NASA EOSDIS Land Processes DAAC.
+Hansen_percent_treecover.tif: Hansen, M. C., Potapov, P. V., Moore, R., Hancher, M., Turubanova, S. A. A., Tyukavina, A., … & Kommareddy, A. (2013). High-resolution global maps of 21st-century forest cover change. science, 342(6160), 850-853.
+MATsingapore.tif: Hijmans, R. J., Cameron, S. E., Parra, J. L., Jones, P. G., & Jarvis, A. (2005). Very high resolution interpolated climate surfaces for global land areas. International journal of climatology, 25(15), 1965-1978.
+PHIHOX_M_sl1_250m.tif:  Hengl T, Mendes de Jesus J, Heuvelink GBM, Ruiperez Gonzalez M, Kilibarda M, Blagotić A, et al. (2017) SoilGrids250m: Global gridded soil information based on machine learning. PLoS ONE 12(2): e0169748. https://doi.org/10.1371/journal.pone.0169748
+Sing_agg.tif: GADM accessed from Hijmans, R. J., Cameron, S. E., Parra, J. L., Jones, P. G., & Jarvis, A. (2005). Very high resolution interpolated climate surfaces for global land areas. International journal of climatology, 25(15), 1965-1978.
+standWaterPercent_cropAgg.tif: Jean-Francois Pekel, Andrew Cottam, Noel Gorelick, Alan S. Belward, High-resolution mapping of global surface water and its long-term changes. Nature 540, 418-422 (2016). (doi:10.1038/nature20584)_
