@@ -31,14 +31,31 @@ To apply multiple masks, e.g., elevation and forest cover, use separate calls to
 \examples{
 \dontrun{
 ########## Forest Cover Mask 
-simulateData()
+###  Initiating data for use case # 1
+##Initiate empty raster object with extent and resolution 
+r1 <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
+# Generate random occurrence points
+datedOccs <- data.frame(dismo::randomPoints(r1, 5))
+# Pair dates (as years) with the occurrences
+datedOccs$date <- 2010:2014
+# convert dates to formal date objects
+datedOccs$date <- parse_date_time(datedOccs$date, orders = c("Y", "Ym"))
+# Create values showing distance from random points to simulate suitability surface
+sdm <- raster::distanceFromPoints(r1, datedOccs[,1:2])
+# Create 5 different rasters as env data
+env1 <- raster::distanceFromPoints(r1, data.frame(dismo::randomPoints(sdm, 3)))
+env2 <- raster::distanceFromPoints(r1, data.frame(dismo::randomPoints(sdm, 3)))
+env3 <- raster::distanceFromPoints(r1, data.frame(dismo::randomPoints(sdm, 3)))
+env4 <- raster::distanceFromPoints(r1, data.frame(dismo::randomPoints(sdm, 3)))
+env5 <- raster::distanceFromPoints(r1, data.frame(dismo::randomPoints(sdm, 3)))
+env <- raster::stack(env1, env2, env3, env4, env5)
 # Declare the date scale
 dateScale = "year"
 # Declare dates for simulated env data
-envDates <- parse_date_time(paste0("",2010:2014, ""), orders = c("Y", "Ym"))
+envDates <- lubridate::parse_date_time(paste0("",2010:2014, ""), orders = c("Y", "Ym"))
 ###  Preparing data
 # convert to spatial object
-coordinates(datedOccs) <- c("x", "y")
+sp::coordinates(datedOccs) <- c("x", "y")
 ##  Performing data-driven masking. First find the values of the environment at point locations
 datedOccs <- annotate(datedOccs, env, envDates, dateScale)
 # find suitable bounds
@@ -57,8 +74,11 @@ plot(sdm, add=T, col = c(grey(0,0), grey(0.4,0.7)))
 plot(maskedDist[[1]], col=c(grey(0.6), 'red1'), main = "Masked Distribution")
 
 ##########  Multiple Expert Maps
-simulateData()
-expertRaster <- rasterize(polyg, r1)
+## Generate random polygon
+coords <- dismo::randomPoints(sdm, 3)
+polyg <- sp::Polygon(coords)
+polyg <- sp::SpatialPolygons(list(sp::Polygons(list(polyg), ID = "a")))
+expertRaster <- raster::rasterize(polyg, r1)
 maskStack <- stack(env1, env2, env3)
 names(maskStack) <- c("env1", "env2", "env3")
 # Get list of tolerances for environmental data

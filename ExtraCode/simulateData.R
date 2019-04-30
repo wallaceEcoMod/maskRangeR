@@ -135,36 +135,36 @@ simulateData <- function(){
   options(warn=-1)
     ###  Initiating data for use case # 1
     # Initiate empty raster object with extent and resolution 
-    r1 <<- raster(extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
+    r1 <<- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
     # Generate random occurrence points
-    datedOccs<<-data.frame(randomPoints(r1, 5))
+    datedOccs<<-data.frame(raster::randomPoints(r1, 5))
     # Pair dates (as years) with the occurrences
     datedOccs$date <<- 2010:2014
     # convert dates to formal date objects
     datedOccs$date <<- parse_date_time(datedOccs$date, orders = c("Y", "Ym"))
     # Create values showing distance from random points to simulate suitability surface
-    sdm <<- distanceFromPoints(r1, datedOccs[,1:2])
+    sdm <<- raster::distanceFromPoints(r1, datedOccs[,1:2])
     # Create 5 different rasters as env data
-    env1 <<- distanceFromPoints(r1, data.frame(randomPoints(sdm, 3)))
-    env2 <<- distanceFromPoints(r1, data.frame(randomPoints(sdm, 3)))
-    env3 <<- distanceFromPoints(r1, data.frame(randomPoints(sdm, 3)))
-    env4 <<- distanceFromPoints(r1, data.frame(randomPoints(sdm, 3)))
-    env5 <<- distanceFromPoints(r1, data.frame(randomPoints(sdm, 3)))
-    env <<- stack(env1, env2, env3, env4, env5)
+    env1 <<- raster::distanceFromPoints(r1, data.frame(raster::randomPoints(sdm, 3)))
+    env2 <<- raster::distanceFromPoints(r1, data.frame(raster::randomPoints(sdm, 3)))
+    env3 <<- raster::distanceFromPoints(r1, data.frame(raster::randomPoints(sdm, 3)))
+    env4 <<- raster::distanceFromPoints(r1, data.frame(raster::randomPoints(sdm, 3)))
+    env5 <<- raster::distanceFromPoints(r1, data.frame(raster::randomPoints(sdm, 3)))
+    env <<- raster::stack(env1, env2, env3, env4, env5)
     ### Initiating data for use case # 2
     ## Generate random polygon
-    coords <- randomPoints(sdm, 3)
-    polyg <- Polygon(coords)
-    polyg <<- SpatialPolygons(list(Polygons(list(polyg), ID = "a")))
+    coords <- raster::randomPoints(sdm, 3)
+    polyg <- sp::Polygon(coords)
+    polyg <<- sp::SpatialPolygons(list(sp::Polygons(list(polyg), ID = "a")))
     ### Initiating data for use case # 3
     ## not needed
     ### Initiating data for use case # 4
     ## Generate some species occurrence records
-    r1.sdm <<- raster(extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
+    r1.sdm <<- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
     values(r1.sdm) <<- (1:ncell(r1.sdm))^2
-    r2.sdm <<- raster(extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
+    r2.sdm <<- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
     values(r2.sdm) <<- (ncell(r2.sdm):1)^2
-    r3.sdm <<- raster(extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
+    r3.sdm <<- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
     r3.sdm [1] <<- 10
     r3.sdm <<- raster::distance(r3.sdm)
     sp1.xy <<- data.frame(randomPoints(r1.sdm, 15, prob = T)); colnames(sp1.xy) <<- c("longitude", "latitude")

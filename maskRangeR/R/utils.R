@@ -2,3 +2,5 @@
   packageStartupMessage("To get started, see the demo with \n", 
                         "vignette(package='maskRangeR')")
 }
+
+if(getRversion() >= "3.4.0")  utils::globalVariables(c("cost"))
