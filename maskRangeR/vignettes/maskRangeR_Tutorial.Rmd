@@ -208,7 +208,7 @@ These analyses require the following data:
 
 A complete description of BioModelos is available [here](https://www.biorxiv.org/content/early/2018/10/05/432617).
 
-Here, we provide an example of 4. indentifying species’ accessible areas as well as areas of model over and underprediction. Using the web tools available in BioModelos, an expert may draw a polygon on top of a geographic viewer to indicate A) a species’ accessible area, B) an area that must be removed from a model, or C) an area that must be added to a model. 
+Here, we provide an example of 4. identifying species’ accessible areas as well as areas of model over and underprediction. Using the web tools available in BioModelos, an expert may draw a polygon on top of a geographic viewer to indicate A) a species’ accessible area, B) an area that must be removed from a model, or C) an area that must be added to a model. 
  
 ### Howler Monkey Example
 
@@ -430,16 +430,21 @@ Occurrence Records from:
 
 *B. variegatus*:  
 [1] Anderson, R. P., and C. O. Handley. 2001. A new species of three-toed sloth (Mammalia: Xenarthra) from Panama, with a review of the genus *Bradypus*. *Proceedings of the Biological Society of Washington* 114:1–33.
+
 [2] de Moraes Barros, N., J. A. B. Silva, and J. S. Morgante. 2011. Morphology, molecular phylogeny, and taxonomic inconsistencies in the study of *Bradypus* sloths (Pilosa: Bradypodidae). *Journal of Mammalogy* 92:86–100.
+
 [3] de Moraes-Barros, N., C. Y. Miyaki, and J. S. Morgante. 2007. Identifying management units in non-endangered species: the example of the sloth *Bradypus variegatus* Schinz, 1825. *Brazilian Journal of Biology* 67:829–837.
+
 [4] Silva, S. M., J. A. Dávila, B. Voirin, S. Lopes, N. Ferrand, and N. Moraes-Barros. 2018. The curious case of *Bradypus variegatus* sloths: populations in threatened habitats are biodiversity components needing protection. *Biodiversity and Conservation* 27:1291–1308.
 
 *B. tridactylus*:  
 [1] Anderson, R. P., and C. O. Handley. 2001. A new species of three-toed sloth (Mammalia: Xenarthra) from Panama, with a review of the genus *Bradypus*. *Proceedings of the Biological Society of Washington* 114:1–33.
+
 [2] de Moraes Barros, N., J. A. B. Silva, and J. S. Morgante. 2011. Morphology, molecular phylogeny, and taxonomic inconsistencies in the study of *Bradypus* sloths (Pilosa: Bradypodidae). *Journal of Mammalogy* 92:86–100.
 
 *B. torquatus*:  
 [1] Anderson, R. P., and C. O. Handley. 2001. A new species of three-toed sloth (Mammalia: Xenarthra) from Panama, with a review of the genus *Bradypus*. *Proceedings of the Biological Society of Washington* 114:1–33.
+
 [2] Moreira, D. de O., G. R. Leite, M. F. de Siqueira, B. R. Coutinho, M. S. Zanon, and S. L. Mendes. 2014. The distributional ecology of the maned sloth: Environmental influences on its distribution and gaps in knowledge. *PLOS ONE* 9:e110929.
 
 
