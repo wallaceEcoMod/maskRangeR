@@ -8,7 +8,7 @@ Authors@R: as.person(c(
   "Cecina Babich Morrow <cbabichmorrow@amnh.org> [aut]",
   "Valentina Grisales Betancur <vgrisale@eafit.edu.co> [aut]"
   ))
-Description: This package masks (or clips) ranges based on expert knowledge or remote sensing layers.
+Description: Masking (or clipping) ranges based on expert knowledge or remote sensing layers.
 Depends: R (>= 3.4.0)
 License: MIT + file LICENSE
 Encoding: UTF-8

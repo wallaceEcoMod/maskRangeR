@@ -8,7 +8,7 @@ output:
     toc: true
     toc_depth: 3
 vignette: >
-  %\VignetteIndexEntry{rangeModelMetadata R package}
+  %\VignetteIndexEntry{maskRangeR: Improving spatial and temporal accuracy of species distribution models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
