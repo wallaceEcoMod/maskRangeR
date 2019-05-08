@@ -8,7 +8,7 @@ output:
     toc: true
     toc_depth: 3
 vignette: >
-  %\VignetteIndexEntry{maskRangeR: Improving spatial and temporal accuracy of species distribution models}
+  %\VignetteIndexEntry{Version Updates}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
