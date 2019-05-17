@@ -1,13 +1,11 @@
 Package: maskRangeR
 Title: Mask Species Geographic Ranges
 Version: 0.1.0
-Authors@R: as.person(c(
-  "Cory Merow <cory.merow@gmail.com> [aut, cre]",
-  "Peter J. Peter J. <pgalante@amnh.org> [aut]",
-  "Jamie M. Kass <jamie.m.kass@gmail.com> [aut]",
-  "Cecina Babich Morrow <cbabichmorrow@amnh.org> [aut]",
-  "Valentina Grisales Betancur <vgrisale@eafit.edu.co> [aut]"
-  ))
+Authors@R: c(person('Cory', 'Merow',role=c('aut', 'cre') ,email='cory.merow@gmail.com'),
+             person('Peter', 'Galante',role=c('aut'),email='pgalante@amnh.org'),
+             person('Jamie', 'Kass',role=c('aut'),email='jamie.m.kass@gmail.com'),
+             person('Cecina', 'Babich Morrow',role=c('aut'),email='cbabichmorrow@amnh.org'),
+             person('Valentina', 'Grisales Betancur',role=c('aut'),email='vgrisale@eafit.edu.co'))
 Description: Masking (or clipping) ranges based on expert knowledge or remote sensing layers.
 Depends: R (>= 3.4.0)
 License: MIT + file LICENSE
