@@ -28,8 +28,9 @@
 #' 
 #' 
 #' @examples
-#' \dontrun{
-#' ########## Maksing by biotic interactions
+#' \donttest{
+#' op=par()
+#' ########## Masking by biotic interactions
 #' ### Initiating data for use case # 4
 #' ## Generate some species occurrence records
 #' r1.sdm <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
@@ -106,6 +107,7 @@
 #' plot(sp1_svmHYB_mask)
 #' plot(sp2_svmHYB_mask)
 #' plot(sp3_svmHYB_mask)
+#' par(op)
 #' }
 #' @export
 
@@ -164,7 +166,7 @@ rangeSVM <- function(xy1, xy2, ...,
   internalFunc=function(i){
     m.tune <- e1071::tune.svm(sp ~ ., data = xy, gamma = gamma_range, 
                               cost = C_range, class.weights = cw)  
-    print(paste("Run", i, "complete."))
+    message(paste("Run", i, "complete."))
     # get optimal parameter values
     list( m.tune$best.parameters, m.tune$best.performance)
   }
@@ -226,7 +228,7 @@ rangeSVM <- function(xy1, xy2, ...,
 #' These values represent the identities of the species.
 #' 
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # raster prediction for xy SVM (spatial)
 #' svm.xy <- rangeSVM(xy1, xy2)
 #' svm.xy.r <- rangeSVM_predict(svm.xy, r)

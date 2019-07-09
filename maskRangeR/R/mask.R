@@ -17,7 +17,8 @@
 #'  \item{mask}{mask cells with values outside the bounds}
 #' }
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' op=par()
 #' ########## Forest Cover Mask 
 #' ###  Initiating data for use case # 1
 #' ##Initiate empty raster object with extent and resolution 
@@ -83,6 +84,7 @@
 #' plot(stack(realized))
 #' plot(realized$realizedDist)
 #' plot(polyg, add = T)
+#' par(op)
 #' }
 # @return
 #' @author Cory Merow <cory.merow@@gmail.com>,

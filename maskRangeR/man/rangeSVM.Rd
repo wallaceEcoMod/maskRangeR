@@ -46,8 +46,9 @@ rasters. These extra predictors can be based on predictions from a species distr
 suitability, depending on the variables used in the SDM.
 }
 \examples{
-\dontrun{
-########## Maksing by biotic interactions
+\donttest{
+op=par()
+########## Masking by biotic interactions
 ### Initiating data for use case # 4
 ## Generate some species occurrence records
 r1.sdm <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
@@ -124,5 +125,6 @@ par(mfrow = c(1,3))
 plot(sp1_svmHYB_mask)
 plot(sp2_svmHYB_mask)
 plot(sp3_svmHYB_mask)
+par(op)
 }
 }

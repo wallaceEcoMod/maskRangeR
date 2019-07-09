@@ -32,7 +32,7 @@ continuousMask=function(contStack,suitable,binaryRange,maskValue=NA,...){
   # in case there's a little misalignment, just tweek the binary map.
   if(!raster::extent(contStack.c)==raster::extent(binaryRange)){
     binaryRange=raster::resample(binaryRange,contStack.c,method='ngb')
-    print("Maps didn't line up perfectly, so I resampled the binaryRange. Probably has only a little effect at range edges.")
+    message("Maps didn't line up perfectly, so I resampled the binaryRange. Probably has only a little effect at range edges.")
   }
   cont.keep=mapply(function(x){grep(x,names(contStack))},suitable)
   suitable.cont=raster::calc(contStack.c[[cont.keep]],sum,na.rm=T)

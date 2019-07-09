@@ -29,7 +29,8 @@ See Examples.
 To apply multiple masks, e.g., elevation and forest cover, use separate calls to maskRS.
 }
 \examples{
-\dontrun{
+\donttest{
+op=par()
 ########## Forest Cover Mask 
 ###  Initiating data for use case # 1
 ##Initiate empty raster object with extent and resolution 
@@ -95,6 +96,7 @@ realized <- lotsOfMasks(expertRaster, maskStack, maskBounds)
 plot(stack(realized))
 plot(realized$realizedDist)
 plot(polyg, add = T)
+par(op)
 }
 }
 \author{

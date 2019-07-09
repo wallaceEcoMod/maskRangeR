@@ -7,7 +7,8 @@
 #' See Examples
 #' 
 #' @examples 
-#' \dontrun{
+#' \donttest{
+#' op=par()
 #' ########## Forest Cover Mask 
 #' # Declare the date scale
 #' dateScale = "year"
@@ -127,6 +128,7 @@
 #' plot(sp2_svmHYB_mask)
 #' plot(sp3_svmHYB_mask)
 #' }
+#' par(op)
 #' @export
 
 #=============================================================================

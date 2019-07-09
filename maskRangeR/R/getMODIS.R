@@ -12,7 +12,7 @@
 #' @param dataset MODIS product of interest. Available are: “Percent tree cover”, “Percent nontree vegetation”, “Percent nonvegetated”, “Quality”, “Percent tree cover 50”, “Percent nonvegetated sd”
 
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' simulateData()
 #' getModis(localSavePath = '', datedOccs, dateScale = "year", dataset = "Percent tree cover")
 #' }
@@ -43,14 +43,14 @@ getModis <- function(localSavePath, datedOccs, dateScale, dataset){
   # Date Range
   years <- unidate$years
   # Download as hdf
-  print('downloading hdf files from MODIS- give it a minute!')
+  message('downloading hdf files from MODIS- give it a minute!')
   hdf = MODIS::getHdf("MOD44B", collection = "006",
                       tileH = tileH, tileV = tileV,
                       begin = paste0(years[1],".08.28"), end = paste0(utils::tail(years,1),".08.31"), 
                       extent = e)
-  print('done')
+  message('done')
   # Extract available datasets and only pull out the first one - percent forest cover. 
-  print('extracting dataset of interest')
+  message('extracting dataset of interest')
   pos.data <- as.data.frame(cbind(c(1:7), c("Percent tree cover", "Percent nontree vegetation", "Percent nonvegetated", "Quality", "Percent tree cover 50", "Percent nonvegetated sd", "Cloud")))
   dset <- pos.data %>% dplyr::filter(pos.data$V2 == dataset)
   dataset.number <-dset[[1]]
@@ -66,14 +66,14 @@ getModis <- function(localSavePath, datedOccs, dateScale, dataset){
   rrs <- lapply(rrs,FUN=function(x) {names(x) <- NULL 
   x})
   # Merge by year
-  print('merging tiles')
+  message('merging tiles')
   merged.rrs <- lapply(rrs, function(x) do.call(raster::merge, x))
   stack.merged.rrs <- raster::stack(merged.rrs)
-  print('finished merging')
+  message('finished merging')
   # reproject to wgs84
-  print('reprojecting rasters to wgs84')
+  message('reprojecting rasters to wgs84')
   rrs.repro <- raster::projectRaster(stack.merged.rrs, crs = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ")
-  print('finished reprojecting')
+  message('finished reprojecting')
   # Rename rasters
   names(rrs.repro) <- paste0("y", years)
   # Save rasters

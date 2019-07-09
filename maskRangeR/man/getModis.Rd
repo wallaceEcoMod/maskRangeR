@@ -22,7 +22,7 @@ Accesses yearly (2000 - 2017) MODIS products based on geographic location and da
 See Examples.
 }
 \examples{
-\dontrun{
+\donttest{
 simulateData()
 getModis(localSavePath = '', datedOccs, dateScale = "year", dataset = "Percent tree cover")
 }

@@ -17,6 +17,26 @@ Obtain the same extents and resample to the finest resolution layer.
 \details{
 See Examples.
 }
+\examples{
+\dontrun{
+# please see complete example in the maskRangeR_tutorial vignette
+expertMap <- readOGR(paste0(dataDir,'IUCNshape/data_0.shp'))
+maskListRaw <- list(treeCover = 
+raster(paste0(dataDir,'/Hansen_percent_treecover.tif')), 
+dem = raster(paste0(dataDir,'/DEM.tif')),
+mat = raster(paste0(dataDir,'/MATsingapore.tif')),
+pH = raster(paste0(dataDir,'/PHIHOX_M_sl1_250m.tif')))
+# define the limits for each mask
+maskBounds <- read.csv(paste0(dataDir,'/crabInfo.csv'))
+# rename the limits to match the raster names in maskListRaw
+maskBounds$Layer <- c('water','treeCover','dem','pH','mat')
+# make sure the units match between the layers and the bounds
+maskListRaw$mat <- maskListRaw$mat/10
+maskListRaw$pH <- maskListRaw$pH/10
+crt <- maskRangeR::cropResampleTrim(expertMap,maskListRaw)
+}
+
+}
 \author{
 Cory Merow <cory.merow@gmail.com>,
 }

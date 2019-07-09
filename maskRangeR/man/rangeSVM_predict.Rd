@@ -27,7 +27,7 @@ The values of the output raster are 1, 2, ..., corresponding to xy1, xy2, and an
 These values represent the identities of the species.
 }
 \examples{
-\dontrun{
+\donttest{
 # raster prediction for xy SVM (spatial)
 svm.xy <- rangeSVM(xy1, xy2)
 svm.xy.r <- rangeSVM_predict(svm.xy, r)

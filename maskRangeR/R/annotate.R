@@ -46,7 +46,7 @@ annotate=function(datedOccs,
     pts=datedOccs[which(datedOccs$myDate==uniqueDates[x]),]
     keep=match(uniqueDates[x],myEnvDates)
     if(is.na(keep)) {
-      print(paste0('Environmental layers were missing for date ',uniqueDates[x]) )
+      message(paste0('Environmental layers were missing for date ',uniqueDates[x]) )
       pts$env=rep(NA,nrow(pts))
       return(pts)
     }
@@ -59,6 +59,6 @@ annotate=function(datedOccs,
 
   tmp=suppressWarnings(do.call('rbind',out))
   lost=nrow(datedOccs)-nrow(tmp)
-  if(lost>0) print(paste(lost,'points were omitted because they had no dates'))
+  if(lost>0) message(paste(lost,'points were omitted because they had no dates'))
   return(tmp)
 }
