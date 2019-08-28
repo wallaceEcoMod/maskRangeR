@@ -41,23 +41,30 @@ annotate=function(datedOccs,
   datedOccs$myDate=format(datedOccs$date,form)
   uniqueDates=stats::na.omit(unique(datedOccs$myDate))
   myEnvDates=format(envDates,form)
-
+  datedOccs$uniqueID=1:nrow(datedOccs) # to put things in the same order in the output as they ahd in the input
+  uniqueDates=sort(uniqueDates)
+  
   out=lapply(seq_along(uniqueDates),function(x,datedOccs,myEnvDates,env){
     pts=datedOccs[which(datedOccs$myDate==uniqueDates[x]),]
+    print(pts$uniqueID)
     keep=match(uniqueDates[x],myEnvDates)
     if(is.na(keep)) {
       message(paste0('Environmental layers were missing for date ',uniqueDates[x]) )
       pts$env=rep(NA,nrow(pts))
+      rownames(pts@data)=NULL
       return(pts)
     }
     if(length(keep)>1) stop('Multiple dates in your environmental layers correspond 
                             to the dates for your occurrences; make sure your 
                             environmental layers have unique dates')
     pts$env=raster::extract(env[[keep]],pts)
+    rownames(pts@data)=NULL
     return(pts)
   },datedOccs=datedOccs,myEnvDates=myEnvDates,env=env)
 
-  tmp=suppressWarnings(do.call('rbind',out))
+  tmp=do.call('rbind',out)
+  tmp=tmp[order(tmp$uniqueID),]
+  tmp=tmp[,-grep('uniqueID',names(tmp))]
   lost=nrow(datedOccs)-nrow(tmp)
   if(lost>0) message(paste(lost,'points were omitted because they had no dates'))
   return(tmp)
