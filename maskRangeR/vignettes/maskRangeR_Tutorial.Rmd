@@ -117,13 +117,13 @@ projection(datedOccs) <- projection(env)
 To perform data-driven masking, first find the values of the environmental variable (forest cover in this example) at the occurrence point locations.
 
 ```{r}
-datedOccs <- maskRangeR::annotate(datedOccs,env,envDates,dateScale)
+datedOccs2 <- maskRangeR::annotate(datedOccs,env,envDates,dateScale)
 # Note the warnings:
 # [1] "Environmental layers were missing for date 2013"
 # [1] "Environmental layers were missing for date 2016"
 # [1] "Environmental layers were missing for date 2015"
 # These indicate that you have occurrencee records that do not match some environmental data.
-# You may want to look into this, but it is not an issue for using the package.
+# You may want to look into this to determine whether you expected to provide environmental layers associated with these dates. But if you didn't mean to provide such layers (e.g., here we did not provide layers fro 2013, 2015, and 2016) it is not an issue for using the package.
 ```
 
 Then find a suitable lower limit for the mask based on the data.
