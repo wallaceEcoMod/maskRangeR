@@ -97,7 +97,7 @@
 # @family - a family name. All functions that have the same family tag will be linked in the documentation.
 #' @export
 
-maskRanger=function(potentialDist,
+maskRanger=function(initialDist,
                     maskLayers,
                     logicString,
                     method='mask'){
@@ -108,7 +108,7 @@ maskRanger=function(potentialDist,
   if(method=='mask'){
     mask.bin=eval(parse(text=logicString))
     if(raster::nlayers(maskLayers)==1){
-      out=raster::mask(potentialDist,mask=mask.bin,maskvalue=0)
+      out=raster::mask(initialDist,mask=mask.bin,maskvalue=0)
     } else {
       if(!raster::nlayers(potentialDist)==raster::nlayers(maskLayers)) {
         stop('Error: you must either supply a single layer to mask all layers 
@@ -116,13 +116,13 @@ maskRanger=function(potentialDist,
              of layers as potentialDist')
       }
       out=raster::stack(lapply(1:raster::nlayers(mask.bin),function(x){
-        raster::mask(potentialDist[[x]],mask=mask.bin[[x]],maskvalue=1)
+        raster::mask(initiallDist[[x]],mask=mask.bin[[x]],maskvalue=1)
       }))
     }
   } # end if method=='mask'
   
-  out=raster::stack(out,potentialDist,mask.bin)
-  names(out)=c('maskedDist','potentialDist',paste0(names(maskLayers),'Mask'))
+  out=raster::stack(out,initialDist,mask.bin)
+  names(out)=c('refinedDist','initialDist',paste0(names(maskLayers),'Mask'))
   return(out)
 }
 
@@ -166,7 +166,9 @@ lotsOfMasks=function(expertRaster,maskStack,maskBounds){
   for(i in 1:raster::nlayers(binaryMasks)){
     realizedDist=raster::mask(realizedDist,binaryMasks[[i]])
   }
-  return(list(realizedDist=realizedDist,binaryMasks=binaryMasks))
+  out=stack(realizedDist,expertRaster,binaryMasks)
+  names(out)=c('refinedDist','initialDist',paste0(names(binaryMasks),'Mask'))
+  return(out)
 }
 
 

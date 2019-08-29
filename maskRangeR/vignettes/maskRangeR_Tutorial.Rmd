@@ -117,7 +117,7 @@ projection(datedOccs) <- projection(env)
 To perform data-driven masking, first find the values of the environmental variable (forest cover in this example) at the occurrence point locations.
 
 ```{r}
-datedOccs2 <- maskRangeR::annotate(datedOccs,env,envDates,dateScale)
+datedOccs <- maskRangeR::annotate(datedOccs,env,envDates,dateScale)
 # Note the warnings:
 # [1] "Environmental layers were missing for date 2013"
 # [1] "Environmental layers were missing for date 2016"
@@ -141,10 +141,23 @@ Create the mask and mask the potential distribution using the most recent year's
 logicString <- paste0('maskLayers>',quantile(datedOccs$env,prob=.25,na.rm=T))
 forest <- env[[5]]
 names(forest) <- 'forest'
-maskedDist <- maskRangeR::maskRanger(potentialDist=sdm,maskLayers=forest,logicString=logicString)
+maskedDist <- maskRanger(initialDist=sdm,maskLayers=forest,
+                                     logicString=logicString)
 ```
 
-Check that there are now fewer cells in the masked map.
+If you additionally wanted to include an upper bound on the masking layer, this can be acheived with another call to `maskRanger`. Although we do not have expert knowledge of an upper limit on forest cover for this species, we pretend that there is an upper bound at the .999 percentile to illustrate how the code would work. In this call, the new `potentialDist` is the output of the previous call to `maskRanger`.
+
+```{r}
+logicString <- paste0('maskLayers<',quantile(datedOccs$env,prob=.999,na.rm=T))
+forest <- env[[5]]
+names(forest) <- 'forest'
+output <- maskRanger(initialDist=maskedDist$refinedDist,
+                                     maskLayers=forest,logicString=logicString)
+```
+
+Note that all `maskRanger()` outputs follow the convention that the output is a stack with the refined distribution, the intial distribution, and any layers used to add or subtract regions to obtain the refined distribution. 
+
+To be sure the masking worked, check that there are now fewer cells in the masked map.
 
 ```{r}
 (nOccupiedCells <- apply(values(maskedDist[[1:2]]),2,sum,na.rm=T))
@@ -156,9 +169,9 @@ Plot the results. The first map shows the percent forest cover across the study 
 ```{r,fig=T,fig.height=6,fig.width=7}
 par(mfrow = c(1,3))
 plot(forest,main = 'Raw Forest Data')
-plot(maskedDist[['forestMask']],main = 'Forest Mask + Potential Distribution')
+plot(output[['forestMask']],main = 'Forest Mask and Initial Distribution')
 plot(sdm,add = T,col = c(grey(0,0),grey(.4,.7)))
-plot(maskedDist[[1]],col = c(grey(.6),'red1'),main = 'Masked Distribution')
+plot(output$refinedDist,col = c(grey(.6),'red1'),main = 'Masked Distribution')
 ```
 
 <!-- ================================================================== -->
@@ -262,6 +275,12 @@ cellStats(original,sum)
 cellStats(final,sum)
 ```
 
+If you were combining this step with a masking step in the previous example, it might be helpful to organize the output the same as all `maskRanger()` outputs. This follows the convention that the output is a stack with the refined distribution, the intial distribution, and any layers used to add or subtract regions to obtain the refined distribution.
+```{r}
+output=stack(final,original,expertAddRaster)
+names(output)=c("refinedDist", "initialDist","expertAdded")
+```
+
 
 
 <!-- ================================================================== -->
@@ -352,19 +371,18 @@ Create each mask, and mask the expert map.
 ```{r}
 expertRaster <- crt$expertRaster
 maskStack <- crt$maskStack
-realized <- maskRangeR::lotsOfMasks(expertRaster,maskStack,maskBounds)
+out <- lotsOfMasks(expertRaster,maskStack,maskBounds)
 ```
 
 Plot the realized distribution, along with each of masks.
 ```{r,fig=T,fig.height=6,fig.width=7}
-plot(stack(realized))
+plot(out)
 ```
 
 We can zoom in to visualize what is left of the realized distribution after the masking process. The black polygon represents the original expert map and red locations indicate those that remain as suitable habitat after the masks have been applied.
 ```{r,fig=T,fig.height=6,fig.width=7}
-real <- raster::trim(realized$realizedDist)
-plot(real,col = c('white','red'))
-plot(expertMap,add = T)
+plot(out$initialDist,col='grey')
+plot(out$refinedDist,col = 'red',add=T)
 ```
 
 
@@ -505,16 +523,22 @@ We can use this SVM as a mask over our original SDM predictions.
 var_svmSP <- sloth_svmSP == 1
 var_svmSP[var_svmSP == 0] <- NA
 var_svmSP_mask <- mask(var_sdm, var_svmSP)
+out.var=stack(var_svmSP_mask,var_sdm,var_svmSP)
+names(out.var)=c("refinedDist", "initialDist","var_svmSpMask")
 
 # masked SDM predictions for tridactylus
 tri_svmSP <- sloth_svmSP == 2
 tri_svmSP[tri_svmSP == 0] <- NA
 tri_svmSP_mask <- mask(tri_sdm_mask, tri_svmSP)
+out.tri=stack(tri_svmSP_mask,tri_sdm,tri_svmSP)
+names(out.tri)=c("refinedDist", "initialDist","tri_svmSpMask")
 
 # masked SDM predictions for torquatus
 tor_svmSP <- sloth_svmSP == 3
 tor_svmSP[tor_svmSP == 0] <- NA
 tor_svmSP_mask <- mask(tor_sdm_mask, tor_svmSP)
+out.tor=stack(tor_svmSP_mask,tor_sdm,tor_svmSP)
+names(out.tor)=c("refinedDist", "initialDist","tor_svmSpMask")
 ```
 
 Plot the predicted realized distributions for each species.
