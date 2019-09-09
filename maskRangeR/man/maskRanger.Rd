@@ -4,11 +4,9 @@
 \alias{maskRanger}
 \title{Make a matrix of modeling decisions to be used to specify clipping rules}
 \usage{
-maskRanger(potentialDist, maskLayers, logicString, method = "mask")
+maskRanger(initialDist, maskLayers, logicString, method = "mask")
 }
 \arguments{
-\item{potentialDist}{A raster stack of binary or continuous values. Supplying more than one layer will be interepreted as different time periods. Layers should follow the naming convention `Y2000`, `Y2001`, etc.}
-
 \item{maskLayers}{A single raster or a raster stack. If a single raster, the same mask will be applied to each layer of `potentialDist`. If a stack it must have the same number of layers as potentialDist, and each layer corresponds to a different time period.}
 
 \item{logicString}{a character indicating the logical conditions to use for masking.}
@@ -18,6 +16,8 @@ If a single value is provided it will be applied to all rasters in `rsList`. Opt
 \itemize{
  \item{mask}{mask cells with values outside the bounds}
 }}
+
+\item{potentialDist}{A raster stack of binary or continuous values. Supplying more than one layer will be interepreted as different time periods. Layers should follow the naming convention `Y2000`, `Y2001`, etc.}
 }
 \description{
 Performs data driven masking of potential species distributions.
