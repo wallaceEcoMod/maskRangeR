@@ -14,7 +14,7 @@ Description: This package masks ranges based on expert
     generate a new map or to update an existing map.
     Methods include expert opinion and data-driven 
     tools to generate thresholds for binary masks.
-Depends: R (>= 3.4.3)
+Depends: R (>= 3.4.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -27,7 +27,13 @@ Imports:
     utils,
     magrittr,
     rgdal,
-    stats
+    stats,
+    MODIS,
+    dplyr,
+    e1071,
+    gdalUtils,
+    dismo,
+    sp
 Suggests:
     testthat,
     knitr,

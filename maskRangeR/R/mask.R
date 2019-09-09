@@ -6,6 +6,7 @@
 #' @description Performs data driven masking of potential species distributions.
 #' @details
 #' See Examples.
+#' @param initialDist A raster showing a previously created optimally tuned SDM
 #' @param potentialDist A raster stack of binary or continuous values. Supplying more than one layer will be interepreted as different time periods. Layers should follow the naming convention `Y2000`, `Y2001`, etc.
 #' @param maskLayers A single raster or a raster stack. If a single raster, the same mask will be applied to each layer of `potentialDist`. If a stack it must have the same number of layers as potentialDist, and each layer corresponds to a different time period.
 #' @param logicString a character indicating the logical conditions to use for masking.
@@ -97,7 +98,8 @@
 # @family - a family name. All functions that have the same family tag will be linked in the documentation.
 #' @export
 
-maskRanger=function(initialDist,
+maskRanger=function(potentialDist,
+                    initialDist= NULL,
                     maskLayers,
                     logicString,
                     method='mask'){
@@ -116,7 +118,7 @@ maskRanger=function(initialDist,
              of layers as potentialDist')
       }
       out=raster::stack(lapply(1:raster::nlayers(mask.bin),function(x){
-        raster::mask(initiallDist[[x]],mask=mask.bin[[x]],maskvalue=1)
+        raster::mask(initialDist[[x]],mask=mask.bin[[x]],maskvalue=1)
       }))
     }
   } # end if method=='mask'
@@ -166,7 +168,7 @@ lotsOfMasks=function(expertRaster,maskStack,maskBounds){
   for(i in 1:raster::nlayers(binaryMasks)){
     realizedDist=raster::mask(realizedDist,binaryMasks[[i]])
   }
-  out=stack(realizedDist,expertRaster,binaryMasks)
+  out=raster::stack(realizedDist,expertRaster,binaryMasks)
   names(out)=c('refinedDist','initialDist',paste0(names(binaryMasks),'Mask'))
   return(out)
 }
