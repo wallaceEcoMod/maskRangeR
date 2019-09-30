@@ -12,11 +12,18 @@
 #' "aroundSelected" selects two observed values above and two below a user-specified threshold value. "quants" returns quantile values as thresholds. 
 #' "userSpecified" will take a list of values defined by the user.
 #'  @param sdm previously generated species distribution model
+#'  @param maskProjection (optional) a proj4string showing the projection of the maskLayer. If NULL, areas will be estimated using the raster package.
+#'  @param maskVal (optional) a user defined value for thresholding when using the "aroundSelected" maskClass
+#'  @return returns a list containing two items. The first is a rasterstack of the masked distributions. The second item is a table of thresholds and areas
 #'  
 #'  @author Peter Galante <pgalante@@amnh.org>
 #'  @export
 
-sensitivityMasks <- function(datedOccs, maskLayer, maskClass, sdm){
+## add swmap crab, olinguito
+
+test <- sensitivityMasks(datedOccs, maskLayer, maskClass = "top5", sdm=sdm, maskProjection = "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6378140 +b=6356750 +units=m +no_defs")
+
+sensitivityMasks <- function(datedOccs, maskLayer, maskProjection = NULL, maskClass, maskVal = NULL, sdm){
   require(maskRangeR)
   require(raster)
   require(lubridate)
@@ -31,7 +38,7 @@ sensitivityMasks <- function(datedOccs, maskLayer, maskClass, sdm){
       maskVals <- rev(sort(unique(na.omit(datedOccs$env))))[(which.min(abs(rev(sort(unique(na.omit(datedOccs$env)))) - selectedValue)) - 1) : (which.min(abs(rev(sort(unique(na.omit(datedOccs$env)))) - selectedValue)) + 2)]
       return(maskVals)
     }
-    maskThresh <- aroundSelected(datedOccs, selectedValue = 55) 
+    maskThresh <- aroundSelected(datedOccs, selectedValue = maskVal) 
   } else if (maskClass == "quants"){
     # Quantile values
     maskThresh <- as.numeric(quantile(datedOccs$env, na.rm=T))
@@ -39,6 +46,7 @@ sensitivityMasks <- function(datedOccs, maskLayer, maskClass, sdm){
     # user defined
     maskThresh <- paste0('maskLayers>',quantile(datedOccs$env,prob=.25,na.rm=T))
   }
+  ## Bounded omission/commission
   
   ### makes several logicStrings
   # get most recent forest cover
@@ -46,7 +54,13 @@ sensitivityMasks <- function(datedOccs, maskLayer, maskClass, sdm){
   
   ### create a list of rasters
   sensitivityStack <- lapply(stringsOfLogic, function(x) maskRanger(initialDist=sdm, maskLayers=maskLayer, logicString=x)$refinedDist)
-  
+  ### Set projection if available
+  proj.FUN<-function(rasterList, proj4){
+    crs(rasterList) <- proj4
+  }
+  if (!is.null(maskProjection)){
+    lapply(sensitivityStack, proj.FUN, maskProjection)
+  }
   ## Calculate areas for each refinedDist
   # Set all values in each reginedDist = 1, calculate area of 1's
   ras.FUN <- function(r1){
@@ -62,15 +76,25 @@ sensitivityMasks <- function(datedOccs, maskLayer, maskClass, sdm){
   # apply area calculation to list of rasters. results are square km
   sensitivityAreas <- lapply(sensitivityOnes, calcAreas)
   
+  .sensitivityPlotting(stringsOfLogic, sensitivityStack, sensitivityAreas)
+  
+}
+
+## Plotting metrics
+.sensitivityPlotting <- function(stringsOfLogic, sensitivityStack, sensitivityAreas){
   ## Plotting each mask and one plot of area vs threshold
   # area vs. threshold
   maskValues <- gsub(".*<","",stringsOfLogic)
-  names(sensitivityStack) <- paste0("mask threshold of ", maskValues)
+  names(sensitivityStack) <- paste0("threshold_of_", maskValues)
+  sensitivityStack<-stack(sensitivityStack)
   dev.new()
   par(mfrow=c(2,(length(stringsOfLogic)/2)+1))
   colPal <- rainbow(5)
   lapply(names(sensitivityStack), function(x) plot(sensitivityStack[[x]], main = x, xlab = "long", ylab = "lat"))
-  plot(maskValues, sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19)
+  #### for here allow for all threshold values, but only plot some maps
+  
+  plot(maskValues, sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19, type="l")
+  plot(maskValues, sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19, add=T)
   # Get values to add to plot
   nums <- gsub(".*= ", "", sensitivityAreas)
   nums <- gsub( ").*$", "", nums)
@@ -79,4 +103,7 @@ sensitivityMasks <- function(datedOccs, maskLayer, maskClass, sdm){
   text(maskValues, sensitivityAreas, labels = nums, cex= 1, pos=3)
   # add legend
   legend(x = "topleft", col = colPal, legend = names(sensitivityStack), pch = 19, cex=0.7)
+  print(cbind(maskValues, sensitivityAreas))
+  sensitivityReturns <- NULL
+  return(list(sensitivityStack, cbind(maskValues, sensitivityAreas)))
 }
