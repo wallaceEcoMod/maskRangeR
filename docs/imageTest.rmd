@@ -1,0 +1,23 @@
+---
+title: "maskRangeR: R package for post-processing species distibution models"
+author: Merow C, Galante PJ, Kass JM, Horning N, Aiello-Lammens ME, Anderson RP, Pinilla-Buitrago GE, Velasquez J,
+  Ersts PJ, Blair ME
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# maskRangeR
+
+<center>
+
+[![](./websiteImages/NASA.png)](https://www.nasa.gov/)[![](./websiteImages/GEOBON.png)](https://geobon.org/)
+
+[![](./websiteImages/Pace.png)](https://www.pace.edu/)[![](./websiteImages/CCNY.png)](https://www.ccny.cuny.edu/)[![](./websiteImages/CUNY.png)](http://www2.cuny.edu/)[![](./websiteImages/UConn.png)](https://uconn.edu/)[![](./websiteImages/Humboldt.png)](http://www.humboldt.org.co/en/)
+[![](./websiteImages/CBC.png)](https://www.amnh.org/our-research/center-for-biodiversity-conservation)
+</center>
