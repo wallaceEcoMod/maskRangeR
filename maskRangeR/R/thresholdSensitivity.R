@@ -22,9 +22,9 @@
 ## add swmap crab, olinguito
 ########################
 ## testing
-test <- thresholdSensitivity(datedOccs, maskLayer, maskClass = "userSpecified", sdm=sdm, 
-                         maskProjection = "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6378140 +b=6356750 +units=m +no_defs", 
-                         maskVal = seq(0, 100, length.out =500))
+#test <- thresholdSensitivity(datedOccs, maskLayer, maskClass = "userSpecified", sdm=sdm, 
+#                         maskProjection = "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6378140 +b=6356750 +units=m +no_defs", 
+#                         maskVal = seq(0, 100, length.out =500))
 ########################
 
 thresholdSensitivity <- function(datedOccs, maskLayer, maskProjection = NULL, maskClass, maskVal = NULL, sdm){
@@ -79,8 +79,8 @@ thresholdSensitivity <- function(datedOccs, maskLayer, maskProjection = NULL, ma
   lapply(names(sensitivityStack), function(x) plot(sensitivityStack[[x]], main = x, xlab = "long", ylab = "lat"))
   #### for here allow for all threshold values, but only plot some maps
   
-  plot(maskValues, sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19, type="l")
-  plot(maskValues, sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19, add=T)
+  plot(maskValues, sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19, type= "l")
+  points(maskValues, sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19)
   # Get values to add to plot
   nums <- gsub(".*= ", "", sensitivityAreas)
   nums <- gsub( ").*$", "", nums)

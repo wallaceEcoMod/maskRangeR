@@ -15,6 +15,10 @@
 #' @export
 
 manyMaskSensitivity <- function(crt, rasProj = NULL){
+  ## define function for calculating areas
+  calcAreas <- function(r2){
+    tapply(area(r2), r2[], sum)
+  }
   ### create combinations of mask layers at list of matrices
   masks <- crt$maskStack
   x <- names(masks)
