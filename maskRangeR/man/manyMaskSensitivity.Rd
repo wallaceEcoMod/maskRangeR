@@ -4,12 +4,14 @@
 \alias{manyMaskSensitivity}
 \title{Sensitivity testing for masks}
 \usage{
-manyMaskSensitivity(crt, rasProj = NULL)
+manyMaskSensitivity(crt, rasProj = NULL, maskBounds = NULL)
 }
 \arguments{
 \item{crt}{A raster stack; the output from the function maskRangeR::cropResampleTrim}
 
 \item{rasProj}{(optional) a character string: a proj4string showing the projection of the environmental layers. If NULL, areas will be estimated using the raster package.}
+
+\item{maskBounds}{A data.frame with columns indicating the layer name (matching the names in maskStack), and the min and max values of that layer to be used for masking.}
 }
 \value{
 returns a data.frame where row names are the environmental layer name combinations, and Area is expressed in square km, unless a projection is supplied
