@@ -4,21 +4,21 @@
 \alias{thresholdSensitivity}
 \title{Sensitivity testing for thresholds}
 \usage{
-thresholdSensitivity(datedOccs, maskLayer, maskProjection = NULL,
-  maskClass, maskVal = NULL, sdm, selectedValue = NULL)
+thresholdSensitivity(datedOccs, maskLayer, maskClass, sdm,
+  maskProjection = NULL, maskVal = NULL, selectedValue = NULL)
 }
 \arguments{
 \item{datedOccs}{a `SpatialPointsDataFrame` where one column is labeled `date` and has class `POSIXct`, e.g., as obtained from using `lubridate::parse_date_time`}
 
 \item{maskLayer}{the layer from which you will build the mask. Usually the most recent satellite derived raster}
 
-\item{maskProjection}{(optional) a proj4string showing the projection of the maskLayer. If NULL, areas will be estimated using the raster package.}
-
 \item{maskClass}{either top5, aroundSelected, quants, or userSpecified. "top5" ranks the environmental values at occurrences and returns the 5 highest observed values."aroundSelected" selects two observed values above and two below a user-specified threshold value. "quants" returns quantile values as thresholds. "userSpecified" will take a list of values defined by the user.}
 
-\item{maskVal}{(optional) a user defined value for thresholding when using the "aroundSelected" maskClass, or if "userSpecified", a list of thresholds to use.}
-
 \item{sdm}{previously generated species distribution model}
+
+\item{maskProjection}{(optional) a proj4string showing the projection of the maskLayer. If NULL, areas will be estimated using the raster package.}
+
+\item{maskVal}{(optional) a user defined value for thresholding when using the "aroundSelected" maskClass, or if "userSpecified", a list of thresholds to use.}
 
 \item{selectedValue}{(optional) a user selected value around which masks will be selected using the nearest two threshold on either side}
 }

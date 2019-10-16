@@ -9,6 +9,7 @@
 #' @param crt A raster stack; the output from the function maskRangeR::cropResampleTrim
 #' @param rasProj (optional) a character string: a proj4string showing the projection of the environmental layers. If NULL, areas will be estimated using the raster package.
 #' @param maskBounds A data.frame with columns indicating the layer name (matching the names in maskStack), and the min and max values of that layer to be used for masking.
+#' @param expertRaster The binary expert map (1s and 0s), rasterized with the same projection as `maskStack`
 #' 
 #' @return returns a data.frame where row names are the environmental layer name combinations, and Area is expressed in square km, unless a projection is supplied
 #'  
@@ -18,7 +19,7 @@
 #' @importFrom stats na.omit quantile  setNames
 #' @importFrom utils combn 
 
-manyMaskSensitivity <- function(crt, rasProj = NULL, maskBounds = NULL){
+manyMaskSensitivity <- function(crt, rasProj = NULL, maskBounds, expertRaster){
   ## define function for calculating areas
   calcAreas <- function(r2){
     tapply(raster::area(r2), r2[], sum)
@@ -32,14 +33,14 @@ manyMaskSensitivity <- function(crt, rasProj = NULL, maskBounds = NULL){
   combiNamesList <- lapply(combinos, function(x) lapply(apply(x, 2, list), unlist))
   combiRastList <- unlist(lapply(combiNamesList, function(y) lapply(y, function(x) raster::subset(masks, x))))
   ### Get many outputs; each combination
-  manyOuts <- lapply(combiRastList, function(x) lotsOfMasks(expertRaster, 
+  manyOuts <- lapply(combiRastList, function(x) lotsOfMasks(expertRaster = expertRaster, 
                                                             maskStack = x, 
                                                             maskBounds = maskBounds))
   if (is.null(rasProj)){
     ### Calculate areas for each "refinedDist"
     manyRefined <- lapply(manyOuts, function(x) x$refinedDist)
     manyMasksArea <- stats::setNames(as.data.frame(cbind(unlist(lapply(manyRefined, 
-                                                         function(r2){tapply(area(r2), r2[], sum)})), 
+                                                         function(r2){tapply(raster::area(r2), r2[], sum)})), 
                                                          lapply(combiRastList, names)), 
                                                    row.names = lapply(combiRastList, names)),  
                                      c("Area", "Layer"))
@@ -70,6 +71,6 @@ manyMaskSensitivity <- function(crt, rasProj = NULL, maskBounds = NULL){
 ## Plotting function
 #' @importFrom graphics barplot legend par plot points text
 .manyMaskSensitivityPlots <- function(v1){
-  graphics::barplot(height = unlist(v1$Area), space = 1, xlab = "", names.arg = "")
+  graphics::barplot(height = unlist(v1$Area), space = 1, xlab = "", names.arg = "", ylab = "area")
   graphics::text(seq(1.5, (0.5 + nrow(v1) + nrow(v1)-1), 2), par("usr")[3]-.25, srt = 60, adj=1, xpd=T, labels = cbind(unlist(lapply(v1$Layer, toString))), cex= 0.65)
 }

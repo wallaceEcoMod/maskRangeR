@@ -33,7 +33,8 @@ Imports:
     e1071,
     gdalUtils,
     dismo,
-    sp
+    sp,
+    maptools
 Suggests:
     testthat,
     knitr,

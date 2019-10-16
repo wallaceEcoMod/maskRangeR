@@ -19,7 +19,7 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(cache = F)
-knitr::opts_chunk$set(eval = F)
+knitr::opts_chunk$set(eval = T)
 mc.cores=1
 ```
 
@@ -230,7 +230,6 @@ The following steps are possible ways to improve the realism of a potential dist
 By setting the pathway to where you saved our canned datasets by using the getDemoData() function, access that data by setting that as the working directory. 
 
 ```{r,results='hide'}
-library(devtools)
 library(maskRangeR)
 library(lubridate)
 library(raster)
@@ -389,7 +388,7 @@ plot(out$refinedDist,col = 'red',add=T)
 Calculate the difference in range size.
 ```{r}
 cellStats(expertRaster,sum)
-cellStats(real,sum)
+cellStats(out$refinedDist,sum)
 ```
 
 
@@ -497,7 +496,7 @@ Spatial SVMs are created using a classifier trained with the occurrence points o
 
 Tune the model and use it to predict ranges for each of the three species.
 
-```{r, message=FALSE}
+```{r, message=FALSE, eval = FALSE}
 set.seed(1234) # to reproduce our exact results
 # Create SVM
 svmSP <- rangeSVM(variegatus[,2:3], tridactylus[,2:3], 
@@ -509,7 +508,7 @@ sloth_svmSP <- rangeSVM_predict(svm = svmSP, r = var_sdm)
 
 Plot the SVM results. The grey areas indicate regions more suitable for *B. variegatus*, the yellow areas indicate regions more suitable for *B. tridactylus*, and the green areas indicate regions more suitable for *B. torquatus*. Black points show the occurrences of *B. variegatus*, red show *B. tridactylus*, and blue show *B. torquatus*.
 
-```{r,fig.height=6,fig.width=7}
+```{r,fig.height=6,fig.width=7, eval = FALSE}
 plot(sloth_svmSP, col=c("yellow","pink","lightblue"))
 points(variegatus[,2:3], pch = 20, cex = 0.75, col = "orange")
 points(tridactylus[,2:3], pch = 20, cex = 0.75, col = "red")
@@ -518,7 +517,7 @@ points(torquatus[,2:3], pch = 20, cex = 0.75, col = "blue")
 
 We can use this SVM as a mask over our original SDM predictions.
 
-```{r}
+```{r, eval = FALSE}
 # masked SDM predictions for variegatus
 var_svmSP <- sloth_svmSP == 1
 var_svmSP[var_svmSP == 0] <- NA
@@ -543,7 +542,7 @@ names(out.tor)=c("refinedDist", "initialDist","tor_svmSpMask")
 
 Plot the predicted realized distributions for each species.
 
-```{r,fig.height=6,fig.width=7}
+```{r,fig.height=6,fig.width=7, eval = FALSE}
 # Create 3-panel figure
 par(mfrow = c(1,3))
 
@@ -559,7 +558,7 @@ plot(wrld_simpl[wrld_simpl$NAME %in% country_list,], add = TRUE)
 
 Hybrid SVMs take into account the occurrence points of all species as well as the environmental suitability predicted by the species' SDMs.
 
-```{r, message = FALSE}
+```{r, message = FALSE, eval = FALSE}
 set.seed(1234)
 # Create SVM: we used a few more reps here to be sure a set of optimal parameters was found
 svmHYB <- rangeSVM(variegatus[,2:3], tridactylus[,2:3], torquatus[,2:3], 
@@ -573,7 +572,7 @@ sloth_svmHYB <- rangeSVM_predict(svm = svmHYB, r = var_sdm,
 
 Plot the SVM results.
 
-```{r,fig.height=6,fig.width=7}
+```{r,fig.height=6,fig.width=7, eval = FALSE}
 plot(sloth_svmHYB, col=c("yellow","pink","lightblue"))
 points(variegatus[,2:3], pch = 20, cex = 0.75, col = "orange")
 points(tridactylus[,2:3], pch = 20, cex = 0.75, col = "red")
@@ -582,7 +581,7 @@ points(torquatus[,2:3], pch = 20, cex = 0.75, col = "blue")
 
 Use the hybrid SVM as a mask over our SDM predictions.
 
-```{r}
+```{r, eval = FALSE}
 # masked SDM predictions for variegatus
 var_svmHYB <- sloth_svmHYB == 1
 var_svmHYB[var_svmHYB == 0] <- NA
@@ -601,7 +600,7 @@ tor_svmHYB_mask <- mask(tor_sdm_mask, tor_svmHYB)
 
 Plot the predicted realized distributions for each species.
 
-```{r,fig.height=6,fig.width=7}
+```{r,fig.height=6,fig.width=7, eval = FALSE}
 # Create 3-panel figure
 par(mfrow = c(1,3))
 
@@ -615,3 +614,150 @@ plot(wrld_simpl[wrld_simpl$NAME %in% country_list,], add = TRUE)
 
 After creating masks such as these based on biotic factors, one could further mask by forest cover, accessible habitat, or other factors.
 
+
+# Sensitivity checking
+
+### Issue
+
+Thresholds used for masking may not be optimally suited for your species. Testing the effects that different thresholds may have on the predicted area can allow you to select the best threshold, manually.
+
+### Needs
+
+Sensitivity analysis requires the following data:
+  1. Potential thresholds to use
+  2. Outputs from previous funtions in this vignette
+  
+### Methods
+
+1. **thresholdSensitivity**: Testing the sensitivity of using different thresholds on the mask layer. For example, using a range of forest cover percentages to examine the differences in predicted area.  
+2. **manyMaskSensitivity**: Tests the sensitivity of using different masks and different combinations of masks. For example, testing different 
+
+
+## Example 1
+### Threshold sensitivity
+
+Set the pathway to where you saved our canned datasets using the getDemoData() function.
+
+```{r}
+library(raster)
+library(maskRangeR)
+library(lubridate)
+## Remember that the 'path' is the directory in which you saved the demonstration data 
+dataDir = paste0(path, '/dataDriven/olinguito/') 
+```
+
+Read in the environmental and occurrence data.
+
+```{r}
+dateScale <- "year" # or "month", "day"
+env <- stack(list.files(path = paste0(dataDir), pattern = "olinguito_Modis.tif$", full.names = T))
+# this should be a formal date object of class "POSIXct" "POSIXt"
+envDates <- parse_date_time((c('2005','2006','2008','2009','2010')),orders = c("Y", "Ym"))
+datedOccs <- read.csv(paste0(dataDir,'All_new_records_by_year.csv'))
+sdm <- raster(paste0(dataDir,'olinguito_SDM.tif'))
+# crop climate data to study region
+env <- crop(env, extent(sdm))
+```
+
+Prepare the data.
+
+```{r}
+# convert dates to formal date objects
+datedOccs$date <- parse_date_time(datedOccs$date,orders = c("Y", "Ym"))
+# convert to spatial object
+coordinates(datedOccs) <- c('long','lat')
+projection(datedOccs) <- projection(env)
+```
+
+To perform data-driven masking, first find the values of the environmental variable (forest cover in this example) at the occurrence point locations.
+
+```{r}
+datedOccs <- maskRangeR::annotate(datedOccs,env,envDates,dateScale)
+# Note the warnings:
+# [1] "Environmental layers were missing for date 2013"
+# [1] "Environmental layers were missing for date 2016"
+# [1] "Environmental layers were missing for date 2015"
+# These indicate that you have occurrencee records that do not match some environmental data.
+# You may want to look into this to determine whether you expected to provide environmental layers associated with these dates. But if you didn't mean to provide such layers (e.g., here we did not provide layers fro 2013, 2015, and 2016) it is not an issue for using the package.
+```
+
+Then find a suitable lower limit for the mask based on the data.
+
+```{r}
+(bounds <- quantile(datedOccs$env,prob=c(0,.025,.25,.5,.75,.975,1),na.rm=T))
+```
+
+Note that here, there is an occurrence record showing 4% forest cover. This occurrence record comes from a roadkilled specimen, so it is likely not representative of necessary forest cover.
+To simplify for this vignette, we use the 25% observed forest cover as the lower limit.
+
+Create the mask and mask the potential distribution using the most recent year's forest cover.
+
+```{r}
+logicString <- paste0('maskLayers>',quantile(datedOccs$env,prob=.25,na.rm=T))
+forest <- env[[5]]
+names(forest) <- 'forest'
+maskedDist <- maskRanger(initialDist=sdm,maskLayers=forest,
+                                     logicString=logicString)
+```
+
+thresholdSensitivity() runs the 'maskRangeR()' function over a series of thresholds and plots these as well as the areas.
+```{r, fig=T,fig.height=6,fig.width=7}
+thresholdSensitivity(datedOccs = datedOccs, maskLayer=forest, maskClass = "top5", sdm = sdm)
+```
+
+
+
+
+## Example 2
+### Masks sensitivity
+
+Set the pathway to where you saved our canned datasets by using the getDemoData() function.
+
+```{r,results='hide'}
+library(maskRangeR)
+library(raster)
+library(rgdal)
+dataDir = paste0(path, '/expertDriven/swampForestCrab/')
+```
+
+
+Read in the expert map and the environmental layers.
+```{r}
+expertMap <- readOGR(paste0(dataDir,'IUCNshape/data_0.shp'))
+
+#CM: pH and Water bounds are mutually exclusive, so we can only choose one, otherwise there is no suitable habitat. as I understand it, the soil grids shouldn't be taken too seriously at fine grain
+#masks
+maskListRaw <- list(treeCover = raster(paste0(dataDir,'/Hansen_percent_treecover.tif')), 
+                    dem = raster(paste0(dataDir,'/DEM.tif')),
+                    mat = raster(paste0(dataDir,'/MATsingapore.tif')),
+                    pH = raster(paste0(dataDir,'/PHIHOX_M_sl1_250m.tif')))
+
+# define the limits for each mask
+maskBounds <- read.csv(paste0(dataDir,'/crabInfo.csv'))
+```
+
+Conduct data cleaning to fix names and units.
+```{r}
+# rename the limits to match the raster names in maskListRaw
+maskBounds$Layer <- c('water','treeCover','dem','pH','mat')
+# make sure the units match between the layers and the bounds
+maskListRaw$mat <- maskListRaw$mat/10
+maskListRaw$pH <- maskListRaw$pH/10
+```
+
+Crop rasters to the same extent as the expert map, since we do not need to build masks outside the expert map.
+```{r}
+crt <- maskRangeR::cropResampleTrim(expertMap,maskListRaw)
+```
+
+Create each mask, and mask the expert map.
+```{r}
+expertRaster <- crt$expertRaster
+maskStack <- crt$maskStack
+```
+
+
+manyMaskSensitivity compares the predicted areas from all possible combinations of predictor variables.
+```{r, fig=T,fig.height=6,fig.width=7}
+manyMaskSensitivity(crt, maskBounds = maskBounds, expertRaster = expertRaster)
+```

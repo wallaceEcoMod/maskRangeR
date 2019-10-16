@@ -27,7 +27,7 @@
 #                         maskVal = seq(0, 100, length.out =500))
 ########################
 
-thresholdSensitivity <- function(datedOccs, maskLayer, maskProjection = NULL, maskClass, maskVal = NULL, sdm, selectedValue=NULL){
+thresholdSensitivity <- function(datedOccs, maskLayer, maskClass, sdm, maskProjection = NULL, maskVal = NULL, selectedValue = NULL){
   ## Maskthresholds
   .maskThresh <- function(datedOccs, maskClass, selectedValue = NULL, maskVal = NULL){
     if (maskClass == "top5"){
@@ -60,7 +60,7 @@ thresholdSensitivity <- function(datedOccs, maskLayer, maskProjection = NULL, ma
   ### create a list of rasters
   sensitivityStack <- lapply(stringsOfLogic, function(x) maskRanger(initialDist=sdm, maskLayers=maskLayer, logicString=x)$refinedDist)
   ### Set projection if available
-  proj.FUN<-function(rasterList, proj4){
+  proj.FUN <- function(rasterList, proj4){
     raster::crs(rasterList) <- proj4
   }
   if (!is.null(maskProjection)){
@@ -86,11 +86,11 @@ thresholdSensitivity <- function(datedOccs, maskLayer, maskProjection = NULL, ma
     # area vs. threshold
     maskValues <- gsub(".*<","",stringsOfLogic)
     names(sensitivityStack) <- paste0("threshold_of_", maskValues)
-    sensitivityStack<-raster::stack(sensitivityStack)
-    grDevices::dev.new()
+    sensitivityStack <- raster::stack(sensitivityStack)
+   # grDevices::dev.new()
     graphics::par(mfrow=c(2,(length(stringsOfLogic)/2)+1))
     colPal <- grDevices::rainbow(5)
-    lapply(names(sensitivityStack), function(x) graphics::plot(sensitivityStack[[x]], main = x, xlab = "long", ylab = "lat"))
+    lapply(names(sensitivityStack), function(x) raster::plot(sensitivityStack[[x]], main = x, xlab = "long", ylab = "lat"))
     #### for here allow for all threshold values, but only plot some maps
     
     graphics::plot(maskValues, sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19, type= "l")
