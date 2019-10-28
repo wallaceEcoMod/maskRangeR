@@ -69,11 +69,12 @@ Next, we used remotely sensed data of the annual percent forest cover for the re
 
 ## References
 
-[1] Phillips, S.J., Anderson, R.P., Schapire, R.E. (2006) Maximum entropy modeling of species geographic distributions. *Ecological Modeling*, **190**, 231 - 259.
+[1] Helgen, K.M., Miguel Pinto, C., Kays, R., Helgen, L.E., Tsuchiya, M. T. N., Quinn, A., Wilson, D.E., Maldonado, J.E. (2013) Taxonomic revision of the olingos (*Bassaricyon*), with description of a new species, the Olinguito. *Zookeys*, **324**, 1-83. https://doi.org/10.3897/zookeys.324.5827.
 
-[2] Helgen, K.M., Miguel Pinto, C., Kays, R., Helgen, L.E., Tsuchiya, M. T. N., Quinn, A., Wilson, D.E., Maldonado, J.E. (2013) Taxonomic revision of the olingos (*Bassaricyon*), with description of a new species, the Olinguito. *Zookeys*, **324**, 1-83. https://doi.org/10.3897/zookeys.324.5827.
+[2] Saavedra-Rodríguez, C. & Rojas-Díaz, V. (2011) Bassaricyon gabbii Allen, 1876 (Carnivora: Procyonidae): new distribution point on western range of Colombian Andes. Check List 7(4), 505–507. http://dx.doi.org/10.15560/7.4.505.
 
-[3] Saavedra-Rodríguez, C. & Rojas-Díaz, V. (2011) Bassaricyon gabbii Allen, 1876 (Carnivora: Procyonidae): new distribution point on western range of Colombian Andes. Check List 7(4), 505–507. http://dx.doi.org/10.15560/7.4.505.
+[3] Phillips, S.J., Anderson, R.P., Schapire, R.E. (2006) Maximum entropy modeling of species geographic distributions. *Ecological Modeling*, **190**, 231 - 259.
+
 
 ```{r, include=F}
 path = "/home/pgalante/Projects/NASA/maskrangeR/UseCaseData"
