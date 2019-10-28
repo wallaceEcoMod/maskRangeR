@@ -20,7 +20,7 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(cache = F)
 knitr::opts_chunk$set(eval = T)
-mc.cores=1
+mc.cores=8
 ```
 
 # Introduction 
@@ -564,7 +564,7 @@ set.seed(1234)
 # Create SVM: we used a few more reps here to be sure a set of optimal parameters was found
 svmHYB <- rangeSVM(variegatus[,2:3], tridactylus[,2:3], torquatus[,2:3], 
                    sdm = raster::stack(var_sdm, tri_sdm, tor_sdm), 
-                   nrep = 14, mc.cores=mc.cores)
+                   nrep = 8, mc.cores=mc.cores)
 
 # Use SVM to create a raster of predicted regions
 sloth_svmHYB <- rangeSVM_predict(svm = svmHYB, r = var_sdm, 
