@@ -20,6 +20,7 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(cache = F)
 knitr::opts_chunk$set(eval = T)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 mc.cores=8
 ```
 
@@ -77,8 +78,7 @@ Next, we used remotely sensed data of the annual percent forest cover for the re
 
 
 ```{r, include=F}
-path = "/home/pgalante/Projects/NASA/maskrangeR/UseCaseData"
-if(Sys.info()['user']=='ctg') path ='/Users/ctg/Dropbox/Projects/Wallace/MymaskRangeR/demoData'
+#path = "/home/pgalante/Projects/NASA/maskrangeR/UseCaseData"
 ```
 ## Example
 
@@ -89,12 +89,12 @@ library(raster)
 library(maskRangeR)
 library(lubridate)
 ## Remember that the 'path' is the directory in which you saved the demonstration data 
-dataDir = paste0(path, '/dataDriven/olinguito/') 
+dataDir = paste0(path, '/dataDriven/olinguito/')
 ```
 
 Read in the environmental and occurrence data.
 
-```{r}
+```{r, eval = F}
 dateScale <- "year" # or "month", "day"
 env <- stack(list.files(path = paste0(dataDir), pattern = "olinguito_Modis.tif$", full.names = T))
 # this should be a formal date object of class "POSIXct" "POSIXt"
@@ -104,6 +104,15 @@ sdm <- raster(paste0(dataDir,'olinguito_SDM.tif'))
 # crop climate data to study region
 env <- crop(env, extent(sdm))
 ```
+
+```{r, include=F}
+dateScale <- "year" # or "month", "day"
+envDates <- parse_date_time((c('2005','2006','2008','2009','2010')),orders = c("Y", "Ym"))
+env <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/env.RDS"))
+datedOccs <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/datedOccs.RDS"))
+sdm <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/sdm.RDS"))
+```
+
 
 Prepare the data.
 
@@ -239,11 +248,15 @@ dataDir = paste0(path, '/dataDriven/Alouatta/')
 ```
 
 Read in the original SDM and the expert polygon.
-```{r}
+```{r, eval=F}
 original = stack(paste0(dataDir, 'Alouatta_seniculus_0_mx.tif'))
 expertAddedPoly = rgdal::readOGR(paste0(dataDir, 'Alouatta_seniculus_add_HO.shp'))
 ```
 
+```{r, include = F}
+original <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/original.RDS"))
+expertAddedPoly <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/expertAddedPoly.RDS"))
+```
 Plot the original SDM.
 
 ```{r,fig.height=6,fig.width=7}
@@ -339,7 +352,7 @@ dataDir = paste0(path, '/expertDriven/swampForestCrab/')
 <!-- singapore=raster(paste0(dataDir,'/SingaporeRaster.tif')) -->
 
 Read in the expert map and the environmental layers.
-```{r}
+```{r, eval=F}
 expertMap <- readOGR(paste0(dataDir,'IUCNshape/data_0.shp'))
 
 #CM: pH and Water bounds are mutually exclusive, so we can only choose one, otherwise there is no suitable habitat. as I understand it, the soil grids shouldn't be taken too seriously at fine grain
@@ -353,6 +366,12 @@ maskListRaw <- list(treeCover = raster(paste0(dataDir,'/Hansen_percent_treecover
 maskBounds <- read.csv(paste0(dataDir,'/crabInfo.csv'))
 ```
 
+```{r, include=F}
+expertMap <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/expertMap.RDS"))
+maskListRaw <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/maskListRaw.RDS"))
+maskBounds <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/maskBounds.RDS"))
+```
+
 Conduct data cleaning to fix names and units.
 ```{r}
 # rename the limits to match the raster names in maskListRaw
@@ -363,8 +382,12 @@ maskListRaw$pH <- maskListRaw$pH/10
 ```
 
 Crop rasters to the same extent as the expert map, since we do not need to build masks outside the expert map.
-```{r}
+```{r, eval = T}
 crt <- maskRangeR::cropResampleTrim(expertMap,maskListRaw)
+```
+
+```{r, include = F}
+#crt <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/crt.RDS"))
 ```
 
 Create each mask, and mask the expert map.
@@ -442,7 +465,7 @@ library(maptools)
 
 Read in the occurrence data and the SDMs for each species. Note that the SDMs must be projected to the same region for input into the hybrid SVMs. For the final step of masking, however, apply the mask to the SDM projected only to the region of biological interest for each species.
 
-```{r}
+```{r, eval = F}
 dataDir = paste0(path, '/dataDriven/bradypus/')
 
 # Species occurrence coordinates
@@ -455,6 +478,22 @@ var_sdm <- raster(paste0(dataDir,'variegatus_sdm.tif'))
 tri_sdm <- raster(paste0(dataDir,'tridactylus_sdm.tif'))
 tor_sdm <- raster(paste0(dataDir,'torquatus_sdm.tif'))
 
+# Crop tridactyus SDM to a 2-degree bounding box
+ext_tri <- extent(c(min(tridactylus$longitude)-2, max(tridactylus$longitude)+2, min(tridactylus$latitude)-2, max(tridactylus$latitude)+2))
+tri_sdm_mask <- mask(tri_sdm, as(ext_tri, "SpatialPolygons"))
+
+# Crop torquatus SDM to a 2-degree bounding box
+ext_tor <- extent(c(min(torquatus$longitude)-2, max(torquatus$longitude)+2, min(torquatus$latitude)-2, max(torquatus$latitude)+2))
+tor_sdm_mask <- mask(tor_sdm, as(ext_tor, "SpatialPolygons"))
+```
+
+```{r, include = F}
+variegatus <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/variegatus.RDS"))
+tridactylus <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/tridactylus.RDS"))
+torquatus <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/torquatus.RDS"))
+var_sdm <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/var_sdm.RDS"))
+tri_sdm <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/tri_sdm.RDS"))
+tor_sdm <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/tor_sdm.RDS"))
 # Crop tridactyus SDM to a 2-degree bounding box
 ext_tri <- extent(c(min(tridactylus$longitude)-2, max(tridactylus$longitude)+2, min(tridactylus$latitude)-2, max(tridactylus$latitude)+2))
 tri_sdm_mask <- mask(tri_sdm, as(ext_tri, "SpatialPolygons"))
@@ -497,7 +536,7 @@ Spatial SVMs are created using a classifier trained with the occurrence points o
 
 Tune the model and use it to predict ranges for each of the three species.
 
-```{r, message=FALSE}
+```{r, message=FALSE, eval=F}
 set.seed(1234) # to reproduce our exact results
 # Create SVM
 svmSP <- rangeSVM(variegatus[,2:3], tridactylus[,2:3], 
@@ -505,6 +544,11 @@ svmSP <- rangeSVM(variegatus[,2:3], tridactylus[,2:3],
 
 # Use SVM to create a raster of predicted regions
 sloth_svmSP <- rangeSVM_predict(svm = svmSP, r = var_sdm)
+```
+
+```{r, include=F}
+svmSP <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/svmSP.RDS"))
+sloth_svmSP <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/sloth_svmSP.RDS"))
 ```
 
 Plot the SVM results. The grey areas indicate regions more suitable for *B. variegatus*, the yellow areas indicate regions more suitable for *B. tridactylus*, and the green areas indicate regions more suitable for *B. torquatus*. Black points show the occurrences of *B. variegatus*, red show *B. tridactylus*, and blue show *B. torquatus*.
@@ -559,7 +603,7 @@ plot(wrld_simpl[wrld_simpl$NAME %in% country_list,], add = TRUE)
 
 Hybrid SVMs take into account the occurrence points of all species as well as the environmental suitability predicted by the species' SDMs.
 
-```{r, message = FALSE}
+```{r, message = FALSE, eval=F}
 set.seed(1234)
 # Create SVM: we used a few more reps here to be sure a set of optimal parameters was found
 svmHYB <- rangeSVM(variegatus[,2:3], tridactylus[,2:3], torquatus[,2:3], 
@@ -569,6 +613,11 @@ svmHYB <- rangeSVM(variegatus[,2:3], tridactylus[,2:3], torquatus[,2:3],
 # Use SVM to create a raster of predicted regions
 sloth_svmHYB <- rangeSVM_predict(svm = svmHYB, r = var_sdm, 
                                  sdm = raster::stack(var_sdm, tri_sdm, tor_sdm))
+```
+
+```{r, include=F}
+svmHYB <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/svmHYB.RDS"))
+sloth_svmHYB <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/sloth_svmHYB.RDS"))  
 ```
 
 Plot the SVM results.
@@ -649,7 +698,7 @@ dataDir = paste0(path, '/dataDriven/olinguito/')
 
 Read in the environmental and occurrence data.
 
-```{r}
+```{r, eval = F}
 dateScale <- "year" # or "month", "day"
 env <- stack(list.files(path = paste0(dataDir), pattern = "olinguito_Modis.tif$", full.names = T))
 # this should be a formal date object of class "POSIXct" "POSIXt"
@@ -658,6 +707,12 @@ datedOccs <- read.csv(paste0(dataDir,'All_new_records_by_year.csv'))
 sdm <- raster(paste0(dataDir,'olinguito_SDM.tif'))
 # crop climate data to study region
 env <- crop(env, extent(sdm))
+```
+
+```{r, include = F}
+env <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/env.RDS"))
+datedOccs <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/datedOccs.RDS"))
+sdm <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/sdm.RDS"))
 ```
 
 Prepare the data.
@@ -723,7 +778,7 @@ dataDir = paste0(path, '/expertDriven/swampForestCrab/')
 
 
 Read in the expert map and the environmental layers.
-```{r}
+```{r, eval = F}
 expertMap <- readOGR(paste0(dataDir,'IUCNshape/data_0.shp'))
 
 #CM: pH and Water bounds are mutually exclusive, so we can only choose one, otherwise there is no suitable habitat. as I understand it, the soil grids shouldn't be taken too seriously at fine grain
@@ -735,6 +790,12 @@ maskListRaw <- list(treeCover = raster(paste0(dataDir,'/Hansen_percent_treecover
 
 # define the limits for each mask
 maskBounds <- read.csv(paste0(dataDir,'/crabInfo.csv'))
+```
+
+```{r, include=F}
+expertMap <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/expertMap.RDS"))
+maskListRaw <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/maskListRaw.RDS"))
+maskBounds <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/maskBounds.RDS"))
 ```
 
 Conduct data cleaning to fix names and units.
