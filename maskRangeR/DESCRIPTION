@@ -1,6 +1,6 @@
 Package: maskRangeR
 Title: Mask Species Geographic Ranges
-Version: 0.1.000
+Version: 1.0
 Authors@R: as.person(c(
   "Cory Merow <cory.merow@gmail.com> [aut, cre]",
   "Peter J. Galante <pgalante@amnh.org> [aut]",
