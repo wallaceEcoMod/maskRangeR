@@ -1,14 +1,12 @@
 Package: maskRangeR
 Title: Mask Species Geographic Ranges
 Version: 1.0
-Authors@R: as.person(c(
-  "Cory Merow <cory.merow@gmail.com> [aut, cre]",
-  "Peter J. Galante <pgalante@amnh.org> [aut]",
-  "Jamie M. Kass <jamie.m.kass@gmail.com> [aut]",
-  "Cecina Babich Morrow <cbabichmorrow@amnh.org> [aut]",
-  "Valentina Grisales Betancur <vgrisale@eafit.edu.co> [aut]"
-  ))
-Description: This package masks ranges based on expert 
+Authors@R: c(person('Cory','Merow',email='cory.merow@gmail.com',role=c('aut','cre')),
+    person('Peter J.', 'Galante',email='pgalante@amnh.org',role=c('aut')),
+    person("Jamie M.","Kass",email='jamie.m.kass@gmail.com',role=c('aut')),
+    person("Cecina","Babich Morrow",email='cbabichmorrow@amnh.org',role=c('aut')),
+    person("Valentina", 'Grisales Betancur',email='vgrisale@eafit.edu.com',role=c('aut')))
+Description: Mask ranges based on expert 
     knowledge or remote sensing layers. These tools can 
     be combined to quantitatively and reproducibly 
     generate a new map or to update an existing map.
