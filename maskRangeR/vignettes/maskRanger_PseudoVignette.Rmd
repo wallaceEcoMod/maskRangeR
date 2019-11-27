@@ -1,0 +1,23 @@
+---
+title: "maskRangeR: Improving spatial and temporal accuracy of species distribution models"
+author: "Cory Merow, Peter J. Galante, Cecina Babich Morrow, Jamie M. Kass, Alex Moore, Valentina Grisales-Betancur, Jorge Velasquez, Robert P. Anderson, Mary E. Blair"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    fig_caption: yes
+    toc: true
+    number_sections: true
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{maskRangeR: Improving spatial and temporal accuracy of species distribution models}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: inline
+---
+
+
+Please see our complete tutorial on our github page at:
+
+Note that this demo requires data larger than we can store on CRAN and involves analyses that run for a few minutes, so we maintain our most comprehensive tutorial on github.
+

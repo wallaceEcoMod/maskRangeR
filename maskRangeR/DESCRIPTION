@@ -19,25 +19,25 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    wallace,
-    raster,
-    virtualspecies,
-    tidyverse,
-    lubridate,
-    utils,
-    magrittr,
-    rgdal,
-    stats,
-    MODIS,
-    dplyr,
-    e1071,
     gdalUtils,
     dismo,
+    dplyr,
+    e1071,
+    lubridate,
+    magrittr,
+    maptools,
+    MODIS,
+    raster,
+    rgdal,
     sp,
-    maptools
+    stats,
+    tidyverse,
+    utils,
+    virtualspecies
 Suggests:
     testthat,
     knitr,
-    rmarkdown    
+    rmarkdown,
+    wallace
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr
