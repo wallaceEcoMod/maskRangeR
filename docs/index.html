@@ -7,12 +7,11 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
-<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 <meta name="author" content="Cory Merow, Peter J. Galante, Cecina Babich Morrow, Jamie M. Kass, Alex Moore, Valentina Grisales-Betancur, Jorge Velasquez, Robert P. Anderson, Mary E. Blair" />
 
-<meta name="date" content="2019-10-01" />
+<meta name="date" content="2019-12-06" />
 
 <title>maskRangeR: R package for post-processing species distibution models</title>
 
@@ -86,6 +85,7 @@ code {
 }
 img {
   max-width:100%;
+  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -159,6 +159,18 @@ summary {
 }
 </style>
 
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
 <!-- code folding -->
 
 
@@ -180,7 +192,7 @@ summary {
 
 <h1 class="title toc-ignore">maskRangeR: R package for post-processing species distibution models</h1>
 <h4 class="author">Cory Merow, Peter J. Galante, Cecina Babich Morrow, Jamie M. Kass, Alex Moore, Valentina Grisales-Betancur, Jorge Velasquez, Robert P. Anderson, Mary E. Blair</h4>
-<h4 class="date">2019-10-01</h4>
+<h4 class="date">2019-12-06</h4>
 
 </div>
 
@@ -191,7 +203,7 @@ summary {
 <p>The Group on Earth Observations Biodiversity Observation Network (<a href="https://geobon.org/">GEO-BON</a>) works to improve the communication of biodiversity measurements to decision makers and the broader scientific community. To locally serve regional scientific and political communities, GEO-BON has implemented a <a href="https://geobon.org/bon-in-a-box/">BON-in-a-Box</a> service that delivers customizable online toolkits for enhancing biodiversity observation systems. maskRangeR package development was funded by the NASA ROSES award No. 80NSSCK0406 to collaboratively improve the utility of the Colombia BON-in-a-Box toolkit as well as build capacity for conservation practitioners and educators. Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Aeronautics and Space Administration.</p>
 <div id="vignette" class="section level2">
 <h2>Vignette</h2>
-<p><a href="http://htmlpreview.github.io/?https://github.com/cmerow/maskRangeR/blob/master/maskRangeR/vignettes/maskRangeR_Tutorial.html">Click here for the maskRangeR vignette.</a></p>
+<p><a href="maskRangeR_Tutorial.html">Click here for the maskRangeR vignette.</a></p>
 <div id="wallace" class="section level3">
 <h3><strong>Wallace</strong></h3>
 <p><em>maskRangeR</em> is developed as part of a project to build new modules for <a href="https://wallaceecomod.github.io/"><em>Wallace</em></a>; a modular, R-based platform for reproducible modeling of species niches and distributions. The application guides users through a complete analysis, from the acquisition of data to visualizing model predictions on an interactive map, thus bundling complex workflows into a single, streamlined interface.</p>
@@ -228,23 +240,6 @@ $(document).ready(function () {
 
 
 </script>
-
-<!-- tabsets -->
-
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
-<!-- code folding -->
-
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
