@@ -4,8 +4,15 @@
 \alias{thresholdSensitivity}
 \title{Sensitivity testing for thresholds}
 \usage{
-thresholdSensitivity(datedOccs, maskLayer, maskClass, sdm,
-  maskProjection = NULL, maskVal = NULL, selectedValue = NULL)
+thresholdSensitivity(
+  datedOccs,
+  maskLayer,
+  maskClass,
+  sdm,
+  maskProjection = NULL,
+  maskVal = NULL,
+  selectedValue = NULL
+)
 }
 \arguments{
 \item{datedOccs}{a `SpatialPointsDataFrame` where one column is labeled `date` and has class `POSIXct`, e.g., as obtained from using `lubridate::parse_date_time`}

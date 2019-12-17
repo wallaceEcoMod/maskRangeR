@@ -4,8 +4,7 @@
 \alias{rangeSVM}
 \title{Classify species ranges based on occurrence coordinates and SDM scores.}
 \usage{
-rangeSVM(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE,
-  mc.cores = 1)
+rangeSVM(xy1, xy2, ..., sdm = NULL, nrep = 100, weight = FALSE, mc.cores = 1)
 }
 \arguments{
 \item{xy1}{Matrix or data frame of occurrence coordinates for species 1.}
@@ -47,7 +46,7 @@ suitability, depending on the variables used in the SDM.
 }
 \examples{
 \donttest{
-op=par()
+op <- par(no.readonly=TRUE)
 ########## Masking by biotic interactions
 ### Initiating data for use case # 4
 ## Generate some species occurrence records
