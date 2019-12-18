@@ -4,8 +4,13 @@
 \alias{maskRanger}
 \title{Make a matrix of modeling decisions to be used to specify clipping rules}
 \usage{
-maskRanger(potentialDist, initialDist = NULL, maskLayers, logicString,
-  method = "mask")
+maskRanger(
+  potentialDist,
+  initialDist = NULL,
+  maskLayers,
+  logicString,
+  method = "mask"
+)
 }
 \arguments{
 \item{potentialDist}{A raster stack of binary or continuous values. Supplying more than one layer will be interepreted as different time periods. Layers should follow the naming convention `Y2000`, `Y2001`, etc.}

@@ -30,6 +30,9 @@ maskBounds[,2] <- as.numeric(as.character(maskBounds[,2]))
 maskBounds[,3] <- as.numeric(as.character(maskBounds[,3]))
 out <- lotsOfMasks(expertRaster = r1, maskStack = maskStack, maskBounds = maskBounds)}
 }
+\value{
+
+}
 \description{
 Based on a potential distribution, environmental rasters, and bounds for suitable habitat on the environmental rasters
 }

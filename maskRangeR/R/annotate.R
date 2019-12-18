@@ -11,6 +11,21 @@
 #' @param dateScale string: 'year', 'month', or 'day'
 # @examples
 #'
+#' r1 <- raster(nrows=108, ncols=108, xmn=-50, xmx=50)
+#' values(r1)<- runif(n = (108*108))
+#' r2 <- raster(nrows=108, ncols=108, xmn=-50, xmx=50)
+#' values(r2)<- runif(n = (108*108))
+#' env <- stack(r1,r2)
+#' names(env) <- c("1995","1996")
+#' datedOccs <- data.frame(cbind(c(0,10), c(-10,15)))
+#' colnames(datedOccs) <- c("long", "lat")
+#' datedOccs$date <- c("1995", "1996")
+#' datedOccs$date <- parse_date_time(datedOccs$date, orders = c("Y", "Ym"))
+#' coordinates(datedOccs) <- c("long", "lat")
+#' projection(datedOccs) <- projection(env)
+#' dateScale = "year"
+#' annotate(datedOccs = datedOccs, env = env, envDates = envDates, dateScale = dateScale)
+#' 
 # @return
 #' @author Cory Merow <cory.merow@@gmail.com>,
 #' @note To apply multiple masks, e.g., elevation and forest cover, use separate calls to maskRS.
