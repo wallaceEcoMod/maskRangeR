@@ -27,6 +27,9 @@ If a single value is provided it will be applied to all rasters in `rsList`. Opt
  \item{mask}{mask cells with values outside the bounds}
 }}
 }
+\value{
+a rasterstack
+}
 \description{
 Performs data driven masking of potential species distributions.
 }

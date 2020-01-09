@@ -30,6 +30,9 @@ projection(datedOccs) <- projection(env)
 dateScale = "year"
 annotate(datedOccs = datedOccs, env = env, envDates = envDates, dateScale = dateScale)}
 }
+\value{
+a SpatialPointsDataFrame
+}
 \description{
 Annotate point data with rasters based on matching dates associated with points to dates associated with rasters. Specifically, we're thinking of the points as species observations and the rasters as remotely sensed environmental layers, but they can represent any points and rasters with dates.
 }

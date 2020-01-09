@@ -24,7 +24,7 @@
 #' values(r2)<- runif(n = (108*21))
 #' maskRanger(initialDist = r1, maskLayers = r2, logicString = "maskLayers> 0.5")
 #' 
-# @return
+#' @return a rasterstack
 #' @author Cory Merow <cory.merow@@gmail.com>,
 #' @note To apply multiple masks, e.g., elevation and forest cover, use separate calls to maskRS.
 # @seealso
@@ -95,7 +95,7 @@ maskRanger=function(potentialDist,
 #' maskBounds[,3] <- as.numeric(as.character(maskBounds[,3]))
 #' out <- lotsOfMasks(expertRaster = r1, maskStack = maskStack, maskBounds = maskBounds)
 #' 
-#' @return
+#' @return a rasterstack
 #' @author Cory Merow <cory.merow@@gmail.com>,
 # @note 
 # @seealso

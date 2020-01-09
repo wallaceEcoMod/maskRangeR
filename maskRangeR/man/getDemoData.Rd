@@ -9,6 +9,9 @@ getDemoData(path)
 \arguments{
 \item{path}{character string representing the file pathway}
 }
+\value{
+saves demonstration data to the specified pathway.
+}
 \description{
 Canned datasets of real case studies for examples to follow along with the vignette
 }

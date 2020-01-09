@@ -18,7 +18,7 @@
 #' values(r2) <- runif((108*21))
 #' cropResampleTrim(expertMap = r1shape, maskListRaw = list(r2))
 #'
-# @return
+#' @return a list
 #' @author Cory Merow <cory.merow@@gmail.com>,
 # @note 
 # @seealso

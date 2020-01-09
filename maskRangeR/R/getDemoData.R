@@ -9,7 +9,7 @@
 # @examples
 #'
 #'
-# @return
+#' @return saves demonstration data to the specified pathway.
 #' @author Peter Galante <pgalante@@amnh.org>,
 #' @author Cecina Babich Morrow <cbabichmorrow@@amnh.org>,
 #' @note These data were to large to serve on CRAN, so this convenience function finds and downloads them automatically.

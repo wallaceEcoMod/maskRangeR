@@ -26,7 +26,7 @@
 #' dateScale = "year"
 #' annotate(datedOccs = datedOccs, env = env, envDates = envDates, dateScale = dateScale)
 #' 
-# @return
+#' @return a SpatialPointsDataFrame
 #' @author Cory Merow <cory.merow@@gmail.com>,
 #' @note To apply multiple masks, e.g., elevation and forest cover, use separate calls to maskRS.
 # @seealso

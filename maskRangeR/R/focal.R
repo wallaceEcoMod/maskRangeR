@@ -14,7 +14,7 @@
 #' r <- raster(ncols=36, nrows=18, xmn=0)
 #' r[] <- runif(ncell(r)) 
 #' r15 <- focalCompare(r, windowSizes = c(1:5),mc.cores=1,fun=mean) 
-# @return
+#' @return a raster layer
 #' @author Cory Merow <cory.merow@@gmail.com>,
 #' @note This may be particularly useful if for mobile species when their movement patterns cover a much larger extent than the single cell in which they were observed. 
 # @seealso

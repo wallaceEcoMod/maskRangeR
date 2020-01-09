@@ -1,11 +1,14 @@
 #===========================================================================
 #===========================================================================
 #' @title Sensitivity testing for masks
-#'
+#' @author Peter Galante <pgalante@@amnh.org>
+#' @export
+#' @importFrom grDevices dev.new rainbow
+#' @importFrom stats na.omit quantile  setNames
+#' @importFrom utils combn 
 #' @description Compare how masks of climate tolerances affect predicted area
 #' @details
 #' See Examples.
-
 #' @param crt A raster stack; the output from the function maskRangeR::cropResampleTrim
 #' @param rasProj (optional) a character string: a proj4string showing the projection of the environmental layers. If NULL, areas will be estimated using the raster package.
 #' @param maskBounds A data.frame with columns indicating the layer name (matching the names in maskStack), and the min and max values of that layer to be used for masking.
@@ -15,11 +18,7 @@
 #' 
 #' @return returns a data.frame where row names are the environmental layer name combinations, and Area is expressed in square km, unless a projection is supplied
 #'  
-#' @author Peter Galante <pgalante@@amnh.org>
-#' @export
-#' @importFrom grDevices dev.new rainbow
-#' @importFrom stats na.omit quantile  setNames
-#' @importFrom utils combn 
+
 
 manyMaskSensitivity <- function(crt, rasProj = NULL, maskBounds, expertRaster){
   ## define function for calculating areas
