@@ -11,6 +11,8 @@
 #' @param maskBounds A data.frame with columns indicating the layer name (matching the names in maskStack), and the min and max values of that layer to be used for masking.
 #' @param expertRaster The binary expert map (1s and 0s), rasterized with the same projection as `maskStack`
 #' 
+#' @examples See 'lotsOfMasks' and 'maskRanger' examples
+#' 
 #' @return returns a data.frame where row names are the environmental layer name combinations, and Area is expressed in square km, unless a projection is supplied
 #'  
 #' @author Peter Galante <pgalante@@amnh.org>

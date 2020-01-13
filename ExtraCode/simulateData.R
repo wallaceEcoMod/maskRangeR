@@ -8,7 +8,6 @@
 #' 
 #' @examples 
 #' \donttest{
-#' op=par()
 #' op=par(no.readonly=T)
 #' ########## Forest Cover Mask 
 #' # Declare the date scale

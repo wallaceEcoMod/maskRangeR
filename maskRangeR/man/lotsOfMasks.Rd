@@ -11,7 +11,27 @@ lotsOfMasks(expertRaster, maskStack, maskBounds)
 
 \item{maskStack}{A stack of *named* layers from which masks will be made}
 
-\item{maskBounds}{A data.frame with columns indicating the layer name (matching the names in maskStack), and the min and max values of that layer to be used for masking.}
+\item{maskBounds}{A data.frame with columns indicating the layer name (matching the names in maskStack), and the min and max values of that layer to be used for masking.
+r1 <- raster(nrows=108, ncols=21, xmn=0, xmx=10)
+values(r1)<- sort(runif(n = (108*21)))
+r1[r1>0.5] <- 1
+r1[r1<0.5] <- 0
+r2 <- raster(nrows=108, ncols=21, xmn=0, xmx=10)
+values(r2) <- runif(n=(108*21))
+r3 <- raster(nrows=108, ncols=21, xmn=0, xmx=10)
+values(r3) <- runif(n=(108*21))
+maskStack <- stack(r2, r3)
+names(maskStack) <- c("r2", "r3")
+minbounds <- c(0.3, 0.4)
+maxbounds <- c(0.4, 0.5)
+maskBounds <- data.frame(cbind(c("r2", "r3"), minbounds, maxbounds))
+colnames(maskBounds)<- c("Layer", "Min Value", "Max Value")
+maskBounds[,2] <- as.numeric(as.character(maskBounds[,2]))
+maskBounds[,3] <- as.numeric(as.character(maskBounds[,3]))
+out <- lotsOfMasks(expertRaster = r1, maskStack = maskStack, maskBounds = maskBounds)}
+}
+\value{
+
 }
 \description{
 Based on a potential distribution, environmental rasters, and bounds for suitable habitat on the environmental rasters
