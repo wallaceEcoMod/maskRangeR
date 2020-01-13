@@ -24,10 +24,6 @@ Compare how masks of climate tolerances affect predicted area
 \details{
 See Examples.
 }
-\examples{
-See 'lotsOfMasks' and 'maskRanger' examples
-
-}
 \author{
 Peter Galante <pgalante@amnh.org>
 }

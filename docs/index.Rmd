@@ -20,7 +20,7 @@ The Group on Earth Observations Biodiversity Observation Network ([GEO-BON](http
 
 ## Vignette
 
-[Click here for the maskRangeR vignette.](maskRangeR_Tutorial.html)
+[Click here for the maskRangeR vignette.](http://htmlpreview.github.io/?https://github.com/cmerow/maskRangeR/blob/master/maskRangeR/vignettes/maskRangeR_Tutorial.html)
 
 ### **Wallace** 
 

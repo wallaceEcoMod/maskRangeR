@@ -29,7 +29,7 @@
 #' 
 #' @examples
 #' \donttest{
-#' op <- par(no.readonly=TRUE)
+#' op=par()
 #' ########## Masking by biotic interactions
 #' ### Initiating data for use case # 4
 #' ## Generate some species occurrence records
