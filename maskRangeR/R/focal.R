@@ -10,11 +10,11 @@
 #' @param fun The function fun should take multiple numbers, and return a single number. For example mean, modal, min or max. It should also accept a na.rm argument (or ignore it, e.g. as one of the 'dots' arguments. For example, length will fail, but function(x, ...){na.omit(length(x))} works. (Specifications from `raster::focal`)
 #' @param mc.cores Number of cores for (optional) parallelization
 
-# @examples
+#' @examples
 #' r <- raster(ncols=36, nrows=18, xmn=0)
 #' r[] <- runif(ncell(r)) 
 #' r15 <- focalCompare(r, windowSizes = c(1:5),mc.cores=1,fun=mean) 
-#' @return a raster layer
+#' @return Raster object
 #' @author Cory Merow <cory.merow@@gmail.com>,
 #' @note This may be particularly useful if for mobile species when their movement patterns cover a much larger extent than the single cell in which they were observed. 
 # @seealso

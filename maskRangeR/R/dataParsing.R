@@ -10,7 +10,7 @@
   }
   if(dateScale == "month"){
     out=datedOccs %>% dplyr::select(long,lat,date) %>%
-      dplyr::mutate(date = parse_date_time(date, "ym")) %>%
+      dplyr::mutate(date = lubridate::parse_date_time(date, "ym")) %>%
       dplyr::mutate(months = lubridate::month(date)) %>%
       dplyr::mutate(years = lubridate::year(date))
   }

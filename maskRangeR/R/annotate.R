@@ -9,20 +9,20 @@
 #' @param env a raster stack
 #' @param envDates a vector of dates the same length as `env`. The vector should have class `POSIXct`, e.g., as obtained from using `lubridate::parse_date_time`
 #' @param dateScale string: 'year', 'month', or 'day'
-# @examples
+#' @examples
 #'
-#' r1 <- raster(nrows=108, ncols=108, xmn=-50, xmx=50)
-#' values(r1)<- runif(n = (108*108))
-#' r2 <- raster(nrows=108, ncols=108, xmn=-50, xmx=50)
-#' values(r2)<- runif(n = (108*108))
-#' env <- stack(r1,r2)
+#' r1 <- raster::raster(nrows=108, ncols=108, xmn=-50, xmx=50)
+#' raster::values(r1)<- runif(n = (108*108))
+#' r2 <-  raster::raster(nrows=108, ncols=108, xmn=-50, xmx=50)
+#' raster::values(r2)<- runif(n = (108*108))
+#' env <-  raster::stack(r1,r2)
 #' names(env) <- c("1995","1996")
 #' datedOccs <- data.frame(cbind(c(0,10), c(-10,15)))
 #' colnames(datedOccs) <- c("long", "lat")
 #' datedOccs$date <- c("1995", "1996")
-#' datedOccs$date <- parse_date_time(datedOccs$date, orders = c("Y", "Ym"))
-#' coordinates(datedOccs) <- c("long", "lat")
-#' projection(datedOccs) <- projection(env)
+#' datedOccs$date <- lubridate::parse_date_time(datedOccs$date, orders = c("Y", "Ym"))
+#' sp::coordinates(datedOccs) <- c("long", "lat")
+#' projection(datedOccs) <-  raster::projection(env)
 #' dateScale = "year"
 #' annotate(datedOccs = datedOccs, env = env, envDates = envDates, dateScale = dateScale)
 #' 

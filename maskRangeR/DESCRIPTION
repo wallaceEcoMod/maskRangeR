@@ -12,15 +12,16 @@ Description: Mask ranges based on expert
     generate a new map or to update an existing map.
     Methods include expert opinion and data-driven 
     tools to generate thresholds for binary masks.
-Depends: R (>= 3.4.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Depends: 
+    R (>= 3.4.0)
 Imports: 
     gdalUtils,
     dismo,
     dplyr,
-    e1071,
+    e1071, 
     lubridate,
     magrittr,
     maptools,

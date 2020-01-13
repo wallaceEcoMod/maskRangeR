@@ -6,8 +6,10 @@
 #' @details The function will download the data from a github repository as a zipped folder and will unzip it in the destination path specifies by 'path'
 #' See Examples.
 #' @param path character string representing the file pathway
-# @examples
-#'
+#' @examples
+#' \dontrun{
+#' getDemoData('~/Desktop')
+#' }
 #'
 #' @return saves demonstration data to the specified pathway.
 #' @author Peter Galante <pgalante@@amnh.org>,
