@@ -4,8 +4,13 @@
 \alias{maskRanger}
 \title{Make a matrix of modeling decisions to be used to specify clipping rules}
 \usage{
-maskRanger(potentialDist, initialDist = NULL, maskLayers, logicString,
-  method = "mask")
+maskRanger(
+  potentialDist,
+  initialDist = NULL,
+  maskLayers,
+  logicString,
+  method = "mask"
+)
 }
 \arguments{
 \item{potentialDist}{A raster stack of binary or continuous values. Supplying more than one layer will be interepreted as different time periods. Layers should follow the naming convention `Y2000`, `Y2001`, etc.}
@@ -16,11 +21,10 @@ maskRanger(potentialDist, initialDist = NULL, maskLayers, logicString,
 
 \item{logicString}{a character indicating the logical conditions to use for masking.}
 
-\item{method}{A list of strings defining methods to be used, in the same order as `rsList`. 
-If a single value is provided it will be applied to all rasters in `rsList`. Options include:
-\itemize{
- \item{mask}{mask cells with values outside the bounds}
-}}
+\item{method}{A list of strings defining methods to be used, in the same order as `rsList`. If a single value is provided it will be applied to all rasters in `rsList`. Options currently include only `mask` to mask cells with values outside the bounds.}
+}
+\value{
+a rasterstack
 }
 \description{
 Performs data driven masking of potential species distributions.
@@ -32,7 +36,31 @@ See Examples.
 To apply multiple masks, e.g., elevation and forest cover, use separate calls to maskRS.
 }
 \examples{
-\donttest{
+# Multiple Expert Maps
+# Generate random polygon
+coords <- dismo::randomPoints(sdm, 3)
+polyg <- sp::Polygon(coords)
+polyg <- sp::SpatialPolygons(list(sp::Polygons(list(polyg), ID = "a")))
+expertRaster <- raster::rasterize(polyg, r1)
+maskStack <- stack(env1, env2, env3)
+names(maskStack) <- c("env1", "env2", "env3")
+# Get list of tolerances for environmental data
+env1Vals <- quantile(values(env1), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
+env2Vals <- quantile(values(env2), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
+env3Vals <- quantile(values(env3), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
+maskBounds <- data.frame(rbind(cbind(env1Vals[[3]], env1Vals[[5]]), 
+                         cbind(env2Vals[[3]], env2Vals[[5]]),
+                         cbind(env3Vals[[3]], env3Vals[[5]])))
+maskBounds <- cbind(names(maskStack), maskBounds)
+colnames(maskBounds) <- c("Layer", "min", "max")
+# mask range by these tolerance masks
+realized <- lotsOfMasks(expertRaster, maskStack, maskBounds)
+plot(stack(realized))
+plot(realized$realizedDist)
+plot(polyg, add = T)
+par(op)
+\dontrun{
+# Here's a more realistic example
 op=par()
 ########## Forest Cover Mask 
 ###  Initiating data for use case # 1
@@ -43,7 +71,7 @@ datedOccs <- data.frame(dismo::randomPoints(r1, 5))
 # Pair dates (as years) with the occurrences
 datedOccs$date <- 2010:2014
 # convert dates to formal date objects
-datedOccs$date <- parse_date_time(datedOccs$date, orders = c("Y", "Ym"))
+datedOccs$date <- lubridate::parse_date_time(datedOccs$date, orders = c("Y", "Ym"))
 # Create values showing distance from random points to simulate suitability surface
 sdm <- raster::distanceFromPoints(r1, datedOccs[,1:2])
 # Create 5 different rasters as env data
@@ -76,31 +104,8 @@ plot(SDMmask, main = "Most recent env")
 plot(maskedDist[['SDM_maskMask']], main = "Mask + SDM")
 plot(sdm, add=T, col = c(grey(0,0), grey(0.4,0.7)))
 plot(maskedDist[[1]], col=c(grey(0.6), 'red1'), main = "Masked Distribution")
-
-##########  Multiple Expert Maps
-## Generate random polygon
-coords <- dismo::randomPoints(sdm, 3)
-polyg <- sp::Polygon(coords)
-polyg <- sp::SpatialPolygons(list(sp::Polygons(list(polyg), ID = "a")))
-expertRaster <- raster::rasterize(polyg, r1)
-maskStack <- stack(env1, env2, env3)
-names(maskStack) <- c("env1", "env2", "env3")
-# Get list of tolerances for environmental data
-env1Vals <- quantile(values(env1), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
-env2Vals <- quantile(values(env2), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
-env3Vals <- quantile(values(env3), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
-maskBounds <- data.frame(rbind(cbind(env1Vals[[3]], env1Vals[[5]]), 
-                         cbind(env2Vals[[3]], env2Vals[[5]]),
-                         cbind(env3Vals[[3]], env3Vals[[5]])))
-maskBounds <- cbind(names(maskStack), maskBounds)
-colnames(maskBounds) <- c("Layer", "min", "max")
-# mask range by these tolerance masks
-realized <- lotsOfMasks(expertRaster, maskStack, maskBounds)
-plot(stack(realized))
-plot(realized$realizedDist)
-plot(polyg, add = T)
-par(op)
 }
+
 }
 \author{
 Cory Merow <cory.merow@gmail.com>,

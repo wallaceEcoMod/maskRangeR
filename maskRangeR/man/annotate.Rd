@@ -15,6 +15,9 @@ annotate(datedOccs, env, envDates, dateScale)
 
 \item{dateScale}{string: 'year', 'month', or 'day'}
 }
+\value{
+a SpatialPointsDataFrame
+}
 \description{
 Annotate point data with rasters based on matching dates associated with points to dates associated with rasters. Specifically, we're thinking of the points as species observations and the rasters as remotely sensed environmental layers, but they can represent any points and rasters with dates.
 }
@@ -23,6 +26,24 @@ See Examples.
 }
 \note{
 To apply multiple masks, e.g., elevation and forest cover, use separate calls to maskRS.
+}
+\examples{
+
+r1 <- raster::raster(nrows=108, ncols=108, xmn=-50, xmx=50)
+raster::values(r1)<- runif(n = (108*108))
+r2 <-  raster::raster(nrows=108, ncols=108, xmn=-50, xmx=50)
+raster::values(r2)<- runif(n = (108*108))
+env <-  raster::stack(r1,r2)
+names(env) <- c("1995","1996")
+datedOccs <- data.frame(cbind(c(0,10), c(-10,15)))
+colnames(datedOccs) <- c("long", "lat")
+datedOccs$date <- c("1995", "1996")
+datedOccs$date <- lubridate::parse_date_time(datedOccs$date, orders = c("Y", "Ym"))
+sp::coordinates(datedOccs) <- c("long", "lat")
+projection(datedOccs) <-  raster::projection(env)
+dateScale = "year"
+annotate(datedOccs = datedOccs, env = env, envDates = envDates, dateScale = dateScale)
+
 }
 \author{
 Cory Merow <cory.merow@gmail.com>,

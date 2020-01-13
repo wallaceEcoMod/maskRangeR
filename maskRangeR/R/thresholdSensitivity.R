@@ -103,7 +103,7 @@ thresholdSensitivity <- function(datedOccs, maskLayer, maskClass, sdm, maskProje
     graphics::text(maskValues, sensitivityAreas, labels = nums, cex= 1, pos=3)
     # add legend
     graphics::legend(x = "topleft", col = colPal, legend = names(sensitivityStack), pch = 19, cex=0.7)
-    print(cbind(maskValues, sensitivityAreas))
+    #print(cbind(maskValues, sensitivityAreas))
     sensitivityReturns <- NULL
     return(list(sensitivityStack, cbind(maskValues, sensitivityAreas)))
   }

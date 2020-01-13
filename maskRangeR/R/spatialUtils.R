@@ -26,7 +26,7 @@
 #' crt <- maskRangeR::cropResampleTrim(expertMap,maskListRaw)
 #' }
 #'
-# @return
+#' @return a list
 #' @author Cory Merow <cory.merow@@gmail.com>,
 # @note 
 # @seealso

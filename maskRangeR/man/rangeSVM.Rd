@@ -45,11 +45,7 @@ rasters. These extra predictors can be based on predictions from a species distr
 suitability, depending on the variables used in the SDM.
 }
 \examples{
-\donttest{
-op <- par(no.readonly=TRUE)
-########## Masking by biotic interactions
-### Initiating data for use case # 4
-## Generate some species occurrence records
+
 r1.sdm <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
 values(r1.sdm) <- (1:ncell(r1.sdm))^2
 r2.sdm <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
@@ -57,7 +53,7 @@ values(r2.sdm) <- (ncell(r2.sdm):1)^2
 r3.sdm <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
 r3.sdm [1] <- 10
 r3.sdm <- raster::distance(r3.sdm)
-sp1.xy <- data.frame(randomPoints(r1.sdm, 15, prob = T))
+sp1.xy <- data.frame(dismo::randomPoints(r1.sdm, 15, prob = T))
 colnames(sp1.xy) <- c("longitude", "latitude")
 sp2.xy <- data.frame(randomPoints(r2.sdm, 15, prob = T))
 colnames(sp2.xy) <- c("longitude", "latitude")
@@ -67,63 +63,5 @@ colnames(sp3.xy) <- c("longitude", "latitude")
 svm.SP <- rangeSVM(sp1.xy, sp2.xy, sp3.xy, nrep=10)
 # Use SVM to create a raster of predicted regions
 rand_svm.SP <- rangeSVM_predict(svm = svm.SP, r = r1.sdm)
-# Plot the results
-plot(rand_svm.SP, col=c("yellow","pink","lightblue"))
-points(sp1.xy, pch = 20, cex = 0.75, col = "orange")
-points(sp2.xy, pch = 20, cex = 0.75, col = "green")
-points(sp3.xy, pch = 20, cex = 0.75, col = "blue")
-# We can use this SVM as a mask over our original SDM predictions.
-# masked SDM predictions for variegatus
-sp1_svm.SP <- rand_svm.SP == 1
-sp1_svm.SP[sp1_svm.SP == 0] <- NA
-sp1_svmSP_mask <- mask(r1.sdm, sp1_svm.SP)
-# masked SDM predictions for tridactylus
-sp2_svm.SP <- rand_svm.SP == 2
-sp2_svm.SP[sp2_svm.SP == 0] <- NA
-sp2_svmSP_mask <- mask(r2.sdm, sp2_svm.SP)
-# masked SDM predictions for torquatus
-sp3_svm.SP <- rand_svm.SP == 3
-sp3_svm.SP[sp3_svm.SP == 0] <- NA
-sp3_svmSP_mask <- mask(r3.sdm, sp3_svm.SP)
-##Plot the predicted realized distributions for each species.
-# Create 3-panel figure
-par(mfrow = c(1,3))
-plot(sp1_svmSP_mask)
-plot(sp2_svmSP_mask)
-plot(sp3_svmSP_mask)
-## Hybrid SVMs
-# Create SVM
-svmHYB <- rangeSVM(sp1.xy, sp2.xy, sp3.xy, 
-                   sdm = raster::stack(r1.sdm, r2.sdm, r3.sdm), 
-                   nrep = 10)
-# Use SVM to create a raster of predicted regions
-rand_svmHYB <- rangeSVM_predict(svm = svmHYB, 
-                                r = r1.sdm, 
-                                sdm = raster::stack(r1.sdm, r2.sdm, r3.sdm))
-## Plot the SVM results.
-plot(rand_svmHYB, col=c("yellow","pink","lightblue"))
-points(sp1.xy, pch = 20, cex = 0.75, col = "orange")
-points(sp2.xy, pch = 20, cex = 0.75, col = "green")
-points(sp3.xy, pch = 20, cex = 0.75, col = "blue")
-## Use the hybrid SVM as a mask over our SDM predictions.
-# masked SDM predictions 
-sp1_svmHYB <- rand_svmHYB == 1
-sp1_svmHYB[rand_svmHYB == 0] <- NA
-sp1_svmHYB_mask <- mask(r1.sdm, sp1_svmHYB)
-# masked SDM predictions for tridactylus
-sp2_svmHYB <- rand_svmHYB == 2
-sp2_svmHYB[sp2_svmHYB == 0] <- NA
-sp2_svmHYB_mask <- mask(r2.sdm, sp2_svmHYB)
-# masked SDM predictions for torquatus
-sp3_svmHYB <- rand_svmHYB == 3
-sp3_svmHYB[sp3_svmHYB == 0] <- NA
-sp3_svmHYB_mask <- mask(r3.sdm, sp3_svmHYB)
-## Plot the predicted realized distributions for each species.
-# Create 3-panel figure
-par(mfrow = c(1,3))
-plot(sp1_svmHYB_mask)
-plot(sp2_svmHYB_mask)
-plot(sp3_svmHYB_mask)
-par(op)
-}
+
 }

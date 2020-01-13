@@ -13,10 +13,10 @@ focalCompare(layer, windowSizes, fun, mc.cores = 1)
 
 \item{fun}{The function fun should take multiple numbers, and return a single number. For example mean, modal, min or max. It should also accept a na.rm argument (or ignore it, e.g. as one of the 'dots' arguments. For example, length will fail, but function(x, ...){na.omit(length(x))} works. (Specifications from `raster::focal`)}
 
-\item{mc.cores}{Number of cores for (optional) parallelization
-r <- raster(ncols=36, nrows=18, xmn=0)
-r[] <- runif(ncell(r)) 
-r15 <- focalCompare(r, windowSizes = c(1:5),mc.cores=1,fun=mean)}
+\item{mc.cores}{Number of cores for (optional) parallelization}
+}
+\value{
+Raster object
 }
 \description{
 Aids in exploring how different focal regions may affect masks.
@@ -26,6 +26,11 @@ See Examples.
 }
 \note{
 This may be particularly useful if for mobile species when their movement patterns cover a much larger extent than the single cell in which they were observed.
+}
+\examples{
+r <- raster(ncols=36, nrows=18, xmn=0)
+r[] <- runif(ncell(r)) 
+r15 <- focalCompare(r, windowSizes = c(1:5),mc.cores=1,fun=mean) 
 }
 \author{
 Cory Merow <cory.merow@gmail.com>,

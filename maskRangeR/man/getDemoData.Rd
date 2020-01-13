@@ -9,6 +9,9 @@ getDemoData(path)
 \arguments{
 \item{path}{character string representing the file pathway}
 }
+\value{
+saves demonstration data to the specified pathway.
+}
 \description{
 Canned datasets of real case studies for examples to follow along with the vignette
 }
@@ -18,6 +21,12 @@ See Examples.
 }
 \note{
 These data were to large to serve on CRAN, so this convenience function finds and downloads them automatically.
+}
+\examples{
+\dontrun{
+getDemoData('~/Desktop')
+}
+
 }
 \author{
 Peter Galante <pgalante@amnh.org>,

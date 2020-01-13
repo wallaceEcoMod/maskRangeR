@@ -25,7 +25,7 @@ Compare how masks of climate tolerances affect predicted area
 See Examples.
 }
 \examples{
-See 'lotsOfMasks' and 'maskRanger' examples
+#See lotsOfMasks and maskRanger examples
 
 }
 \author{

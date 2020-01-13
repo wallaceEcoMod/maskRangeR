@@ -11,6 +11,9 @@ cropResampleTrim(expertMap, maskListRaw)
 
 \item{maskListRaw}{A list of rasters, each corresponding to layers from which masks will eventually be made (in another function).}
 }
+\value{
+a list
+}
 \description{
 Obtain the same extents and resample to the finest resolution layer.
 }
