@@ -29,7 +29,7 @@
 #' 
 #' @return a SpatialPointsDataFrame
 #' @author Cory Merow <cory.merow@@gmail.com>,
-#' @note To apply multiple masks, e.g., elevation and forest cover, use separate calls to maskRS.
+# @note To apply multiple masks, e.g., elevation and forest cover, use separate calls to maskRS.
 # @seealso
 # @references
 # @aliases - a list of additional topic names that will be mapped to
