@@ -23,15 +23,15 @@ Based on a potential distribution, environmental rasters, and bounds for suitabl
 See Examples.
 }
 \examples{
-r1 <- raster(nrows=108, ncols=21, xmn=0, xmx=10)
-values(r1)<- sort(runif(n = (108*21)))
+r1 <- raster::raster(nrows=108, ncols=21, xmn=0, xmx=10)
+raster::values(r1)<- sort(runif(n = (108*21)))
 r1[r1>0.5] <- 1
 r1[r1<0.5] <- 0
-r2 <- raster(nrows=108, ncols=21, xmn=0, xmx=10)
-values(r2) <- runif(n=(108*21))
-r3 <- raster(nrows=108, ncols=21, xmn=0, xmx=10)
-values(r3) <- runif(n=(108*21))
-maskStack <- stack(r2, r3)
+r2 <- raster::raster(nrows=108, ncols=21, xmn=0, xmx=10)
+raster::values(r2) <- runif(n=(108*21))
+r3 <- raster::raster(nrows=108, ncols=21, xmn=0, xmx=10)
+raster::values(r3) <- runif(n=(108*21))
+maskStack <- raster::stack(r2, r3)
 names(maskStack) <- c("r2", "r3")
 minbounds <- c(0.3, 0.4)
 maxbounds <- c(0.4, 0.5)

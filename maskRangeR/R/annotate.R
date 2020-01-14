@@ -22,8 +22,9 @@
 #' datedOccs$date <- c("1995", "1996")
 #' datedOccs$date <- lubridate::parse_date_time(datedOccs$date, orders = c("Y", "Ym"))
 #' sp::coordinates(datedOccs) <- c("long", "lat")
-#' projection(datedOccs) <-  raster::projection(env)
+#' raster::projection(datedOccs) <-  raster::projection(env)
 #' dateScale = "year"
+#' envDates <- c("1995","1996")
 #' annotate(datedOccs = datedOccs, env = env, envDates = envDates, dateScale = dateScale)
 #' 
 #' @return a SpatialPointsDataFrame
@@ -53,10 +54,10 @@ annotate=function(datedOccs,
     form="%Y-%m-%d"
   } else { stop('Choose a supported value for dateScale: year, month or day')}
   
-  datedOccs$myDate=format(datedOccs$date,form)
+  datedOccs$myDate=format(datedOccs$date,format = form)
   uniqueDates=stats::na.omit(unique(datedOccs$myDate))
-  myEnvDates=format(envDates,form)
-  datedOccs$uniqueID=1:nrow(datedOccs) # to put things in the same order in the output as they ahd in the input
+  myEnvDates=format(envDates, format = form)
+  datedOccs$uniqueID=1:nrow(datedOccs) # to put things in the same order in the output as they had in the input
   uniqueDates=sort(uniqueDates)
   
   out=lapply(seq_along(uniqueDates),function(x,datedOccs,myEnvDates,env){

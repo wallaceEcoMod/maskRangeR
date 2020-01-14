@@ -40,8 +40,9 @@ colnames(datedOccs) <- c("long", "lat")
 datedOccs$date <- c("1995", "1996")
 datedOccs$date <- lubridate::parse_date_time(datedOccs$date, orders = c("Y", "Ym"))
 sp::coordinates(datedOccs) <- c("long", "lat")
-projection(datedOccs) <-  raster::projection(env)
+raster::projection(datedOccs) <-  raster::projection(env)
 dateScale = "year"
+envDates <- c("1995","1996")
 annotate(datedOccs = datedOccs, env = env, envDates = envDates, dateScale = dateScale)
 
 }

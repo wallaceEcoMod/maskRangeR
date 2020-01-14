@@ -11,8 +11,8 @@
 #' @param mc.cores Number of cores for (optional) parallelization
 
 #' @examples
-#' r <- raster(ncols=36, nrows=18, xmn=0)
-#' r[] <- runif(ncell(r)) 
+#' r <- raster::raster(ncols=36, nrows=18, xmn=0)
+#' r[] <- runif(raster::ncell(r)) 
 #' r15 <- focalCompare(r, windowSizes = c(1:5),mc.cores=1,fun=mean) 
 #' @return Raster object
 #' @author Cory Merow <cory.merow@@gmail.com>,

@@ -16,28 +16,34 @@
 #' @examples
 #' # Multiple Expert Maps
 #' # Generate random polygon
+#' env1 <- raster::raster(nrows=108, ncols=21, xmn=0, xmx=10)
+#' env2 <- raster::raster(nrows=108, ncols=21, xmn=0, xmx=10)
+#' env3 <- raster::raster(nrows=108, ncols=21, xmn=0, xmx=10)
+#' raster::values(env1)<- sort(runif(n = (108*21)))  
+#' raster::values(env2)<- runif(n = (108*21))
+#' raster::values(env3)<- runif(n = (108*21))
+#' sdm <- raster::raster(nrows=108, ncols=21, xmn=0, xmx=10)
+#' raster::values(sdm)<- sort(runif(n = (108*21)))  
 #' coords <- dismo::randomPoints(sdm, 3)
 #' polyg <- sp::Polygon(coords)
 #' polyg <- sp::SpatialPolygons(list(sp::Polygons(list(polyg), ID = "a")))
-#' expertRaster <- raster::rasterize(polyg, r1)
-#' maskStack <- stack(env1, env2, env3)
+#' expertRaster <- raster::rasterize(polyg, sdm)
+#' maskStack <-raster:: stack(env1, env2, env3)
 #' names(maskStack) <- c("env1", "env2", "env3")
 #' # Get list of tolerances for environmental data
-#' env1Vals <- quantile(values(env1), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
-#' env2Vals <- quantile(values(env2), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
-#' env3Vals <- quantile(values(env3), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), na.rm = T)
+#' env1Vals <- quantile(raster::values(env1), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), 
+#'                      na.rm = TRUE)
+#' env2Vals <- quantile(raster::values(env2), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), 
+#'                      na.rm = TRUE)
+#' env3Vals <- quantile(raster::values(env3), prob = c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1), 
+#'                      na.rm = TRUE)
 #' maskBounds <- data.frame(rbind(cbind(env1Vals[[3]], env1Vals[[5]]), 
-#'                          cbind(env2Vals[[3]], env2Vals[[5]]),
-#'                          cbind(env3Vals[[3]], env3Vals[[5]])))
+#'                                cbind(env2Vals[[3]], env2Vals[[5]]),
+#'                                cbind(env3Vals[[3]], env3Vals[[5]])))
 #' maskBounds <- cbind(names(maskStack), maskBounds)
 #' colnames(maskBounds) <- c("Layer", "min", "max")
 #' # mask range by these tolerance masks
 #' realized <- lotsOfMasks(expertRaster, maskStack, maskBounds)
-#' plot(stack(realized))
-#' plot(realized$realizedDist)
-#' plot(polyg, add = T)
-#' par(op)
-
 #' \dontrun{
 #' # Here's a more realistic example
 #' op=par()
@@ -138,15 +144,15 @@ maskRanger=function(potentialDist,
 #' @param maskStack A stack of *named* layers from which masks will be made
 #' @param maskBounds A data.frame with columns indicating the layer name (matching the names in maskStack), and the min and max values of that layer to be used for masking.
 #' @examples
-#' r1 <- raster(nrows=108, ncols=21, xmn=0, xmx=10)
-#' values(r1)<- sort(runif(n = (108*21)))
+#' r1 <- raster::raster(nrows=108, ncols=21, xmn=0, xmx=10)
+#' raster::values(r1)<- sort(runif(n = (108*21)))
 #' r1[r1>0.5] <- 1
 #' r1[r1<0.5] <- 0
-#' r2 <- raster(nrows=108, ncols=21, xmn=0, xmx=10)
-#' values(r2) <- runif(n=(108*21))
-#' r3 <- raster(nrows=108, ncols=21, xmn=0, xmx=10)
-#' values(r3) <- runif(n=(108*21))
-#' maskStack <- stack(r2, r3)
+#' r2 <- raster::raster(nrows=108, ncols=21, xmn=0, xmx=10)
+#' raster::values(r2) <- runif(n=(108*21))
+#' r3 <- raster::raster(nrows=108, ncols=21, xmn=0, xmx=10)
+#' raster::values(r3) <- runif(n=(108*21))
+#' maskStack <- raster::stack(r2, r3)
 #' names(maskStack) <- c("r2", "r3")
 #' minbounds <- c(0.3, 0.4)
 #' maxbounds <- c(0.4, 0.5)

@@ -29,17 +29,17 @@
 #' @examples
 #' 
 #' r1.sdm <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
-#' values(r1.sdm) <- (1:ncell(r1.sdm))^2
+#' raster::values(r1.sdm) <- (1:raster::ncell(r1.sdm))^2
 #' r2.sdm <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
-#' values(r2.sdm) <- (ncell(r2.sdm):1)^2
+#' raster::values(r2.sdm) <- (raster::ncell(r2.sdm):1)^2
 #' r3.sdm <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
 #' r3.sdm [1] <- 10
 #' r3.sdm <- raster::distance(r3.sdm)
-#' sp1.xy <- data.frame(dismo::randomPoints(r1.sdm, 15, prob = T))
+#' sp1.xy <- data.frame(dismo::randomPoints(r1.sdm, 15, prob = TRUE))
 #' colnames(sp1.xy) <- c("longitude", "latitude")
-#' sp2.xy <- data.frame(randomPoints(r2.sdm, 15, prob = T))
+#' sp2.xy <- data.frame(dismo::randomPoints(r2.sdm, 15, prob = TRUE))
 #' colnames(sp2.xy) <- c("longitude", "latitude")
-#' sp3.xy <- data.frame(randomPoints(r3.sdm, 15, prob = T))
+#' sp3.xy <- data.frame(dismo::randomPoints(r3.sdm, 15, prob = TRUE))
 #' colnames(sp3.xy) <- c("longitude", "latitude")
 #' # Spatial SVMs
 #' svm.SP <- rangeSVM(sp1.xy, sp2.xy, sp3.xy, nrep=10)
