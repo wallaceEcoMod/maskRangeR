@@ -24,9 +24,6 @@ Annotate point data with rasters based on matching dates associated with points 
 \details{
 See Examples.
 }
-\note{
-To apply multiple masks, e.g., elevation and forest cover, use separate calls to maskRS.
-}
 \examples{
 
 r1 <- raster::raster(nrows=108, ncols=108, xmn=-50, xmx=50)

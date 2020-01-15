@@ -62,6 +62,5 @@ colnames(sp3.xy) <- c("longitude", "latitude")
 # Spatial SVMs
 svm.SP <- rangeSVM(sp1.xy, sp2.xy, sp3.xy, nrep=10)
 # Use SVM to create a raster of predicted regions
-rand_svm.SP <- rangeSVM_predict(svm = svm.SP, r = r1.sdm)
 
 }

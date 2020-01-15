@@ -21,23 +21,16 @@ Obtain the same extents and resample to the finest resolution layer.
 See Examples.
 }
 \examples{
-\dontrun{
-# please see complete example in the maskRangeR_tutorial vignette
-expertMap <- readOGR(paste0(dataDir,'IUCNshape/data_0.shp'))
-maskListRaw <- list(treeCover = 
-raster(paste0(dataDir,'/Hansen_percent_treecover.tif')), 
-dem = raster(paste0(dataDir,'/DEM.tif')),
-mat = raster(paste0(dataDir,'/MATsingapore.tif')),
-pH = raster(paste0(dataDir,'/PHIHOX_M_sl1_250m.tif')))
-# define the limits for each mask
-maskBounds <- read.csv(paste0(dataDir,'/crabInfo.csv'))
-# rename the limits to match the raster names in maskListRaw
-maskBounds$Layer <- c('water','treeCover','dem','pH','mat')
-# make sure the units match between the layers and the bounds
-maskListRaw$mat <- maskListRaw$mat/10
-maskListRaw$pH <- maskListRaw$pH/10
-crt <- maskRangeR::cropResampleTrim(expertMap,maskListRaw)
-}
+r1 <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
+raster::values(r1) <- (1:raster::ncell(r1))^2
+coords <- dismo::randomPoints(r1, 4)
+polyg <- sp::SpatialPolygons(list(sp::Polygons(list(sp::Polygon(coords)),1)))
+r2 <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
+raster::values(r2) <- (1:raster::ncell(r2))^3
+r3 <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
+raster::values(r3) <- (1:raster::ncell(r3))^0.5
+maskListRaw <- list(r1, r2, r3)
+cropResampleTrim(expertMap = polyg, maskListRaw = maskListRaw)
 
 }
 \author{

@@ -27,15 +27,21 @@ The values of the output raster are 1, 2, ..., corresponding to xy1, xy2, and an
 These values represent the identities of the species.
 }
 \examples{
-\donttest{
-# raster prediction for xy SVM (spatial)
-svm.xy <- rangeSVM(xy1, xy2)
-svm.xy.r <- rangeSVM_predict(svm.xy, r)
-plot(svm.xy.r)
-
-# raster prediction for xyEnv SVM (spatial + SDM predictions)
-svm.xyEnv <- rangeSVM(xy1, xy2, raster::stack(sdm1, sdm2))
-svm.xyEnv.r <- rangeSVM_predict(svm.xyEnv, r, raster::stack(sdm1, sdm2))
-plot(svm.xyEnv.r)
-}
+r1.sdm <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
+raster::values(r1.sdm) <- (1:raster::ncell(r1.sdm))^2
+r2.sdm <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
+raster::values(r2.sdm) <- (raster::ncell(r2.sdm):1)^2
+r3.sdm <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
+r3.sdm [1] <- 10
+r3.sdm <- raster::distance(r3.sdm)
+sp1.xy <- data.frame(dismo::randomPoints(r1.sdm, 15, prob = TRUE))
+colnames(sp1.xy) <- c("longitude", "latitude")
+sp2.xy <- data.frame(dismo::randomPoints(r2.sdm, 15, prob = TRUE))
+colnames(sp2.xy) <- c("longitude", "latitude")
+sp3.xy <- data.frame(dismo::randomPoints(r3.sdm, 15, prob = TRUE))
+colnames(sp3.xy) <- c("longitude", "latitude")
+# Spatial SVMs
+svm.SP <- rangeSVM(sp1.xy, sp2.xy, sp3.xy, nrep=10)
+# Use SVM to create a raster of predicted regions
+rand_svm.SP <- rangeSVM_predict(svm = svm.SP, r = r1.sdm)
 }
