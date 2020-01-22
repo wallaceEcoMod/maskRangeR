@@ -62,7 +62,7 @@ annotate=function(datedOccs,
   
   out=lapply(seq_along(uniqueDates),function(x,datedOccs,myEnvDates,env){
     pts=datedOccs[which(datedOccs$myDate==uniqueDates[x]),]
-    print(pts$uniqueID)
+    #print(pts$uniqueID)
     keep=match(uniqueDates[x],myEnvDates)
     if(is.na(keep)) {
       message(paste0('Environmental layers were missing for date ',uniqueDates[x]) )
