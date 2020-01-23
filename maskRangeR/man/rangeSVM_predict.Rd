@@ -27,6 +27,7 @@ The values of the output raster are 1, 2, ..., corresponding to xy1, xy2, and an
 These values represent the identities of the species.
 }
 \examples{
+\donttest{
 r1.sdm <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
 raster::values(r1.sdm) <- (1:raster::ncell(r1.sdm))^2
 r2.sdm <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
@@ -44,4 +45,5 @@ colnames(sp3.xy) <- c("longitude", "latitude")
 svm.SP <- rangeSVM(sp1.xy, sp2.xy, sp3.xy, nrep=10)
 # Use SVM to create a raster of predicted regions
 rand_svm.SP <- rangeSVM_predict(svm = svm.SP, r = r1.sdm)
+}
 }

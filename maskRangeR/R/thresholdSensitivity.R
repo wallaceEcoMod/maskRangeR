@@ -19,12 +19,7 @@
 #' @author Peter Galante <pgalante@@amnh.org>
 #' @export
 
-## add swmap crab, olinguito
-########################
-## testing
-#test <- thresholdSensitivity(datedOccs, maskLayer, maskClass = "userSpecified", sdm=sdm, 
-#                         maskProjection = "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6378140 +b=6356750 +units=m +no_defs", 
-#                         maskVal = seq(0, 100, length.out =500))
+
 ########################
 
 thresholdSensitivity <- function(datedOccs, maskLayer, maskClass, sdm, maskProjection = NULL, maskVal = NULL, selectedValue = NULL){

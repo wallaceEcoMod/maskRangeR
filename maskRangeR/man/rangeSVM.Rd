@@ -45,7 +45,7 @@ rasters. These extra predictors can be based on predictions from a species distr
 suitability, depending on the variables used in the SDM.
 }
 \examples{
-
+\donttest{
 r1.sdm <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
 raster::values(r1.sdm) <- (1:raster::ncell(r1.sdm))^2
 r2.sdm <- raster::raster(raster::extent(c(-72, -64, 41, 50)), res = c(0.008333333, 0.008333333))
@@ -61,5 +61,6 @@ sp3.xy <- data.frame(dismo::randomPoints(r3.sdm, 15, prob = TRUE))
 colnames(sp3.xy) <- c("longitude", "latitude")
 # Spatial SVMs
 svm.SP <- rangeSVM(sp1.xy, sp2.xy, sp3.xy, nrep=5) # more reps are recommended
+}
 
 }
