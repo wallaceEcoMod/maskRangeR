@@ -83,6 +83,8 @@ thresholdSensitivity <- function(datedOccs, maskLayer, maskClass, sdm, maskProje
     names(sensitivityStack) <- paste0("threshold_of_", maskValues)
     sensitivityStack <- raster::stack(sensitivityStack)
    # grDevices::dev.new()
+    oldpar <- par(no.readonly = TRUE)
+    on.exit(par(oldpar))  
     graphics::par(mfrow=c(2,(length(stringsOfLogic)/2)+1))
     colPal <- grDevices::rainbow(5)
     lapply(names(sensitivityStack), function(x) raster::plot(sensitivityStack[[x]], main = x, xlab = "long", ylab = "lat"))

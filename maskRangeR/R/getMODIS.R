@@ -16,7 +16,7 @@
 #' simulateData()
 #' getModis(localSavePath = '', datedOccs, dateScale = "year", dataset = "Percent tree cover")
 #' }
-#' @return Saves rastersto specified path
+#' @return Saves rasters to specified path
 #' @author Peter Galante <pgalante@@amnh.org>,
 #' 
 # @seealso

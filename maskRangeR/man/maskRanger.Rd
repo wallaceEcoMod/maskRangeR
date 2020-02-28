@@ -66,7 +66,7 @@ maskBounds <- cbind(names(maskStack), maskBounds)
 colnames(maskBounds) <- c("Layer", "min", "max")
 # mask range by these tolerance masks
 realized <- lotsOfMasks(expertRaster, maskStack, maskBounds)
-\dontrun{
+\donttest{
 # Here's a more realistic example
 op=par()
 ########## Forest Cover Mask 

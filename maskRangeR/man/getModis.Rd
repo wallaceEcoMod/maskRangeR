@@ -16,7 +16,7 @@ getModis(localSavePath, datedOccs, dateScale, dataset)
 \item{dataset}{MODIS product of interest. Available are: “Percent tree cover”, “Percent nontree vegetation”, “Percent nonvegetated”, “Quality”, “Percent tree cover 50”, “Percent nonvegetated sd”}
 }
 \value{
-Saves rastersto specified path
+Saves rasters to specified path
 }
 \description{
 Accesses yearly (2000 - 2017) MODIS products based on geographic location and date
