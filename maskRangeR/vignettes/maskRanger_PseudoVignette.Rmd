@@ -1,6 +1,6 @@
 ---
 title: "maskRangeR: Improving spatial and temporal accuracy of species distribution models"
-author: "Cory Merow, Peter J. Galante, Cecina Babich Morrow, Jamie M. Kass, Alex Moore, Valentina Grisales-Betancur, Jorge Velasquez, Robert P. Anderson, Mary E. Blair"
+author: "Cory Merow, Peter J. Galante, Cecina Babich Morrow, Jamie M. Kass, Alex Moore, Valentina Grisales-Betancur, Beth Gerstner, Jorge Velasquez, Robert P. Anderson, Mary E. Blair"
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
