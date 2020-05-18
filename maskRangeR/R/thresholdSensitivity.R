@@ -80,7 +80,7 @@ thresholdSensitivity <- function(datedOccs, maskLayer, maskClass, sdm, maskProje
     ## Plotting each mask and one plot of area vs threshold
     # area vs. threshold
     maskValues <- gsub(".*<","",stringsOfLogic)
-    names(sensitivityStack) <- paste0("threshold_of_", maskValues)
+    names(sensitivityStack) <- paste0("threshold_of_", rev(maskValues))
     sensitivityStack <- raster::stack(sensitivityStack)
    # grDevices::dev.new()
     oldpar <- par(no.readonly = TRUE)
@@ -92,6 +92,7 @@ thresholdSensitivity <- function(datedOccs, maskLayer, maskClass, sdm, maskProje
     
     graphics::plot(maskValues, sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19, type= "l")
     graphics::points(maskValues, sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19)
+    axis(labels=NA,side=1,tck=-0.015,at=maskValues)
     # Get values to add to plot
     nums <- gsub(".*= ", "", sensitivityAreas)
     nums <- gsub( ").*$", "", nums)
