@@ -90,8 +90,8 @@ thresholdSensitivity <- function(datedOccs, maskLayer, maskClass, sdm, maskProje
     lapply(names(sensitivityStack), function(x) raster::plot(sensitivityStack[[x]], main = x, xlab = "long", ylab = "lat"))
     #### for here allow for all threshold values, but only plot some maps
     
-    graphics::plot(maskValues, sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19, type= "l")
-    graphics::points(maskValues, sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19)
+    graphics::plot(rev(maskValues), sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19, type= "l")
+    graphics::points(rev(maskValues), sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19)
     axis(labels=NA,side=1,tck=-0.015,at=maskValues)
     # Get values to add to plot
     nums <- gsub(".*= ", "", sensitivityAreas)
