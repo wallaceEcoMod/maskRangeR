@@ -6,9 +6,9 @@
 #' @description Performs data driven masking of potential species distributions.
 #' @details
 #' See Examples.
-#' @param initialDist A raster showing a previously created optimally tuned SDM
-#' @param potentialDist A raster stack of binary or continuous values. Supplying more than one layer will be interepreted as different time periods. Layers should follow the naming convention `Y2000`, `Y2001`, etc.
-#' @param maskLayers A single raster or a raster stack. If a single raster, the same mask will be applied to each layer of `potentialDist`. If a stack it must have the same number of layers as potentialDist, and each layer corresponds to a different time period.
+#' @param initialDist A raster showing a previously created optimally tuned SDM. Must have same extent and resolution as maskLayers.
+#' @param potentialDist A raster stack of binary or continuous values. Supplying more than one layer will be interepreted as different time periods. Layers should follow the naming convention `Y2000`, `Y2001`, etc. Must have same extent and resolution as maskLayers.
+#' @param maskLayers A single raster or a raster stack. If a single raster, the same mask will be applied to each layer of `potentialDist`. If a stack it must have the same number of layers as potentialDist, and each layer corresponds to a different time period. Must have same extent and resolution as initialDist.
 #' @param logicString a character indicating the logical conditions to use for masking.
 # @param rsLower A list of lower bounds of suitable values in the same order as `rsList`
 # @param rsUpper A list of upper bounds of suitable values in the same order as `rsList`

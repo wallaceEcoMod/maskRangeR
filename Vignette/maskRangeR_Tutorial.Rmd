@@ -68,7 +68,7 @@ The Olinguito (*Bassaricyon neblina*) is a new species of carnivore described in
 
 A 30 arc-second Bioclimatic-variable climate-based Maxent [1] SDM was tuned for the Olinguito using a mix of historical data paired with field notes, as well as contemporary citizen science records associated with photo-vouchers. The model was trained on 0.7 degree buffered circles around occurrence records and then projected to a 5-degree bounding box around occurrence records. We then removed areas from the SDM representing biogeographic regions where the species has not been documented, like the Eastern Cordillera of Colombia and other small non-contiguous areas.
 
-Next, we used remotely sensed data of the annual percent forest cover for the region (MODIS Vegetation Continuous Fields; 250 m from the years matching the most recent occurrence records: 2006-2016). The MODIS rasters from different years were not all aligned with one another and had to be realigned to create a raster stack. A subset of the more recent occurrence records (2006-2016) were then temporally matched with the forest cover rasters to obtain values of forest cover per occurrence (one record was excluded because it was based on an observation that stemmed from a likely roadkilled specimen [2]). The forest cover values at occurrence records were then assessed across all years, and the 25th quantile forest cover level was used to generate a forest cover mask for the most recent year (2010). After resampling the SDM to match the resolution of the MODIS data, we applied this forest cover mask to reduce the SDM’s spatial prediction to only those climatically suitable areas where forest cover is above the threshold. This reduced model shows a conservative estimation of the species range given current non-climatic variables that represent anthropogenic modification of land cover.
+Next, we used remotely sensed data of the annual percent forest cover for the region (MODIS Vegetation Continuous Fields; 250 m from the years matching the most recent occurrence records: 2006-2016). The MODIS rasters from different years were not all aligned with one another and had to be realigned to create a raster stack. A subset of the more recent occurrence records (2006-2016) were then temporally matched with the forest cover rasters to obtain values of forest cover per occurrence (one record was excluded because it was based on an observation that stemmed from a likely roadkilled specimen [2]). The forest cover values at occurrence records were then assessed across all years, and the 25th quantile forest cover level was used to generate a forest cover mask for the most recent year (2010). After resampling (e.g., making the resolutions match) the SDM to match the resolution of the MODIS data, we applied this forest cover mask to reduce the SDM’s spatial prediction to only those climatically suitable areas where forest cover is above the threshold. This reduced model shows a conservative estimation of the species range given current non-climatic variables that represent anthropogenic modification of land cover.
 
 ## References
 
@@ -109,7 +109,7 @@ library(lubridate)
 ```
 
 
-Read in the environmental and occurrence data.
+Read in the environmental and occurrence data. These can be dated yearly, monthly, or daily, but must match between dated occurrence records and dated recent environmental data.
 
 ```{r, eval = F}
 dateScale <- "year" # or "month", "day"
@@ -121,6 +121,8 @@ sdm <- raster(paste0(dataDir,'olinguito_SDM.tif'))
 # crop climate data to study region
 env <- crop(env, extent(sdm))
 ```
+
+NOTE: SDM was resampled to match the resolution of MODIS remotely sensed data.
 
 ```{r, include=F}
 dateScale <- "year" # or "month", "day"
@@ -141,6 +143,13 @@ coordinates(datedOccs) <- c('long','lat')
 projection(datedOccs) <- projection(env)
 ```
 
+Ensure coordinate reference system, extent, and resolution are the same.
+```{r}
+identical(crs(sdm), crs(env))
+identical(extent(sdm), extent(env))
+identical(res(sdm), res(env))
+```
+
 To perform data-driven masking, first find the values of the environmental variable (forest cover in this example) at the occurrence point locations.
 
 ```{r}
@@ -156,6 +165,9 @@ datedOccs <- maskRangeR::annotate(datedOccs, env, envDates, dateScale)
 Then find a suitable lower limit for the mask based on the data.
 
 ```{r}
+## Take a look at the forest cover values at each occurrence point
+sort(datedOccs$env)
+## Use quantiles to find a suitable lower limit
 (bounds <- quantile(datedOccs$env,prob=c(0,.025,.25,.5,.75,.975,1),na.rm=T))
 ```
 
@@ -376,8 +388,7 @@ expertMap <- readOGR(paste0(dataDir,'IUCNshape/data_0.shp'))
 #masks
 maskListRaw <- list(treeCover = raster(paste0(dataDir,'/Hansen_percent_treecover.tif')), 
                     dem = raster(paste0(dataDir,'/DEM.tif')),
-                    mat = raster(paste0(dataDir,'/MATsingapore.tif')),
-                    pH = raster(paste0(dataDir,'/PHIHOX_M_sl1_250m.tif')))
+                    water = raster(paste0(dataDir,'/standWaterPercent_cropAgg.tif')))
 
 # define the limits for each mask
 maskBounds <- read.csv(paste0(dataDir,'/crabInfo.csv'))
@@ -386,16 +397,23 @@ maskBounds <- read.csv(paste0(dataDir,'/crabInfo.csv'))
 ```{r, include=F}
 expertMap <- readRDS(paste0(path, "/extdata/expertMap.RDS"))
 maskListRaw <- readRDS(paste0(path, "/extdata/maskListRaw.RDS"))
+maskListRaw$pH <- NULL
+maskListRaw <- maskListRaw[1:3]
+
 maskBounds <- readRDS(paste0(path, "/extdata/maskBounds.RDS"))
+#maskListRaw$water <- raster("C:/Users/pgalante/Projects/NASA/maskRangeR/expertDriven/swampForestCrab/standWaterPercent_cropAgg.tif")
+#maskListRaw$pH<-NULL
+#maskListRaw <- maskListRaw[1:3]
+maskBounds <- read.csv("C:/Users/pgalante/Projects/NASA/maskRangeR/expertDriven/swampForestCrab/crabInfo.csv")
+maskBounds <- maskBounds[2:4,] 
 ```
 
 Conduct data cleaning to fix names and units.
 ```{r}
+# Divide worldclim values for temperature by 10
+maskListRaw$mat <- maskListRaw$mat / 10
 # rename the limits to match the raster names in maskListRaw
-maskBounds$Layer <- c('water','treeCover','dem','pH','mat')
-# make sure the units match between the layers and the bounds
-maskListRaw$mat <- maskListRaw$mat/10
-maskListRaw$pH <- maskListRaw$pH/10
+maskBounds$Layer <- c('treeCover','dem', 'mat')
 ```
 
 Crop rasters to the same extent as the expert map, since we do not need to build masks outside the expert map.
@@ -757,6 +775,9 @@ datedOccs <- maskRangeR::annotate(datedOccs,env,envDates,dateScale)
 Then find a suitable lower limit for the mask based on the data.
 
 ```{r}
+## Take a look at the forest cover values at each occurrence point
+sort(datedOccs$env)
+## Use quantiles to find a suitable lower limit
 (bounds <- quantile(datedOccs$env,prob=c(0,.025,.25,.5,.75,.975,1),na.rm=T))
 ```
 

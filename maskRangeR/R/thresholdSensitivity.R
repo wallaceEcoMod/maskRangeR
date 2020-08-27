@@ -92,7 +92,7 @@ thresholdSensitivity <- function(datedOccs, maskLayer, maskClass, sdm, maskProje
     
     graphics::plot(rev(maskValues), sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19, type= "l")
     graphics::points(rev(maskValues), sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19)
-    axis(labels=NA,side=1,tck=-0.015,at=maskValues)
+    graphics::axis(labels=NA,side=1,tck=-0.015,at=maskValues)
     # Get values to add to plot
     nums <- gsub(".*= ", "", sensitivityAreas)
     nums <- gsub( ").*$", "", nums)
