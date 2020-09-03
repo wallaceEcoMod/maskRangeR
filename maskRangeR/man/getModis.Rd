@@ -9,11 +9,11 @@ getModis(localSavePath, datedOccs, dateScale, dataset)
 \arguments{
 \item{localSavePath}{the pathway or directory in which to save MODIS rasters}
 
-\item{datedOccs}{a `SpatialPointsDataFrame` where one column is labeled `date` and has class `POSIXct`, e.g., as obtained from using `lubridate::parse_date_time`}
+\item{datedOccs}{a data.frame showing longitude, latitude, and date. The date should match the date scale and of class `POSIXct`, e.g., as obtained from using `lubridate::parse_date_time`}
 
 \item{dateScale}{string: 'year', 'month', or 'day'}
 
-\item{dataset}{MODIS product of interest. Available are: “Percent tree cover”, “Percent nontree vegetation”, “Percent nonvegetated”, “Quality”, “Percent tree cover 50”, “Percent nonvegetated sd”}
+\item{dataset}{MODIS product of interest. Available are: "Percent_Tree_Cover", "Percent_Nontree_Vegetation", "Percent_Nonvegetated", "Quality", "Percent_Tree_Cover_SD", "Percent_Nonvegetated_SD", "Cloud"}
 }
 \value{
 Saves rasters to specified path
