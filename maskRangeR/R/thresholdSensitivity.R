@@ -75,37 +75,43 @@ thresholdSensitivity <- function(datedOccs, maskLayer, maskClass, sdm, maskProje
   }
   # apply area calculation to list of rasters. results are square km
   sensitivityAreas <- lapply(sensitivityOnes, calcAreas)
-  ## Plotting metrics
-  .sensitivityPlotting <- function(stringsOfLogic, sensitivityStack, sensitivityAreas){
-    ## Plotting each mask and one plot of area vs threshold
-    # area vs. threshold
-    maskValues <- gsub(".*<","",stringsOfLogic)
-    names(sensitivityStack) <- paste0("threshold_of_", rev(maskValues))
-    sensitivityStack <- raster::stack(sensitivityStack)
-   # grDevices::dev.new()
-    oldpar <- par(no.readonly = TRUE)
-    on.exit(par(oldpar))  
-    graphics::par(mfrow=c(2,(length(stringsOfLogic)/2)+1))
-    colPal <- grDevices::rainbow(5)
-    lapply(names(sensitivityStack), function(x) raster::plot(sensitivityStack[[x]], main = x, xlab = "long", ylab = "lat"))
-    #### for here allow for all threshold values, but only plot some maps
-    
-    graphics::plot(rev(maskValues), sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19, type= "l")
-    graphics::points(rev(maskValues), sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19)
-    graphics::axis(labels=NA,side=1,tck=-0.015,at=maskValues)
-    # Get values to add to plot
-    nums <- gsub(".*= ", "", sensitivityAreas)
-    nums <- gsub( ").*$", "", nums)
-    nums <- format(round(unlist(lapply(nums, function(x) as.numeric(as.character(x)))), 3))
-    # add values
-    graphics::text(maskValues, sensitivityAreas, labels = nums, cex= 1, pos=3)
-    # add legend
-    graphics::legend(x = "topleft", col = colPal, legend = rev(names(sensitivityStack)), pch = 19, cex=0.7)
-    #print(cbind(maskValues, sensitivityAreas))
-    sensitivityReturns <- NULL
-    return(list(sensitivityStack, cbind(maskValues, sensitivityAreas)))
-  }
-  .sensitivityPlotting(stringsOfLogic, sensitivityStack, sensitivityAreas)
+  
+  maskValues <- gsub(".*<","",stringsOfLogic)
+  names(sensitivityStack) <- paste0("threshold_of_", rev(maskValues))
+  sensitivityStack <- raster::stack(sensitivityStack)
+  
+  # ## Plotting metrics
+  # .sensitivityPlotting <- function(stringsOfLogic, sensitivityStack, sensitivityAreas){
+  #   ## Plotting each mask and one plot of area vs threshold
+  #   # area vs. threshold
+  #   maskValues <- gsub(".*<","",stringsOfLogic)
+  #   names(sensitivityStack) <- paste0("threshold_of_", rev(maskValues))
+  #   sensitivityStack <- raster::stack(sensitivityStack)
+  #  # grDevices::dev.new()
+  #   oldpar <- par(no.readonly = TRUE)
+  #   on.exit(par(oldpar))
+  #   graphics::par(mfrow=c(2,(length(stringsOfLogic)/2)+1))
+  #   colPal <- grDevices::rainbow(5)
+  #   lapply(names(sensitivityStack), function(x) raster::plot(sensitivityStack[[x]], main = x, xlab = "long", ylab = "lat"))
+  #   #### for here allow for all threshold values, but only plot some maps
+  # 
+  #   graphics::plot(rev(maskValues), sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19, type= "l")
+  #   graphics::points(rev(maskValues), sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", col = colPal, pch = 19)
+  #   graphics::axis(labels=NA,side=1,tck=-0.015,at=maskValues)
+  #   # Get values to add to plot
+  #   nums <- gsub(".*= ", "", sensitivityAreas)
+  #   nums <- gsub( ").*$", "", nums)
+  #   nums <- format(round(unlist(lapply(nums, function(x) as.numeric(as.character(x)))), 3))
+  #   # add values
+  #   graphics::text(maskValues, sensitivityAreas, labels = nums, cex= 1, pos=3)
+  #   # add legend
+  # #  graphics::legend(x = "topright", inset=c(-0.2, 0), col = colPal, legend = rev(names(sensitivityStack)), pch = 19, cex=0.7)
+  #   #print(cbind(maskValues, sensitivityAreas))
+  #   sensitivityReturns <- NULL
+  #   return(list(sensitivityStack, cbind(maskValues, sensitivityAreas)))
+  # }
+  # .sensitivityPlotting(stringsOfLogic, sensitivityStack, sensitivityAreas)
+  return(list("Sensitivity_Rasters" = sensitivityStack, "Areas" = as.data.frame(cbind(maskValues, sensitivityAreas))))
 }
 
 

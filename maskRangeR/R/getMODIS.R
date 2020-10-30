@@ -7,8 +7,8 @@
 #' @details
 #' See Examples.
 #' @param localSavePath the pathway or directory in which to save MODIS rasters
-#' @param datedOccs a data.frame showing longitude, latitude, and date. The date should match the date scale and of class `POSIXct`, e.g., as obtained from using `lubridate::parse_date_time` 
-#' @param dateScale string: 'year', 'month', or 'day'
+#' @param datedOccs a data.frame showing longitude, latitude, and date. The date should match the date scale and of class `POSIXct`, e.g., as obtained from using `lubridate::parse_date_time`. Dates must be within the time range of MODIS data (i.e., 2000-2017).
+#' @param dateScale string: 'year', 'month', or 'day'. CURRENTLY ONLY TESTED FOR YEARLY DATA
 #' @param dataset MODIS product of interest. Available are: "Percent_Tree_Cover", "Percent_Nontree_Vegetation", "Percent_Nonvegetated", "Quality", "Percent_Tree_Cover_SD", "Percent_Nonvegetated_SD", "Cloud"
 
 #' @examples
@@ -24,7 +24,7 @@
 #' @export
 
 
-getModis <- function(localSavePath, datedOccs, dateScale, dataset){
+.getModis <- function(localSavePath, datedOccs, dateScale, dataset){
 
   .reDate <- function(datedOccs, dateScale){
     long=lat=date=parse_date_time=ymd=year=month=day=NULL # trick for check
@@ -113,7 +113,7 @@ getModis <- function(localSavePath, datedOccs, dateScale, dataset){
   message('extracting dataset of interest')
   pos.data <- as.data.frame(cbind(c(1:7), c("Percent_Tree_Cover", "Percent_Nontree_Vegetation", "Percent_Nonvegetated", "Quality", "Percent_Tree_Cover_SD", "Percent_Nonvegetated_SD", "Cloud")))
   dset <- pos.data %>% dplyr::filter(pos.data$V2 == dataset)
-  dataset.number <-dset[[1]]
+  dataset.number <- dset[[1]]
   #sds <- sapply(lapply(hdf$MOD44B.006, gdalUtils::get_subdatasets), "[", dataset.number)
   tt <- lapply(hdf$MOD44B.006, gdalUtils::get_subdatasets)
   ttList <- sapply(tt, grep, pattern = paste0("\\", dataset, "$"))

@@ -715,7 +715,7 @@ Sensitivity analysis requires the following data:
 ### Methods
 
 1. **thresholdSensitivity**: Testing the sensitivity of using different thresholds on the mask layer. For example, using a range of forest cover percentages to examine the differences in predicted area.  
-2. **manyMaskSensitivity**: Tests the sensitivity of using different masks and different combinations of masks. For example, testing different 
+2. **manyMaskSensitivity**: Tests the sensitivity of using different masks and different combinations of masks. For example, testing all combinations of the layers.
 
 
 ## Example 1
@@ -729,6 +729,7 @@ library(maskRangeR)
 library(lubridate)
 ## Remember that the 'path' is the directory in which you saved the demonstration data 
 dataDir = paste0(path, '/dataDriven/olinguito/') 
+dataDir = "C:/Users/pgalante/Git/maskRangeR"
 ```
 
 Read in the environmental and occurrence data.
@@ -745,9 +746,9 @@ env <- crop(env, extent(sdm))
 ```
 
 ```{r, include = F}
-env <- readRDS(paste0(path, "/extdata/env.RDS"))
-datedOccs <- readRDS(paste0(path, "/extdata/datedOccs.RDS"))
-sdm <- readRDS(paste0(path, "/extdata/sdm.RDS"))
+env <- readRDS(paste0(dataDir, "/extdata/env.RDS"))
+datedOccs <- readRDS(paste0(dataDir, "/extdata/datedOccs.RDS"))
+sdm <- readRDS(paste0(dataDir, "/extdata/sdm.RDS"))
 ```
 
 Prepare the data.
@@ -795,12 +796,48 @@ maskedDist <- maskRanger(initialDist=sdm,maskLayers=forest,
 ```
 
 thresholdSensitivity() runs the 'maskRangeR()' function over a series of thresholds and plots these as well as the areas.
-```{r, fig=T,fig.height=6,fig.width=7}
-thresholdSensitivity(datedOccs = datedOccs, maskLayer=forest, maskClass = "top5", sdm = sdm)
+```{r}
+ThreshSens <- thresholdSensitivity(datedOccs = datedOccs, maskLayer=forest, maskClass = "top5", sdm = sdm)
 ```
 
 
+```{r}
+threshold.stack <- ThreshSens$Sensitivity_Rasters
+e <- raster::extent(c(-79.76875, -74.62083, -3.59375, 8.072917))
+threshold.stack <- raster::crop(threshold.stack, e)
+```
 
+
+Take a look at the SDMs when each of the thresholds of interest are applied.
+```{r, fig.height=7,fig.width=5}
+par(mfrow = c(3,2))
+plot(threshold.stack[[1]])
+plot(threshold.stack[[2]])
+plot(threshold.stack[[3]])
+plot(threshold.stack[[4]])
+plot(threshold.stack[[5]])
+```
+
+
+Plot how the area of the SDM can be affected by the threshold used
+```{r, fig.height=5,fig.width=7}
+sensitivityAreas <- ThreshSens$Areas
+# set a color palette
+colPal <- grDevices::rainbow(5)
+# Organize the threshold values
+#nums <- gsub(".*= ", "", ThreshSens$Areas)
+#nums <- gsub( ").*$", "", nums)
+nums <- ThreshSens$Areas$sensitivityAreas
+nums <- format(round(unlist(lapply(nums, function(x) as.numeric(as.character(x)))), 3))
+
+# plot
+graphics::plot(rev(ThreshSens$Areas$maskValues), ThreshSens$Areas$sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", type= "l")
+graphics::points(rev(ThreshSens$Areas$maskValues), ThreshSens$Areas$sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", pch = c(15, 13, 17,18,19))
+#graphics::axis(labels=NA,side=1,tck=-0.015,at=maskValues)
+graphics::text(rev(ThreshSens$Areas$maskValues), ThreshSens$Areas$sensitivityAreas, labels = nums, cex= 0.5, pos=1, offset = 0.09)
+# Add a legend
+graphics::legend(x = "bottomleft", legend = substr(names(ThreshSens$Sensitivity_Rasters), 1, 17), pch = c(15, 13, 17, 18, 19), cex=1)
+```
 
 ## Example 2
 ### Masks sensitivity
