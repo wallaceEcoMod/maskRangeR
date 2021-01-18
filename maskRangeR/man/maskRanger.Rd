@@ -13,11 +13,11 @@ maskRanger(
 )
 }
 \arguments{
-\item{potentialDist}{A raster stack of binary or continuous values. Supplying more than one layer will be interepreted as different time periods. Layers should follow the naming convention `Y2000`, `Y2001`, etc.}
+\item{potentialDist}{A raster stack of binary or continuous values. Supplying more than one layer will be interepreted as different time periods. Layers should follow the naming convention `Y2000`, `Y2001`, etc. Must have same extent and resolution as maskLayers.}
 
-\item{initialDist}{A raster showing a previously created optimally tuned SDM}
+\item{initialDist}{A raster showing a previously created optimally tuned SDM. Must have same extent and resolution as maskLayers.}
 
-\item{maskLayers}{A single raster or a raster stack. If a single raster, the same mask will be applied to each layer of `potentialDist`. If a stack it must have the same number of layers as potentialDist, and each layer corresponds to a different time period.}
+\item{maskLayers}{A single raster or a raster stack. If a single raster, the same mask will be applied to each layer of `potentialDist`. If a stack it must have the same number of layers as potentialDist, and each layer corresponds to a different time period. Must have same extent and resolution as initialDist.}
 
 \item{logicString}{a character indicating the logical conditions to use for masking.}
 
@@ -66,7 +66,7 @@ maskBounds <- cbind(names(maskStack), maskBounds)
 colnames(maskBounds) <- c("Layer", "min", "max")
 # mask range by these tolerance masks
 realized <- lotsOfMasks(expertRaster, maskStack, maskBounds)
-\dontrun{
+\donttest{
 # Here's a more realistic example
 op=par()
 ########## Forest Cover Mask 

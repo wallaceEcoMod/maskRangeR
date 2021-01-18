@@ -1,6 +1,6 @@
 ---
 title: "maskRangeR: Improving spatial and temporal accuracy of species distribution models"
-author: "Cory Merow, Peter J. Galante, Cecina Babich Morrow, Jamie M. Kass, Alex Moore, Valentina Grisales-Betancur, Jorge Velasquez, Robert P. Anderson, Mary E. Blair"
+author: "Cory Merow, Peter J. Galante, Cecina Babich Morrow, Jamie M. Kass, Alex Moore, Valentina Grisales-Betancur, Beth Gerstner, Jorge Velasquez, Robert P. Anderson, Mary E. Blair"
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
@@ -21,7 +21,7 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(cache = F)
 knitr::opts_chunk$set(eval = T)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
-mc.cores=8
+mc.cores=1
 ```
 
 # Introduction 
@@ -41,6 +41,8 @@ Throughout the package, we use the following definitions:
 <!-- ================================================================== -->
 
 In the following use cases, we describe distribution modeling scenarios that require post-processing of the potential distribution to better estimate a species’ realized distribution. This post-processing is carried out in the form of masks based on expert opinion or data. For each scenario, we list the components needed to carry out the analysis and provide examples of the process.
+
+To download example data used in this vignette, [click here](https://github.com/cmerow/maskRangeR/blob/master/demoData/demoData.zip?raw=true)
 
 # Data Driven: Land Cover Mask
 
@@ -66,7 +68,7 @@ The Olinguito (*Bassaricyon neblina*) is a new species of carnivore described in
 
 A 30 arc-second Bioclimatic-variable climate-based Maxent [1] SDM was tuned for the Olinguito using a mix of historical data paired with field notes, as well as contemporary citizen science records associated with photo-vouchers. The model was trained on 0.7 degree buffered circles around occurrence records and then projected to a 5-degree bounding box around occurrence records. We then removed areas from the SDM representing biogeographic regions where the species has not been documented, like the Eastern Cordillera of Colombia and other small non-contiguous areas.
 
-Next, we used remotely sensed data of the annual percent forest cover for the region (MODIS Vegetation Continuous Fields; 250 m from the years matching the most recent occurrence records: 2006-2016). The MODIS rasters from different years were not all aligned with one another and had to be realigned to create a raster stack. A subset of the more recent occurrence records (2006-2016) were then temporally matched with the forest cover rasters to obtain values of forest cover per occurrence (one record was excluded because it was based on an observation that stemmed from a likely roadkilled specimen [2]). The forest cover values at occurrence records were then assessed across all years, and the 25th quantile forest cover level was used to generate a forest cover mask for the most recent year (2010). After resampling the SDM to match the resolution of the MODIS data, we applied this forest cover mask to reduce the SDM’s spatial prediction to only those climatically suitable areas where forest cover is above the threshold. This reduced model shows a conservative estimation of the species range given current non-climatic variables that represent anthropogenic modification of land cover.
+Next, we used remotely sensed data of the annual percent forest cover for the region (MODIS Vegetation Continuous Fields; 250 m from the years matching the most recent occurrence records: 2006-2016). The MODIS rasters from different years were not all aligned with one another and had to be realigned to create a raster stack. A subset of the more recent occurrence records (2006-2016) were then temporally matched with the forest cover rasters to obtain values of forest cover per occurrence (one record was excluded because it was based on an observation that stemmed from a likely roadkilled specimen [2]). The forest cover values at occurrence records were then assessed across all years, and the 25th quantile forest cover level was used to generate a forest cover mask for the most recent year (2010). After resampling (e.g., making the resolutions match) the SDM to match the resolution of the MODIS data, we applied this forest cover mask to reduce the SDM’s spatial prediction to only those climatically suitable areas where forest cover is above the threshold. This reduced model shows a conservative estimation of the species range given current non-climatic variables that represent anthropogenic modification of land cover.
 
 ## References
 
@@ -78,13 +80,19 @@ Next, we used remotely sensed data of the annual percent forest cover for the re
 
 
 ```{r, include=F}
-#path = "/home/pgalante/Projects/NASA/maskrangeR/UseCaseData"
+path = "C:/Users/pgalante/Git/maskRangeR"
 ```
 ## Example
 
-By setting the pathway to where you saved our canned datasets by using the getDemoData() function, access that data by setting that as the working directory. 
+By setting the pathway to where you saved our canned datasets, access that data by setting that as the working directory. 
 
-```{r}
+```{r, eval = F}
+## Set the pathway
+path <- "path/to/your/data/directory"
+```
+
+
+```{r, eval = F}
 library(raster)
 library(maskRangeR)
 library(lubridate)
@@ -92,7 +100,16 @@ library(lubridate)
 dataDir = paste0(path, '/dataDriven/olinguito/')
 ```
 
-Read in the environmental and occurrence data.
+```{r, include = F}
+library(raster)
+library(maskRangeR)
+library(lubridate)
+## Remember that the 'path' is the directory in which you saved the demonstration data 
+#dataDir = paste0(path, '/dataDriven/olinguito/')
+```
+
+
+Read in the environmental and occurrence data. These can be dated yearly, monthly, or daily, but must match between dated occurrence records and dated recent environmental data.
 
 ```{r, eval = F}
 dateScale <- "year" # or "month", "day"
@@ -105,12 +122,14 @@ sdm <- raster(paste0(dataDir,'olinguito_SDM.tif'))
 env <- crop(env, extent(sdm))
 ```
 
+NOTE: SDM was resampled to match the resolution of MODIS remotely sensed data.
+
 ```{r, include=F}
 dateScale <- "year" # or "month", "day"
 envDates <- parse_date_time((c('2005','2006','2008','2009','2010')),orders = c("Y", "Ym"))
-env <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/env.RDS"))
-datedOccs <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/datedOccs.RDS"))
-sdm <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/sdm.RDS"))
+env <- readRDS(paste0(path, "/extdata/env.RDS"))
+datedOccs <- readRDS(paste0(path, "/extdata/datedOccs.RDS"))
+sdm <- readRDS(paste0(path, "/extdata/sdm.RDS"))
 ```
 
 
@@ -124,10 +143,17 @@ coordinates(datedOccs) <- c('long','lat')
 projection(datedOccs) <- projection(env)
 ```
 
+Ensure coordinate reference system, extent, and resolution are the same.
+```{r}
+identical(crs(sdm), crs(env))
+identical(extent(sdm), extent(env))
+identical(res(sdm), res(env))
+```
+
 To perform data-driven masking, first find the values of the environmental variable (forest cover in this example) at the occurrence point locations.
 
 ```{r}
-datedOccs <- maskRangeR::annotate(datedOccs,env,envDates,dateScale)
+datedOccs <- maskRangeR::annotate(datedOccs, env, envDates, dateScale)
 # Note the warnings:
 # [1] "Environmental layers were missing for date 2013"
 # [1] "Environmental layers were missing for date 2016"
@@ -139,6 +165,9 @@ datedOccs <- maskRangeR::annotate(datedOccs,env,envDates,dateScale)
 Then find a suitable lower limit for the mask based on the data.
 
 ```{r}
+## Take a look at the forest cover values at each occurrence point
+sort(datedOccs$env)
+## Use quantiles to find a suitable lower limit
 (bounds <- quantile(datedOccs$env,prob=c(0,.025,.25,.5,.75,.975,1),na.rm=T))
 ```
 
@@ -237,9 +266,9 @@ The following steps are possible ways to improve the realism of a potential dist
 
 ## Example
 
-By setting the pathway to where you saved our canned datasets by using the getDemoData() function, access that data by setting that as the working directory. 
+By setting the pathway to where you saved our canned datasets, access that data by setting that as the working directory. 
 
-```{r,results='hide'}
+```{r,results='hide', eval = F}
 library(maskRangeR)
 library(lubridate)
 library(raster)
@@ -254,8 +283,8 @@ expertAddedPoly = rgdal::readOGR(paste0(dataDir, 'Alouatta_seniculus_add_HO.shp'
 ```
 
 ```{r, include = F}
-original <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/original.RDS"))
-expertAddedPoly <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/expertAddedPoly.RDS"))
+original <- readRDS(paste0(path, "/extdata/original.RDS"))
+expertAddedPoly <- readRDS(paste0(path, "/extdata/expertAddedPoly.RDS"))
 ```
 Plot the original SDM.
 
@@ -340,7 +369,7 @@ In this use case, we will perform an expert-driven species range estimate using 
 
 ## Example
 
-By setting the pathway to where you saved our canned datasets by using the getDemoData() function, access that data by setting that as the working directory. 
+By setting the pathway to where you saved our canned datasets, access that data by setting that as the working directory. 
 
 ```{r,results='hide'}
 library(maskRangeR)
@@ -359,26 +388,32 @@ expertMap <- readOGR(paste0(dataDir,'IUCNshape/data_0.shp'))
 #masks
 maskListRaw <- list(treeCover = raster(paste0(dataDir,'/Hansen_percent_treecover.tif')), 
                     dem = raster(paste0(dataDir,'/DEM.tif')),
-                    mat = raster(paste0(dataDir,'/MATsingapore.tif')),
-                    pH = raster(paste0(dataDir,'/PHIHOX_M_sl1_250m.tif')))
+                    water = raster(paste0(dataDir,'/standWaterPercent_cropAgg.tif')))
 
 # define the limits for each mask
 maskBounds <- read.csv(paste0(dataDir,'/crabInfo.csv'))
 ```
 
 ```{r, include=F}
-expertMap <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/expertMap.RDS"))
-maskListRaw <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/maskListRaw.RDS"))
-maskBounds <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/maskBounds.RDS"))
+expertMap <- readRDS(paste0(path, "/extdata/expertMap.RDS"))
+maskListRaw <- readRDS(paste0(path, "/extdata/maskListRaw.RDS"))
+maskListRaw$pH <- NULL
+maskListRaw <- maskListRaw[1:3]
+
+maskBounds <- readRDS(paste0(path, "/extdata/maskBounds.RDS"))
+#maskListRaw$water <- raster("C:/Users/pgalante/Projects/NASA/maskRangeR/expertDriven/swampForestCrab/standWaterPercent_cropAgg.tif")
+#maskListRaw$pH<-NULL
+#maskListRaw <- maskListRaw[1:3]
+maskBounds <- read.csv("C:/Users/pgalante/Projects/NASA/maskRangeR/expertDriven/swampForestCrab/crabInfo.csv")
+maskBounds <- maskBounds[2:4,] 
 ```
 
 Conduct data cleaning to fix names and units.
 ```{r}
+# Divide worldclim values for temperature by 10
+maskListRaw$mat <- maskListRaw$mat / 10
 # rename the limits to match the raster names in maskListRaw
-maskBounds$Layer <- c('water','treeCover','dem','pH','mat')
-# make sure the units match between the layers and the bounds
-maskListRaw$mat <- maskListRaw$mat/10
-maskListRaw$pH <- maskListRaw$pH/10
+maskBounds$Layer <- c('treeCover','dem', 'mat')
 ```
 
 Crop rasters to the same extent as the expert map, since we do not need to build masks outside the expert map.
@@ -455,7 +490,7 @@ After obtaining SDMs for each of the three species, we used the process below to
 
 ## Example
 
-By setting the pathway to where you saved our canned datasets by using the getDemoData() function, access that data by setting that as the working directory. 
+By setting the pathway to where you saved our canned datasets, access that data by setting that as the working directory. 
 
 ```{r}
 library(maskRangeR)
@@ -488,12 +523,12 @@ tor_sdm_mask <- mask(tor_sdm, as(ext_tor, "SpatialPolygons"))
 ```
 
 ```{r, include = F}
-variegatus <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/variegatus.RDS"))
-tridactylus <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/tridactylus.RDS"))
-torquatus <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/torquatus.RDS"))
-var_sdm <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/var_sdm.RDS"))
-tri_sdm <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/tri_sdm.RDS"))
-tor_sdm <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/tor_sdm.RDS"))
+variegatus <- readRDS(paste0(path, "/extdata/variegatus.RDS"))
+tridactylus <- readRDS(paste0(path, "/extdata/tridactylus.RDS"))
+torquatus <- readRDS(paste0(path, "/extdata/torquatus.RDS"))
+var_sdm <- readRDS(paste0(path, "/extdata/var_sdm.RDS"))
+tri_sdm <- readRDS(paste0(path, "/extdata/tri_sdm.RDS"))
+tor_sdm <- readRDS(paste0(path, "/extdata/tor_sdm.RDS"))
 # Crop tridactyus SDM to a 2-degree bounding box
 ext_tri <- extent(c(min(tridactylus$longitude)-2, max(tridactylus$longitude)+2, min(tridactylus$latitude)-2, max(tridactylus$latitude)+2))
 tri_sdm_mask <- mask(tri_sdm, as(ext_tri, "SpatialPolygons"))
@@ -547,8 +582,8 @@ sloth_svmSP <- rangeSVM_predict(svm = svmSP, r = var_sdm)
 ```
 
 ```{r, include=F}
-svmSP <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/svmSP.RDS"))
-sloth_svmSP <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/sloth_svmSP.RDS"))
+svmSP <- readRDS(paste0(path, "/extdata/svmSP.RDS"))
+sloth_svmSP <- readRDS(paste0(path, "/extdata/sloth_svmSP.RDS"))
 ```
 
 Plot the SVM results. The grey areas indicate regions more suitable for *B. variegatus*, the yellow areas indicate regions more suitable for *B. tridactylus*, and the green areas indicate regions more suitable for *B. torquatus*. Black points show the occurrences of *B. variegatus*, red show *B. tridactylus*, and blue show *B. torquatus*.
@@ -616,8 +651,8 @@ sloth_svmHYB <- rangeSVM_predict(svm = svmHYB, r = var_sdm,
 ```
 
 ```{r, include=F}
-svmHYB <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/svmHYB.RDS"))
-sloth_svmHYB <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/sloth_svmHYB.RDS"))  
+svmHYB <- readRDS(paste0(path, "/extdata/svmHYB.RDS"))
+sloth_svmHYB <- readRDS(paste0(path, "/extdata/sloth_svmHYB.RDS"))  
 ```
 
 Plot the SVM results.
@@ -680,13 +715,13 @@ Sensitivity analysis requires the following data:
 ### Methods
 
 1. **thresholdSensitivity**: Testing the sensitivity of using different thresholds on the mask layer. For example, using a range of forest cover percentages to examine the differences in predicted area.  
-2. **manyMaskSensitivity**: Tests the sensitivity of using different masks and different combinations of masks. For example, testing different 
+2. **manyMaskSensitivity**: Tests the sensitivity of using different masks and different combinations of masks. For example, testing all combinations of the layers.
 
 
 ## Example 1
 ### Threshold sensitivity
 
-Set the pathway to where you saved our canned datasets using the getDemoData() function.
+Set the pathway to where you saved our canned datasets.
 
 ```{r}
 library(raster)
@@ -694,6 +729,7 @@ library(maskRangeR)
 library(lubridate)
 ## Remember that the 'path' is the directory in which you saved the demonstration data 
 dataDir = paste0(path, '/dataDriven/olinguito/') 
+dataDir = "C:/Users/pgalante/Git/maskRangeR"
 ```
 
 Read in the environmental and occurrence data.
@@ -710,9 +746,9 @@ env <- crop(env, extent(sdm))
 ```
 
 ```{r, include = F}
-env <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/env.RDS"))
-datedOccs <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/datedOccs.RDS"))
-sdm <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/sdm.RDS"))
+env <- readRDS(paste0(dataDir, "/extdata/env.RDS"))
+datedOccs <- readRDS(paste0(dataDir, "/extdata/datedOccs.RDS"))
+sdm <- readRDS(paste0(dataDir, "/extdata/sdm.RDS"))
 ```
 
 Prepare the data.
@@ -740,6 +776,9 @@ datedOccs <- maskRangeR::annotate(datedOccs,env,envDates,dateScale)
 Then find a suitable lower limit for the mask based on the data.
 
 ```{r}
+## Take a look at the forest cover values at each occurrence point
+sort(datedOccs$env)
+## Use quantiles to find a suitable lower limit
 (bounds <- quantile(datedOccs$env,prob=c(0,.025,.25,.5,.75,.975,1),na.rm=T))
 ```
 
@@ -757,17 +796,53 @@ maskedDist <- maskRanger(initialDist=sdm,maskLayers=forest,
 ```
 
 thresholdSensitivity() runs the 'maskRangeR()' function over a series of thresholds and plots these as well as the areas.
-```{r, fig=T,fig.height=6,fig.width=7}
-thresholdSensitivity(datedOccs = datedOccs, maskLayer=forest, maskClass = "top5", sdm = sdm)
+```{r}
+ThreshSens <- thresholdSensitivity(datedOccs = datedOccs, maskLayer=forest, maskClass = "top5", sdm = sdm)
 ```
 
 
+```{r}
+threshold.stack <- ThreshSens$Sensitivity_Rasters
+e <- raster::extent(c(-79.76875, -74.62083, -3.59375, 8.072917))
+threshold.stack <- raster::crop(threshold.stack, e)
+```
 
+
+Take a look at the SDMs when each of the thresholds of interest are applied.
+```{r, fig.height=7,fig.width=5}
+par(mfrow = c(3,2))
+plot(threshold.stack[[1]])
+plot(threshold.stack[[2]])
+plot(threshold.stack[[3]])
+plot(threshold.stack[[4]])
+plot(threshold.stack[[5]])
+```
+
+
+Plot how the area of the SDM can be affected by the threshold used
+```{r, fig.height=5,fig.width=7}
+sensitivityAreas <- ThreshSens$Areas
+# set a color palette
+colPal <- grDevices::rainbow(5)
+# Organize the threshold values
+#nums <- gsub(".*= ", "", ThreshSens$Areas)
+#nums <- gsub( ").*$", "", nums)
+nums <- ThreshSens$Areas$sensitivityAreas
+nums <- format(round(unlist(lapply(nums, function(x) as.numeric(as.character(x)))), 3))
+
+# plot
+graphics::plot(rev(ThreshSens$Areas$maskValues), ThreshSens$Areas$sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", type= "l")
+graphics::points(rev(ThreshSens$Areas$maskValues), ThreshSens$Areas$sensitivityAreas, ylab = "Area (square km)", xlab = "Mask values", main = "Mask Threshold Area Sensitivity", pch = c(15, 13, 17,18,19))
+#graphics::axis(labels=NA,side=1,tck=-0.015,at=maskValues)
+graphics::text(rev(ThreshSens$Areas$maskValues), ThreshSens$Areas$sensitivityAreas, labels = nums, cex= 0.5, pos=1, offset = 0.09)
+# Add a legend
+graphics::legend(x = "bottomleft", legend = substr(names(ThreshSens$Sensitivity_Rasters), 1, 17), pch = c(15, 13, 17, 18, 19), cex=1)
+```
 
 ## Example 2
 ### Masks sensitivity
 
-Set the pathway to where you saved our canned datasets by using the getDemoData() function.
+Set the pathway to where you saved our canned datasets.
 
 ```{r,results='hide'}
 library(maskRangeR)
@@ -793,9 +868,9 @@ maskBounds <- read.csv(paste0(dataDir,'/crabInfo.csv'))
 ```
 
 ```{r, include=F}
-expertMap <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/expertMap.RDS"))
-maskListRaw <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/maskListRaw.RDS"))
-maskBounds <- readRDS(paste0(getwd(), "/maskRangeR/inst/extdata/maskBounds.RDS"))
+expertMap <- readRDS(paste0(path, "/extdata/expertMap.RDS"))
+maskListRaw <- readRDS(paste0(path, "/extdata/maskListRaw.RDS"))
+maskBounds <- readRDS(paste0(path, "/extdata/maskBounds.RDS"))
 ```
 
 Conduct data cleaning to fix names and units.

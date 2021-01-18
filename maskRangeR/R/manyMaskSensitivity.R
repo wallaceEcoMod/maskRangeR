@@ -63,6 +63,8 @@ manyMaskSensitivity <- function(crt, rasProj = NULL, maskBounds, expertRaster){
   v1 <- manyMasksArea[with(manyMasksArea, order(unlist(manyMasksArea$Area))), ]
   ## Plotting function
   .manyMaskSensitivityPlots <- function(v1){
+    oldpar <- par(no.readonly = TRUE)
+    on.exit(par(oldpar))  
     graphics::barplot(height = unlist(v1$Area), space = 1, xlab = "", names.arg = "")
     graphics::text(seq(1.5, (0.5 + nrow(v1) + nrow(v1)-1), 2), graphics::par("usr")[3]-.25, srt = 60, adj=1, xpd=T, labels = cbind(unlist(lapply(v1$Layer, toString))), cex= 0.65)
   }
@@ -73,6 +75,8 @@ manyMaskSensitivity <- function(crt, rasProj = NULL, maskBounds, expertRaster){
 ## Plotting function
 #' @importFrom graphics barplot legend par plot points text
 .manyMaskSensitivityPlots <- function(v1){
+  oldpar <- par(no.readonly = TRUE)
+  on.exit(par(oldpar))  
   graphics::barplot(height = unlist(v1$Area), space = 1, xlab = "", names.arg = "", ylab = "area")
   graphics::text(seq(1.5, (0.5 + nrow(v1) + nrow(v1)-1), 2), par("usr")[3]-.25, srt = 60, adj=1, xpd=T, labels = cbind(unlist(lapply(v1$Layer, toString))), cex= 0.65)
 }
