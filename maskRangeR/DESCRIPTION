@@ -12,7 +12,7 @@ Description: Mask ranges based on expert
     generate a new map or to update an existing map.
     Methods include expert opinion and data-driven 
     tools to generate thresholds for binary masks.
-License: GPL-3 + file LICENSE
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends: 
