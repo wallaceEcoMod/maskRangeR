@@ -78,21 +78,18 @@ Next, we used remotely sensed data of the annual percent forest cover for the re
 
 [3] Phillips, S.J., Anderson, R.P., Schapire, R.E. (2006) Maximum entropy modeling of species geographic distributions. *Ecological Modeling*, **190**, 231 - 259.
 
-
-```{r, include=F}
-path = "C:/Users/pgalante/Git/maskRangeR"
-```
 ## Example
 
 By setting the pathway to where you saved our canned datasets, access that data by setting that as the working directory. 
 
-```{r, eval = F}
-## Set the pathway
-path <- "path/to/your/data/directory"
+```{r}
+## Set the pathway. You'll need to download the data from https://github.com/cmerow/maskRangeR and set your path to the appropriate location on your computer.
+if(Sys.info()['user']=='ctg') path='../demoData'
+if(Sys.info()['user']=='pgalante') path <- "path/to/your/data/directory"
 ```
 
 
-```{r, eval = F}
+```{r}
 library(raster)
 library(maskRangeR)
 library(lubridate)
@@ -100,20 +97,11 @@ library(lubridate)
 dataDir = paste0(path, '/dataDriven/olinguito/')
 ```
 
-```{r, include = F}
-library(raster)
-library(maskRangeR)
-library(lubridate)
-## Remember that the 'path' is the directory in which you saved the demonstration data 
-#dataDir = paste0(path, '/dataDriven/olinguito/')
-```
-
-
 Read in the environmental and occurrence data. These can be dated yearly, monthly, or daily, but must match between dated occurrence records and dated recent environmental data.
 
 ```{r, eval = F}
 dateScale <- "year" # or "month", "day"
-env <- stack(list.files(path = paste0(dataDir), pattern = "olinguito_Modis.tif$", full.names = T))
+env <- stack(list.files(path = dataDir, pattern = "olinguito_Modis", full.names = T))
 # this should be a formal date object of class "POSIXct" "POSIXt"
 envDates <- parse_date_time((c('2005','2006','2008','2009','2010')),orders = c("Y", "Ym"))
 datedOccs <- read.csv(paste0(dataDir,'All_new_records_by_year.csv'))
@@ -158,8 +146,8 @@ datedOccs <- maskRangeR::annotate(datedOccs, env, envDates, dateScale)
 # [1] "Environmental layers were missing for date 2013"
 # [1] "Environmental layers were missing for date 2016"
 # [1] "Environmental layers were missing for date 2015"
-# These indicate that you have occurrencee records that do not match some environmental data.
-# You may want to look into this to determine whether you expected to provide environmental layers associated with these dates. But if you didn't mean to provide such layers (e.g., here we did not provide layers fro 2013, 2015, and 2016) it is not an issue for using the package.
+# These indicate that you have occurrence records that do not match some environmental data.
+# You may want to look into this to determine whether you expected to provide environmental layers associated with these dates. But if you didn't mean to provide such layers (e.g., here we did not provide layers for 2013, 2015, and 2016) it is not an issue for using the package.
 ```
 
 Then find a suitable lower limit for the mask based on the data.
