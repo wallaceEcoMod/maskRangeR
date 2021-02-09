@@ -82,10 +82,10 @@ Next, we used remotely sensed data of the annual percent forest cover for the re
 
 By setting the pathway to where you saved our canned datasets, access that data by setting that as the working directory. 
 
-```{r}
+```{r, eval = F, include = F}
 ## Set the pathway. You'll need to download the data from https://github.com/cmerow/maskRangeR and set your path to the appropriate location on your computer.
 if(Sys.info()['user']=='ctg') path='../demoData'
-if(Sys.info()['user']=='pgalante') path <- "path/to/your/data/directory"
+if(Sys.info()['user']=='pgalante') path <- paste0(getwd())
 ```
 
 
