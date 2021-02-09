@@ -41,11 +41,10 @@ manyMaskSensitivity <- function(crt, rasProj = NULL, maskBounds, expertRaster){
   if (is.null(rasProj)){
     ### Calculate areas for each "refinedDist"
     manyRefined <- lapply(manyOuts, function(x) x$refinedDist)
-    manyMasksArea <- stats::setNames(as.data.frame(cbind(unlist(lapply(manyRefined, 
-                                                         function(r2){tapply(raster::area(r2), r2[], sum)})), 
-                                                         lapply(combiRastList, names)), 
-                                                   row.names = lapply(combiRastList, names)),  
-                                     c("Area", "Layer"))
+    manyMasksArea <- stats::setNames(as.data.frame(
+      cbind(unlist(lapply(manyRefined, function(r2){tapply(raster::area(r2), r2[], sum)})), 
+            lapply(combiRastList, names)), 
+      row.names = lapply(combiRastList, names)), c("Area", "Layer"))
     
     v1 <- manyMasksArea[with(manyMasksArea, order(unlist(manyMasksArea$Area))), ]
   } 
@@ -57,7 +56,9 @@ manyMaskSensitivity <- function(crt, rasProj = NULL, maskBounds, expertRaster){
     lapply(manyOuts, proj.FUN, rasProj)
     ### Calculate areas for each "refinedDist"
     manyRefined <- lapply(manyOuts, function(x) x$refinedDist)
-    manyMasksArea <- stats::setNames(as.data.frame(cbind(unlist(lapply(manyRefined, calcAreas)), lapply(combiRastList, names)), row.names = lapply(combiRastList, names)),  c("Area", "Layer"))
+    manyMasksArea <- stats::setNames(as.data.frame(
+      cbind(unlist(lapply(manyRefined, calcAreas)), lapply(combiRastList, names)), 
+      row.names = lapply(combiRastList, names)),  c("Area", "Layer"))
     v1 <- manyMasksArea[with(manyMasksArea, order(unlist(manyMasksArea$Area))), ]
   }
   v1 <- manyMasksArea[with(manyMasksArea, order(unlist(manyMasksArea$Area))), ]
@@ -77,6 +78,8 @@ manyMaskSensitivity <- function(crt, rasProj = NULL, maskBounds, expertRaster){
 .manyMaskSensitivityPlots <- function(v1){
   oldpar <- par(no.readonly = TRUE)
   on.exit(par(oldpar))  
-  graphics::barplot(height = unlist(v1$Area), space = 1, xlab = "", names.arg = "", ylab = "area")
-  graphics::text(seq(1.5, (0.5 + nrow(v1) + nrow(v1)-1), 2), par("usr")[3]-.25, srt = 60, adj=1, xpd=T, labels = cbind(unlist(lapply(v1$Layer, toString))), cex= 0.65)
+  graphics::barplot(height = unlist(v1$Area), space = 1, xlab = "", names.arg = "", 
+                    ylab = "area")
+  graphics::text(seq(1.5, (0.5 + nrow(v1) + nrow(v1)-1), 2), par("usr")[3]-.25, srt = 60, 
+                 adj=1, xpd=T, labels = cbind(unlist(lapply(v1$Layer, toString))), cex= 0.65)
 }

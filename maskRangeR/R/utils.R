@@ -4,3 +4,4 @@
 }
 
 #if(getRversion() >= "3.4.0")  utils::globalVariables(c("cost"))
+
