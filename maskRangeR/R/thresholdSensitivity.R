@@ -50,7 +50,7 @@ thresholdSensitivity <- function(datedOccs, maskLayer, maskClass, sdm, maskProje
   
   ### makes several logicStrings
   # get most recent forest cover
-  stringsOfLogic <- paste0('maskLayers<', maskThresh)
+  stringsOfLogic <- paste0('maskLayers>', maskThresh)
   
   ### create a list of rasters
   sensitivityStack <- lapply(stringsOfLogic, function(x) maskRanger(initialDist=sdm, maskLayers=maskLayer, logicString=x)$refinedDist)
@@ -76,7 +76,7 @@ thresholdSensitivity <- function(datedOccs, maskLayer, maskClass, sdm, maskProje
   # apply area calculation to list of rasters. results are square km
   sensitivityAreas <- lapply(sensitivityOnes, calcAreas)
   
-  maskValues <- gsub(".*<","",stringsOfLogic)
+  maskValues <- gsub(".*>","",stringsOfLogic)
   names(sensitivityStack) <- paste0("threshold_of_", rev(maskValues))
   sensitivityStack <- raster::stack(sensitivityStack)
   
