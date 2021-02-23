@@ -82,7 +82,7 @@ Next, we used remotely sensed data of the annual percent forest cover for the re
 
 By setting the pathway to where you saved our canned datasets, access that data by setting that as the working directory. 
 
-```{r, eval = F, include = F}
+```{r, eval = T, include = F}
 ## Set the pathway. You'll need to download the data from https://github.com/cmerow/maskRangeR and set your path to the appropriate location on your computer.
 if(Sys.info()['user']=='ctg') path='../demoData'
 if(Sys.info()['user']=='pgalante') path <- paste0(getwd())
@@ -336,15 +336,16 @@ The "swamp forest crab" (*Parathelphusa reticulata*) is a freshwater crab endemi
 
 ## Methods
 
-In this use case, we will perform an expert-driven species range estimate using a series of informed masks that constrain the coarse IUCN range map to a more realistic area of suitable environmental conditions. We will then constrain the range to: areas of soil pH from 5.17-5.79, dissolved oxygen from 27.2-36.6%, daytime air temperature 26-34˚C, elevation 16-26m, and canopy cover 75-100%. These tolerances were developed following Chua et al. (2015), a study that conducted fine-scale sampling in two of the nature reserves in Singapore known to have swamp forest crabs and analyzed the relationship between crab communities and environmental variables. Due to the species' rarity, the occurrence data are not publicly available, however the environmental correlates described above are provided. Data layers include soil pH accessed from soilGrids.org [1], temperature data from worldclim.org [2], elevation from LPDAAC [3], canopy cover from Hansen et al., 2013 [4], and surface water from the global surface water database (Source: EC JRC/Google) [5]. Resolutions differ between layers, so rasters were either resampled or dis/aggregated to match the mask. 
+In this use case, we will perform an expert-driven species range estimate using a series of informed masks that constrain the coarse IUCN range map to a more realistic area of suitable environmental conditions. Ideally, we would then constrain the range to: areas with aquatic pH ranging from 5.17-5.79, dissolved oxygen from 27.2-36.6%, daytime air temperature 26-34˚C, elevation 16-26m, and canopy cover 75-100%. These tolerances were developed following Chua et al. (2015)[1], a study that conducted fine-scale sampling in two of the nature reserves in Singapore known to have swamp forest crabs and analyzed the relationship between crab communities and environmental variables. However, modeling natural systems is often hindered by lack of data availability. Due to the species' rarity, the occurrence data are not publicly available. Similarly, high resolution raster products representing all of these environmental variables may not exist or not be available. Because of these limitations, we did not include several layers in our analyses. In this example, we did not provide data pertaining to dissolved oxygen, aquatic pH, or standing or moving waterbodies.
+
+However several of the environmental correlates described above are provided. Data layers include Mean Annual Temperature data from worldclim.org [2] as a substitute of daytime air temperature, elevation from LPDAAC [3], canopy cover from Hansen et al., 2013 [4]. Resolutions differ between layers, so rasters were either resampled or dis/aggregated to match the mask.
 
 ## References
 
-[1] Hengl T, Mendes de Jesus J, Heuvelink GBM, Ruiperez Gonzalez M, Kilibarda M, Blagotić A, et al. (2017) SoilGrids250m: Global gridded soil information based on machine learning. PLoS ONE 12(2): e0169748. https://doi.org/10.1371/journal.pone.0169748  
-[2] Hijmans, R. J., Cameron, S. E., Parra, J. L., Jones, P. G., & Jarvis, A. (2005). Very high resolution interpolated climate surfaces for global land areas. International journal of climatology, 25(15), 1965-1978.  
-[3] NASA/METI/AIST/Japan Space Systems. (2009). ASTER global digital elevation model [data set]. NASA EOSDIS Land Processes DAAC.  
+[1]Chua KWJ, Ng DJJ, Zeng Y, Yeo DCJ. 2015. Habitat characteristics of tropical rainforest freshwater crabs in Singapore. Journal of Crustacean Biology 35(4): 533-539. https://academic.oup.com/jcb/article/35/4/533/2547833 <br>
+[2] Hijmans, R. J., Cameron, S. E., Parra, J. L., Jones, P. G., & Jarvis, A. (2005). Very high resolution interpolated climate surfaces for global land areas. International journal of climatology, 25(15), 1965-1978. <br>  
+[3] NASA/METI/AIST/Japan Space Systems. (2009). ASTER global digital elevation model [data set]. NASA EOSDIS Land Processes DAAC. <br>
 [4] Hansen, M. C., Potapov, P. V., Moore, R., Hancher, M., Turubanova, S. A. A., Tyukavina, A., ... & Kommareddy, A. (2013). High-resolution global maps of 21st-century forest cover change. science, 342(6160), 850-853.  
-[5] Jean-Francois Pekel, Andrew Cottam, Noel Gorelick, Alan S. Belward, High-resolution mapping of global surface water and its long-term changes. Nature 540, 418-422 (2016).
 
 
 <!-- Chua KWJ, Ng DJJ, Zeng Y, Yeo DCJ. 2015. Habitat characteristics of tropical rainforest freshwater crabs in Singapore. Journal of Crustacean Biology 35(4): 533-539. https://academic.oup.com/jcb/article/35/4/533/2547833  -->
@@ -372,11 +373,10 @@ Read in the expert map and the environmental layers.
 ```{r, eval=F}
 expertMap <- readOGR(paste0(dataDir,'IUCNshape/data_0.shp'))
 
-#CM: pH and Water bounds are mutually exclusive, so we can only choose one, otherwise there is no suitable habitat. as I understand it, the soil grids shouldn't be taken too seriously at fine grain
 #masks
 maskListRaw <- list(treeCover = raster(paste0(dataDir,'/Hansen_percent_treecover.tif')), 
                     dem = raster(paste0(dataDir,'/DEM.tif')),
-                    water = raster(paste0(dataDir,'/standWaterPercent_cropAgg.tif')))
+                    mat = raster(paste0(dataDir,'/MATsingapore.tif')))
 
 # define the limits for each mask
 maskBounds <- read.csv(paste0(dataDir,'/crabInfo.csv'))
@@ -385,15 +385,15 @@ maskBounds <- read.csv(paste0(dataDir,'/crabInfo.csv'))
 ```{r, include=F}
 expertMap <- readRDS(paste0(path, "/extdata/expertMap.RDS"))
 maskListRaw <- readRDS(paste0(path, "/extdata/maskListRaw.RDS"))
-maskListRaw$pH <- NULL
-maskListRaw <- maskListRaw[1:3]
+#maskListRaw$pH <- NULL
+#maskListRaw <- maskListRaw[1:3]
 
 maskBounds <- readRDS(paste0(path, "/extdata/maskBounds.RDS"))
 #maskListRaw$water <- raster("C:/Users/pgalante/Projects/NASA/maskRangeR/expertDriven/swampForestCrab/standWaterPercent_cropAgg.tif")
 #maskListRaw$pH<-NULL
 #maskListRaw <- maskListRaw[1:3]
-maskBounds <- read.csv("C:/Users/pgalante/Projects/NASA/maskRangeR/expertDriven/swampForestCrab/crabInfo.csv")
-maskBounds <- maskBounds[2:4,] 
+#maskBounds <- read.csv("C:/Users/pgalante/Projects/NASA/maskRangeR/expertDriven/swampForestCrab/crabInfo.csv")
+#maskBounds <- maskBounds[2:4,] 
 ```
 
 Conduct data cleaning to fix names and units.
@@ -848,9 +848,7 @@ expertMap <- readOGR(paste0(dataDir,'IUCNshape/data_0.shp'))
 #masks
 maskListRaw <- list(treeCover = raster(paste0(dataDir,'/Hansen_percent_treecover.tif')), 
                     dem = raster(paste0(dataDir,'/DEM.tif')),
-                    mat = raster(paste0(dataDir,'/MATsingapore.tif')),
-                    pH = raster(paste0(dataDir,'/PHIHOX_M_sl1_250m.tif')))
-
+                    mat = raster(paste0(dataDir,'/MATsingapore.tif')))
 # define the limits for each mask
 maskBounds <- read.csv(paste0(dataDir,'/crabInfo.csv'))
 ```
@@ -864,10 +862,9 @@ maskBounds <- readRDS(paste0(path, "/extdata/maskBounds.RDS"))
 Conduct data cleaning to fix names and units.
 ```{r}
 # rename the limits to match the raster names in maskListRaw
-maskBounds$Layer <- c('water','treeCover','dem','pH','mat')
+maskBounds$Layer <- c('treeCover','dem','mat')
 # make sure the units match between the layers and the bounds
 maskListRaw$mat <- maskListRaw$mat/10
-maskListRaw$pH <- maskListRaw$pH/10
 ```
 
 Crop rasters to the same extent as the expert map, since we do not need to build masks outside the expert map.
