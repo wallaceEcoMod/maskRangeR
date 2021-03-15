@@ -7,7 +7,7 @@
 annotate(datedOccs, env, envDates, dateScale)
 }
 \arguments{
-\item{datedOccs}{a `SpatialPointsDataFrame` where one column is labeled `date` and has class `POSIXct`, e.g., as obtained from using `lubridate::parse_date_time`}
+\item{datedOccs}{a `SpatialPointsDataFrame` of occurrence localities (generally longitude and latitude in decimal degrees) paired with dates. One column must be labeled `date` and have class `POSIXct`, e.g., as obtained from using `lubridate::parse_date_time`}
 
 \item{env}{a raster stack}
 

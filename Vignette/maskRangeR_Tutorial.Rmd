@@ -121,10 +121,21 @@ sdm <- readRDS(paste0(path, "/extdata/sdm.RDS"))
 ```
 
 
-Prepare the data.
-
+The names of our env rasters reflect the dates (here, only years). Check that the rasters represent the same dates as envDates.
 ```{r}
-# convert dates to formal date objects
+names(env)
+envDates
+```
+
+Similarly, your dated occurrences *must* have a column named "date". These will be converted to class 'POSIXct'.
+```{r}
+head(datedOccs)
+```
+
+
+Prepare the data.
+```{r}
+# convert dates to formal POSIXct objects
 datedOccs$date <- parse_date_time(datedOccs$date,orders = c("Y", "Ym"))
 # convert to spatial object
 coordinates(datedOccs) <- c('long','lat')
