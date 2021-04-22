@@ -5,9 +5,9 @@ author: Cory Merow, Peter J. Galante, Cecina Babich Morrow, Jamie M. Kass, Alex 
   Mary E. Blair
 date: "`r Sys.Date()`"
 output:
-  word_document: default
-  pdf_document: default
   html_document: default
+  pdf_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
