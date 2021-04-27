@@ -1,12 +1,12 @@
 ---
-title: 'maskRangeR: R package for post-processing species distribution models'
-author: Cory Merow, Peter J. Galante, Cecina Babich Morrow, Jamie M. Kass, Alex Moore,
-  Valentina Grisales-Betancur, Beth Gerstner, Jorge Velasquez, Robert P. Anderson,
-  Mary E. Blair
-date: "`r Sys.Date()`"
+title: 'changeRangeR: an R package for repeatable and transparent translations of
+  species distributions into meaningful conservation metrics.'
+author: Peter J. Galante, Samuel Chang, Matthew Aiello-Lammens, Beth Gerstner, Bethany
+  Johnson, Jamie M. Kass, Cory Merow, Elkin Noguera-Urbano , Andrea Paz, Gonzalo E.
+  Pinilla-Buitrago, Dan Rosauer, Robert P. Anderson, Mary E. Blair
+date: '`r Sys.Date()`'
 output:
   html_document: default
-  pdf_document: default
   word_document: default
 ---
 
@@ -15,38 +15,35 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 </br>
 </br>
-Click here to learn about our new R package [*changeRangeR*](./changeRangeRwebsite.html)
-
-<font size="4">
-*maskRangeR* is an R package that refines species distribution models (SDMs) to improve estimates of species' current ranges in several ways:
-
-  - spatiotemporally matching in-situ observations of species’ occurrence with environmental and/or remotely sensed data (e.g., MODIS-derived) to assess tolerances
-  
-  - directly incorporating expert knowledge of species' ranges
-  
-  - sequential masking of driving environmental variable tolerances 
-  
-  - accounting for competitive interactions
-
-Refined range maps can be considered as improved representations of a species' realized distribution, aiding in conservation decision-making.
-
-Additionally, *maskRangeR* will soon be available as a module for [*Wallace*](https://wallaceecomod.github.io/); a user-friendly R application for species distribution modeling that provides guidance towards following best-practices at each step of the process. This application makes state-of-the-art modeling tools accessible and transparent to users without having to rely on computer coding skills. 
-
-</font>
-
-<center>
-<img src="./websiteImages/fig1.png" width="400">
+Click here to learn about our other R package, [maskRangeR](./index.html)
 </br>
-SDMs can be refined to account for competitive interactions. 
-</center>
+</br>
+<font size = "4">
+*changeRangeR* is an R package that translates species’ current distributions into meaningful conservation metrics in repeatable and transparent ways. By using a species distribution model (SDM), as well as landscape requirements (e.g., forest cover), we can reduce an SDM to only those areas likely to be suitable to estimate the species’ current range (e.g., in *maskRangeR*).
 
-## **Vignette**
+*changeRangeR* is able to make several calculations from range information:
 
-[Click here for the *maskRangeR* vignette.](maskRangeR_Tutorial.html)
+  - IUCN metrics regarding area of occupancy (upper bounds of AOO) and extent of occurrence (EOO)
+  
+  - Proportion of a species' range size protected, threatened, or associated with different landcover types
+  
+  - Given past or future model projections or geospatial data for masking, calculate and visualize changes over time
+  
+  - Community metrics like diversity and richness for regions of interest
+  
+  - Sparse-matrices can be utilized for massive dataset processing 
+
+These change metrics can then inform redlisting and forward-thinking conservation planning. Also, users can choose to utilize sparse matrices for massive dataset processing of metrics.		
+
+## Vignette
+changeRangeR has three vignettes:
+
+[Single species metrics (TBD)]()</br>
+[Community metrics (TBD)]()</br>
+[Sparse matrices (TBD)]()</br>
 
 ### **Training materials**
 <font size="4">Also in development are training materials and best practices for modeling species' niches and distributions in biodiversity change indicator assessments for the expanded *Wallace* in both English and Spanish. Materials will be web-based and openly available. They will be available as both guidance text within *Wallace* and also published as part of an open source teaching module for the Center for Biodiversity and Conservation at the American Museum of Natural History ([CBC-AMNH](https://www.amnh.org/our-research/center-for-biodiversity-conservation)) Network of Conservation Educators and Practitioners ([NCEP](https://www.amnh.org/our-research/center-for-biodiversity-conservation/capacity-development/ncep)). NCEP is a global initiative that seeks to improve the availability and quality of conservation education and professional training.</font>
-
 
 ## **BioModelos and *Wallace* integration**
 <font size="4">The Group on Earth Observations Biodiversity Observation Network ([GEO-BON](https://geobon.org/)) works to improve the communication of biodiversity measurements to decision makers and the broader scientific community. To locally serve regional scientific and political communities, GEO-BON has implemented a [BON-in-a-Box](https://geobon.org/bon-in-a-box/) service that delivers customizable online toolkits for enhancing biodiversity observation systems.
@@ -58,8 +55,7 @@ The integration of *BioModelos* and *Wallace* leverages the expert knowledge ava
 This synergistic relationship allows conservation practitioners to access important model statistics (indicators of biodiversity and ecosystem services) such as: extent of occurrence, proportion of range under protected status, and projected change in future scenarios.
 </font>
 
-
-*maskRangeR* package development was funded by the NASA ROSES award No. 80NSSCK0406 to collaboratively improve the utility of the Colombia BON-in-a-Box toolkit as well as build capacity for conservation practitioners and educators. Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Aeronautics and Space Administration.
+*changeRangeR* package development was funded by the NASA ROSES award No. 80NSSCK0406 to collaboratively improve the utility of the Colombia BON-in-a-Box toolkit as well as build capacity for conservation practitioners and educators. Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Aeronautics and Space Administration.
 
 
 <center>
@@ -69,3 +65,6 @@ This synergistic relationship allows conservation practitioners to access import
 [![](./websiteImages/Pace.png)](https://www.pace.edu/)[![](./websiteImages/CCNY.png)](https://www.ccny.cuny.edu/)[![](./websiteImages/CUNY.png)](http://www2.cuny.edu/)[![](./websiteImages/UConn.png)](https://uconn.edu/)[![](./websiteImages/Humboldt.png)](http://www.humboldt.org.co/en/)
 [![](./websiteImages/CBC.png)](https://www.amnh.org/our-research/center-for-biodiversity-conservation)
 </center>
+
+
+
