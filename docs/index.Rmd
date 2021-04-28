@@ -1,8 +1,7 @@
 ---
 title: 'maskRangeR: R package for post-processing species distribution models'
-author: Cory Merow, Peter J. Galante, Cecina Babich Morrow, Jamie M. Kass, Alex Moore,
-  Valentina Grisales-Betancur, Beth Gerstner, Jorge Velasquez, Robert P. Anderson,
-  Mary E. Blair
+author: Cory Merow, Peter J. Galante, Jamie M. Kass, Matthew E. Aiello-Lammens, Cecina Babich Morrow, Beth E. Gerstner, Valentina Grisales-Betancur, Alexandria C. Moore,
+  Elkin A. Noguera-Urbano, Gonzalo E. Pinillla-Buitrago, Jorge Velásquez-Tibatá, Robert P. Anderson, Mary E. Blair
 date: "`r Sys.Date()`"
 output:
   html_document: default
