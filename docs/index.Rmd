@@ -29,7 +29,7 @@ Click here to learn about our new R package [*changeRangeR*](./changeRangeRwebsi
 
 Refined range maps can be considered as improved representations of a species' realized distribution, aiding in conservation decision-making.
 
-Additionally, *maskRangeR* will soon be available as a module for [*Wallace*](https://wallaceecomod.github.io/); a user-friendly R application for species distribution modeling that provides guidance towards following best-practices at each step of the process. This application makes state-of-the-art modeling tools accessible and transparent to users without having to rely on computer coding skills. 
+Additionally, *maskRangeR* will soon be available as several modules for [*Wallace*](https://wallaceecomod.github.io/); a user-friendly R application for species distribution modeling that provides guidance towards following best-practices at each step of the process. This application makes state-of-the-art modeling tools accessible and transparent to users without having to rely on computer coding skills. 
 
 </font>
 

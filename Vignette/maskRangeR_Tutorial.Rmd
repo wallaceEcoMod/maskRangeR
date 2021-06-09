@@ -1,6 +1,6 @@
 ---
 title: "maskRangeR: Improving spatial and temporal accuracy of species distribution models"
-author: "Cory Merow, Peter J. Galante, Cecina Babich Morrow, Jamie M. Kass, Alex Moore, Valentina Grisales-Betancur, Beth Gerstner, Jorge Velasquez, Robert P. Anderson, Mary E. Blair"
+author: "Peter J. Galante, Cory Merow, Cecina Babich Morrow, Jamie M. Kass, Alex Moore, Valentina Grisales-Betancur, Beth Gerstner, Jorge Velasquez, Robert P. Anderson, Mary E. Blair"
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
@@ -835,7 +835,7 @@ graphics::points(rev(ThreshSens$Areas$maskValues), ThreshSens$Areas$sensitivityA
 #graphics::axis(labels=NA,side=1,tck=-0.015,at=maskValues)
 graphics::text(rev(ThreshSens$Areas$maskValues), ThreshSens$Areas$sensitivityAreas, labels = nums, cex= 0.5, pos=1, offset = 0.09)
 # Add a legend
-graphics::legend(x = "bottomleft", legend = substr(names(ThreshSens$Sensitivity_Rasters), 1, 17), pch = c(15, 13, 17, 18, 19), cex=1)
+graphics::legend(x = "topleft", legend = substr(names(ThreshSens$Sensitivity_Rasters), 1, 17), pch = c(15, 13, 17, 18, 19), cex=1)
 ```
 
 ## Example 2
