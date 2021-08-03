@@ -25,7 +25,6 @@ Imports:
     lubridate,
     magrittr,
     maptools,
-    MODIS,
     raster,
     rgdal,
     sp,
