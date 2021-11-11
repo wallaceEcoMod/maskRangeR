@@ -14,7 +14,6 @@ Description: Mask ranges based on expert
     tools to generate thresholds for binary masks.
 License: GPL-3
 Encoding: UTF-8
-LazyData: true
 Depends: 
     R (>= 3.4.0)
 Imports: 

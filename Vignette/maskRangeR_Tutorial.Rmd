@@ -144,9 +144,7 @@ projection(datedOccs) <- projection(env)
 
 Ensure coordinate reference system, extent, and resolution are the same.
 ```{r}
-identical(crs(sdm), crs(env))
-identical(extent(sdm), extent(env))
-identical(res(sdm), res(env))
+raster::compareRaster(sdm, env)
 ```
 
 To perform data-driven masking, first find the values of the environmental variable (forest cover in this example) at the occurrence point locations.

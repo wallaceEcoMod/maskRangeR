@@ -26,10 +26,10 @@ See Examples.
 }
 \examples{
 
-r1 <- raster::raster(nrows=108, ncols=108, xmn=-50, xmx=50)
-raster::values(r1)<- runif(n = (108*108))
-r2 <-  raster::raster(nrows=108, ncols=108, xmn=-50, xmx=50)
-raster::values(r2)<- runif(n = (108*108))
+r1 <- raster::raster(nrows=50, ncols=50, xmn=-50, xmx=50)
+raster::values(r1)<- runif(n = (50*50))
+r2 <-  raster::raster(nrows=50, ncols=50, xmn=-50, xmx=50)
+raster::values(r2)<- runif(n = (50*50))
 env <-  raster::stack(r1,r2)
 names(env) <- c("1995","1996")
 datedOccs <- data.frame(cbind(c(0,10), c(-10,15)))

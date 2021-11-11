@@ -41,6 +41,7 @@ maskBounds[,2] <- as.numeric(as.character(maskBounds[,2]))
 maskBounds[,3] <- as.numeric(as.character(maskBounds[,3]))
 out <- lotsOfMasks(expertRaster = r1, maskStack = maskStack, maskBounds = maskBounds)
 
+
 }
 \author{
 Cory Merow <cory.merow@gmail.com>,

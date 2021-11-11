@@ -41,8 +41,8 @@ sp2.xy <- data.frame(dismo::randomPoints(r2.sdm, 15, prob = TRUE))
 colnames(sp2.xy) <- c("longitude", "latitude")
 sp3.xy <- data.frame(dismo::randomPoints(r3.sdm, 15, prob = TRUE))
 colnames(sp3.xy) <- c("longitude", "latitude")
-# Spatial SVMs
-svm.SP <- rangeSVM(sp1.xy, sp2.xy, sp3.xy, nrep=10)
+# Spatial SVMs (this can take about a minute to run)
+svm.SP <- rangeSVM(sp1.xy, sp2.xy, sp3.xy, nrep=5)
 # Use SVM to create a raster of predicted regions
 rand_svm.SP <- rangeSVM_predict(svm = svm.SP, r = r1.sdm)
 }
