@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 </br>
 </br>
-Click here to learn about our new R package [*changeRangeR*](./changeRangeRwebsite.html)
+Click here to learn about our new R package [*changeRangeR*](https://cmerow.github.io/changeRangeR/)
 
 <font size="4">
 *maskRangeR* is an R package that refines species distribution models (SDMs) to improve estimates of species' current ranges in several ways:
