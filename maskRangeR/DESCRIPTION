@@ -1,6 +1,6 @@
 Package: maskRangeR
 Title: Mask Species Geographic Ranges
-Version: 1.0
+Version: 1.1.1
 Authors@R: c(person('Cory','Merow',email='cory.merow@gmail.com',role=c('aut','cre')),
     person('Peter J.', 'Galante',email='pgalante@amnh.org',role=c('aut')),
     person("Jamie M.","Kass",email='jamie.m.kass@gmail.com',role=c('aut')),
@@ -17,24 +17,19 @@ Encoding: UTF-8
 Depends: 
     R (>= 3.4.0)
 Imports: 
-    gdalUtils,
-    dismo,
     dplyr,
     e1071, 
     lubridate,
     magrittr,
-    maptools,
     raster,
-    rgdal,
     sp,
     stats,
-    tidyverse,
     utils,
-    virtualspecies
 Suggests:
+    dismo,
     testthat,
     knitr,
     rmarkdown,
     wallace
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 VignetteBuilder: knitr

@@ -42,7 +42,7 @@ Throughout the package, we use the following definitions:
 
 In the following use cases, we describe distribution modeling scenarios that require post-processing of the potential distribution to better estimate a species’ realized distribution. This post-processing is carried out in the form of masks based on expert opinion or data. For each scenario, we list the components needed to carry out the analysis and provide examples of the process.
 
-To download example data used in this vignette, [click here](https://github.com/cmerow/maskRangeR/blob/master/demoData/demoData.zip?raw=true)
+To download example data used in this vignette, [click here](https://github.com/wallaceEcoMod/maskRangeR/blob/master/demoData/demoData.zip?raw=true)
 
 # Data Driven: Land Cover Mask
 
@@ -83,7 +83,7 @@ Next, we used remotely sensed data of the annual percent forest cover for the re
 By setting the pathway to where you saved our canned datasets, access that data by setting that as the working directory. 
 
 ```{r, eval = T, include = F}
-## Set the pathway. You'll need to download the data from https://github.com/cmerow/maskRangeR and set your path to the appropriate location on your computer.
+## Set the pathway. You'll need to download the data from https://github.com/wallaceEcoMod/maskRangeR and set your path to the appropriate location on your computer.
 if(Sys.info()['user']=='ctg') path='../demoData'
 if(Sys.info()['user']=='pgalante') path <- paste0(getwd())
 ```
